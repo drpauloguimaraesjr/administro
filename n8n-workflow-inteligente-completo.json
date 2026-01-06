@@ -1,0 +1,330 @@
+{
+  "name": "WhatsApp Receipt Processing - Inteligente com Confirmação",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "receive-media",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-receive",
+      "name": "Webhook - Receber Mensagem",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "webhookId": "whatsapp-receive-media"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition-1",
+              "leftValue": "={{ $json.mediaType }}",
+              "rightValue": "image",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-image",
+      "name": "IF - É Imagem?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.mediaUrl }}",
+        "authentication": "none",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "download-image",
+      "name": "Download Imagem",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [650, 200],
+      "notes": "Baixa a imagem do Firebase Storage"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Converter imagem baixada para Base64\nconst binaryData = $input.first().binary;\nconst imageKey = Object.keys(binaryData)[0];\nconst imageData = binaryData[imageKey];\n\nreturn {\n  json: {\n    imageBase64: imageData.data,\n    mimeType: imageData.mimeType || 'image/jpeg',\n    fileName: imageData.fileName || 'receipt.jpg',\n    mediaUrl: $('Webhook - Receber Mensagem').item.json.mediaUrl,\n    from: $('Webhook - Receber Mensagem').item.json.from,\n    fromName: $('Webhook - Receber Mensagem').item.json.fromName,\n    messageId: $('Webhook - Receber Mensagem').item.json.messageId\n  }\n};"
+      },
+      "id": "convert-base64",
+      "name": "Converter para Base64",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 200],
+      "notes": "Converte a imagem para Base64"
+    },
+    {
+      "parameters": {
+        "url": "https://api.openai.com/v1/chat/completions",
+        "method": "POST",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gpt-4o\",\n  \"max_tokens\": 2000,\n  \"temperature\": 0.1,\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Você é um especialista em análise de comprovantes bancários brasileiros. Extraia TODOS os dados possíveis da imagem. Retorne APENAS JSON válido, sem markdown.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"Analise esta imagem de comprovante bancário, recibo, nota fiscal ou extrato brasileiro.\\n\\nExtraia TODOS os dados possíveis em formato JSON:\\n\\n{\\n  \\\"amount\\\": número (valor em reais),\\n  \\\"type\\\": \\\"income\\\" ou \\\"expense\\\",\\n  \\\"date\\\": \\\"YYYY-MM-DD\\\",\\n  \\\"description\\\": \\\"descrição completa\\\",\\n  \\\"category\\\": \\\"categoria mais provável\\\",\\n  \\\"possibleCategories\\\": [\\\"categoria1\\\", \\\"categoria2\\\", \\\"categoria3\\\"],\\n  \\\"categoryConfidence\\\": 0.0 a 1.0,\\n  \\\"contextId\\\": \\\"HOME\\\" ou \\\"CLINIC\\\" (se conseguir identificar),\\n  \\\"contextConfidence\\\": 0.0 a 1.0,\\n  \\\"payer\\\": \\\"nome do pagador\\\",\\n  \\\"receiver\\\": \\\"nome do recebedor\\\",\\n  \\\"transactionId\\\": \\\"ID da transação no banco\\\",\\n  \\\"bank\\\": \\\"nome do banco\\\",\\n  \\\"account\\\": \\\"número da conta\\\",\\n  \\\"notes\\\": \\\"observações adicionais\\\",\\n  \\\"confidence\\\": 0.0 a 1.0\\n}\\n\\nRegras:\\n- Se não conseguir identificar, use null ou valores padrão\\n- Se tiver múltiplas categorias possíveis, liste em possibleCategories\\n- Se categoryConfidence < 0.7, a categoria precisa ser confirmada\\n- Se contextConfidence < 0.8, o contexto precisa ser confirmado\\n- Retorne APENAS JSON válido\"\n        },\n        {\n          \"type\": \"image_url\",\n          \"image_url\": {\n            \"url\": \"data:{{ $json.mimeType }};base64,{{ $json.imageBase64 }}\",\n            \"detail\": \"high\"\n          }\n        }\n      ]\n    }\n  ]\n}",
+        "options": {
+          "bodyContentType": "json"
+        }
+      },
+      "id": "openai-vision",
+      "name": "GPT-4 Vision - Extrair Dados",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1050, 200],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "openai-api",
+          "name": "OpenAI API"
+        }
+      },
+      "notes": "Extrai máximo de dados possível do comprovante"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Processa resposta do GPT-4 Vision e prepara dados para confirmação\nconst visionResponse = $input.first().json;\nconst webhookData = $('Webhook - Receber Mensagem').item.json;\n\n// Extrair conteúdo\nlet content = '';\ntry {\n  if (visionResponse.choices && visionResponse.choices[0]) {\n    content = visionResponse.choices[0].message?.content || '';\n  } else {\n    content = JSON.stringify(visionResponse);\n  }\n} catch (e) {\n  content = JSON.stringify(visionResponse);\n}\n\n// Limpar e parsear JSON\nlet jsonString = content.replace(/```json\\n?/gi, '').replace(/```\\n?/gi, '').trim();\nlet extractedData;\n\ntry {\n  const jsonMatch = jsonString.match(/\\{[\\s\\S]*\\}/);\n  extractedData = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(jsonString);\n} catch (error) {\n  console.error('Erro ao parsear:', error);\n  extractedData = {};\n}\n\n// Normalizar dados\nconst result = {\n  // Dados básicos\n  amount: parseFloat(extractedData.amount) || 0,\n  type: (extractedData.type === 'income' || extractedData.type === 'receita') ? 'income' : 'expense',\n  date: extractedData.date || new Date().toISOString().split('T')[0],\n  description: extractedData.description || 'Transação via WhatsApp',\n  \n  // Categoria com sistema inteligente\n  category: extractedData.category || 'Outros',\n  possibleCategories: extractedData.possibleCategories || [extractedData.category || 'Outros'],\n  categoryConfidence: parseFloat(extractedData.categoryConfidence) || 0.5,\n  needsCategoryConfirmation: (parseFloat(extractedData.categoryConfidence) || 0.5) < 0.7,\n  \n  // Contexto\n  contextId: (extractedData.contextId === 'CLINIC' || extractedData.contextId === 'clinica') ? 'CLINIC' : 'HOME',\n  contextConfidence: parseFloat(extractedData.contextConfidence) || 0.3,\n  needsContextConfirmation: true, // Sempre confirmar contexto\n  \n  // Dados adicionais extraídos\n  payer: extractedData.payer || null,\n  receiver: extractedData.receiver || null,\n  transactionId: extractedData.transactionId || null,\n  bank: extractedData.bank || null,\n  account: extractedData.account || null,\n  notes: extractedData.notes || null,\n  \n  // Metadados\n  attachmentUrl: webhookData.mediaUrl,\n  from: webhookData.from,\n  fromName: webhookData.fromName,\n  messageId: webhookData.messageId,\n  confidence: parseFloat(extractedData.confidence) || 0.5,\n  \n  // Para confirmação\n  confirmationId: `confirm_${Date.now()}_${webhookData.messageId}`\n};\n\n// Validações\nif (result.amount < 0) result.amount = Math.abs(result.amount);\nif (!result.date.match(/^\\d{4}-\\d{2}-\\d{2}$/)) {\n  result.date = new Date().toISOString().split('T')[0];\n}\n\nreturn result;"
+      },
+      "id": "process-data",
+      "name": "Processar Dados Extraídos",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1250, 200],
+      "notes": "Processa dados e identifica o que precisa ser confirmado"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepara mensagem de confirmação para WhatsApp\nconst data = $input.first().json;\n\n// Monta mensagem com dados extraídos\nlet message = `📋 *Comprovante Recebido*\\n\\n`;\nmessage += `💰 *Valor:* R$ ${data.amount.toFixed(2)}\\n`;\nmessage += `📅 *Data:* ${data.date}\\n`;\nmessage += `📝 *Descrição:* ${data.description}\\n`;\nmessage += `🏷️ *Tipo:* ${data.type === 'income' ? 'Receita' : 'Despesa'}\\n\\n`;\n\n// Categoria (se precisa confirmar)\nif (data.needsCategoryConfirmation && data.possibleCategories.length > 1) {\n  message += `❓ *Categoria:* (Precisa confirmar)\\n`;\n  message += `Opções:\\n`;\n  data.possibleCategories.forEach((cat, idx) => {\n    message += `${idx + 1}. ${cat}\\n`;\n  });\n  message += `\\nResponda com o número da categoria ou digite o nome.\\n\\n`;\n} else {\n  message += `🏷️ *Categoria:* ${data.category}\\n\\n`;\n}\n\n// Sempre pedir contexto\nmessage += `📍 *Para onde vai esta transação?*\\n`;\nmessage += `1. 🏠 HOME (Pessoal)\\n`;\nmessage += `2. 🏥 CLINIC (Clínica)\\n\\n`;\nmessage += `Responda com 1 ou 2, ou digite HOME/CLINIC.\\n\\n`;\n\n// Dados adicionais se disponíveis\nif (data.bank) message += `🏦 Banco: ${data.bank}\\n`;\nif (data.payer) message += `👤 Pagador: ${data.payer}\\n`;\nif (data.receiver) message += `👤 Recebedor: ${data.receiver}\\n`;\n\nmessage += `\\n---\\n`;\nmessage += `Confirme os dados acima para criar a transação.`;\n\nreturn {\n  json: {\n    ...data,\n    confirmationMessage: message,\n    confirmationStep: data.needsCategoryConfirmation ? 'category' : 'context'\n  }\n};"
+      },
+      "id": "prepare-confirmation",
+      "name": "Preparar Mensagem Confirmação",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1450, 200],
+      "notes": "Prepara mensagem WhatsApp pedindo confirmação"
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.BACKEND_WEBHOOK_URL || 'http://localhost:3001' }}/api/whatsapp/send",
+        "method": "POST",
+        "authentication": "none",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"to\": \"{{ $json.from }}\",\n  \"text\": \"{{ $json.confirmationMessage }}\"\n}",
+        "options": {
+          "bodyContentType": "json"
+        }
+      },
+      "id": "send-confirmation",
+      "name": "Enviar Mensagem Confirmação",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1650, 200],
+      "notes": "Envia mensagem WhatsApp pedindo confirmação"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"message\": \"Aguardando confirmação do usuário\", \"confirmationId\": $json.confirmationId, \"needsConfirmation\": true } }}",
+        "options": {}
+      },
+      "id": "respond-pending",
+      "name": "Responder Aguardando",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1850, 200]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "confirm-transaction",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-confirm",
+      "name": "Webhook - Receber Confirmação",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [250, 600],
+      "webhookId": "whatsapp-confirm-transaction"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Processa resposta do usuário e cria transação final\nconst confirmation = $input.first().json;\n\n// Aqui você salvaria os dados da confirmação em um banco temporário\n// Por enquanto, vamos assumir que os dados vêm no payload\n\nconst transactionData = {\n  amount: confirmation.amount,\n  type: confirmation.type,\n  date: confirmation.date,\n  description: confirmation.description,\n  category: confirmation.category || confirmation.selectedCategory,\n  contextId: confirmation.contextId || confirmation.selectedContext,\n  attachmentUrl: confirmation.attachmentUrl\n};\n\nreturn { json: transactionData };"
+      },
+      "id": "process-confirmation",
+      "name": "Processar Confirmação",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 600]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.BACKEND_WEBHOOK_URL || 'http://localhost:3001' }}/api/n8n/create-transaction",
+        "method": "POST",
+        "authentication": "none",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"amount\": {{ $json.amount }},\n  \"type\": \"{{ $json.type }}\",\n  \"date\": \"{{ $json.date }}\",\n  \"description\": \"{{ $json.description }}\",\n  \"category\": \"{{ $json.category }}\",\n  \"contextId\": \"{{ $json.contextId }}\",\n  \"attachmentUrl\": \"{{ $json.attachmentUrl }}\"\n}",
+        "options": {
+          "bodyContentType": "json"
+        }
+      },
+      "id": "create-transaction",
+      "name": "Criar Transação Final",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [650, 600]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"message\": \"Transação criada com sucesso\", \"transactionId\": $json.transactionId } }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Responder Sucesso",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [850, 600]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": false, \"message\": \"Mensagem não contém imagem\" } }}",
+        "options": {}
+      },
+      "id": "respond-no-image",
+      "name": "Responder Sem Imagem",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [650, 400]
+    }
+  ],
+  "connections": {
+    "Webhook - Receber Mensagem": {
+      "main": [
+        [
+          {
+            "node": "IF - É Imagem?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - É Imagem?": {
+      "main": [
+        [
+          {
+            "node": "Download Imagem",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Responder Sem Imagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Imagem": {
+      "main": [
+        [
+          {
+            "node": "Converter para Base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Converter para Base64": {
+      "main": [
+        [
+          {
+            "node": "GPT-4 Vision - Extrair Dados",
+            "type": "main",
+            "index": "0"
+          }
+        ]
+      ]
+    },
+    "GPT-4 Vision - Extrair Dados": {
+      "main": [
+        [
+          {
+            "node": "Processar Dados Extraídos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Processar Dados Extraídos": {
+      "main": [
+        [
+          {
+            "node": "Preparar Mensagem Confirmação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Mensagem Confirmação": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensagem Confirmação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Mensagem Confirmação": {
+      "main": [
+        [
+          {
+            "node": "Responder Aguardando",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+

@@ -1,0 +1,23 @@
+# ============================================
+# VARIÁVEIS PARA O VERCEL (Frontend)
+# ============================================
+# Adicione estas variáveis no Vercel:
+# Settings → Environment Variables → Add New
+# 
+# Configure para: Production, Preview E Development
+
+NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyDKxHxISTitakS8o8sJmebsXpiTRAiqTXo
+
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=administro-af341.firebaseapp.com
+
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=administro-af341
+
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=administro-af341.firebasestorage.app
+
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=857150753142
+
+NEXT_PUBLIC_FIREBASE_APP_ID=1:857150753142:web:375eea8cb1e8c92b33d257
+
+NEXT_PUBLIC_BACKEND_URL=https://seu-backend.railway.app
+# ⚠️ IMPORTANTE: Substitua "seu-backend.railway.app" pela URL real do seu backend no Railway
+

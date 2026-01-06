@@ -1,0 +1,193 @@
+{
+  "name": "WhatsApp Receipt Processing - Simples (Sem OpenAI)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "receive-media",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-receive",
+      "name": "Webhook - Receber Mensagem",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "webhookId": "whatsapp-receive-media"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition-1",
+              "leftValue": "={{ $json.mediaType }}",
+              "rightValue": "image",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-image",
+      "name": "IF - É Imagem?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extrai informações do texto da mensagem se houver\n// Ou usa valores padrão para processamento manual posterior\nconst messageText = $('Webhook - Receber Mensagem').item.json.text || '';\n\n// Tenta extrair valor do texto (padrão simples)\nlet amount = 0;\nconst amountMatch = messageText.match(/R\\$?\\s*(\\d+[,\\.]?\\d*)/i);\nif (amountMatch) {\n  amount = parseFloat(amountMatch[1].replace(',', '.'));\n}\n\n// Determina tipo baseado em palavras-chave\nlet type = 'expense';\nconst incomeKeywords = ['receita', 'recebido', 'salário', 'pagamento recebido'];\nconst expenseKeywords = ['despesa', 'pago', 'gasto', 'compra'];\n\nif (incomeKeywords.some(k => messageText.toLowerCase().includes(k))) {\n  type = 'income';\n} else if (expenseKeywords.some(k => messageText.toLowerCase().includes(k))) {\n  type = 'expense';\n}\n\n// Determina contexto\nlet contextId = 'HOME';\nif (messageText.toLowerCase().includes('clínica') || messageText.toLowerCase().includes('clinica')) {\n  contextId = 'CLINIC';\n}\n\n// Determina categoria básica\nlet category = 'Outros';\nconst categories = {\n  'alimentação': ['comida', 'restaurante', 'mercado', 'supermercado'],\n  'transporte': ['uber', 'táxi', 'combustível', 'gasolina'],\n  'saúde': ['médico', 'farmacia', 'consulta'],\n  'serviços': ['conta', 'luz', 'água', 'internet'],\n};\n\nfor (const [cat, keywords] of Object.entries(categories)) {\n  if (keywords.some(k => messageText.toLowerCase().includes(k))) {\n    category = cat.charAt(0).toUpperCase() + cat.slice(1);\n    break;\n  }\n}\n\nreturn {\n  amount: amount,\n  type: type,\n  date: new Date().toISOString().split('T')[0], // Data atual\n  description: messageText || 'Transação via WhatsApp',\n  category: category,\n  contextId: contextId,\n  attachmentUrl: $('Webhook - Receber Mensagem').item.json.mediaUrl,\n  requiresManualReview: amount === 0 // Marca se precisa revisão manual\n};"
+      },
+      "id": "process-simple",
+      "name": "Processar Texto (Simples)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 200],
+      "notes": "Versão simples que processa apenas o texto da mensagem. Útil para testes ou quando não tem OCR."
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.BACKEND_WEBHOOK_URL || 'http://localhost:3001/api/n8n/create-transaction' }}",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "amount",
+              "value": "={{ $json.amount }}"
+            },
+            {
+              "name": "type",
+              "value": "={{ $json.type }}"
+            },
+            {
+              "name": "date",
+              "value": "={{ $json.date }}"
+            },
+            {
+              "name": "description",
+              "value": "={{ $json.description }}"
+            },
+            {
+              "name": "category",
+              "value": "={{ $json.category }}"
+            },
+            {
+              "name": "contextId",
+              "value": "={{ $json.contextId }}"
+            },
+            {
+              "name": "attachmentUrl",
+              "value": "={{ $json.attachmentUrl }}"
+            }
+          ]
+        },
+        "options": {
+          "bodyContentType": "json"
+        }
+      },
+      "id": "create-transaction",
+      "name": "Criar Transação no Backend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [850, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"message\": \"Comprovante processado\", \"transactionId\": $json.transactionId, \"requiresManualReview\": $('Processar Texto (Simples)').item.json.requiresManualReview } }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Responder Sucesso",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1050, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": false, \"message\": \"Mensagem não contém imagem\" } }}",
+        "options": {}
+      },
+      "id": "respond-no-image",
+      "name": "Responder Sem Imagem",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [650, 400]
+    }
+  ],
+  "connections": {
+    "Webhook - Receber Mensagem": {
+      "main": [
+        [
+          {
+            "node": "IF - É Imagem?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - É Imagem?": {
+      "main": [
+        [
+          {
+            "node": "Processar Texto (Simples)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Responder Sem Imagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Processar Texto (Simples)": {
+      "main": [
+        [
+          {
+            "node": "Criar Transação no Backend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Criar Transação no Backend": {
+      "main": [
+        [
+          {
+            "node": "Responder Sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+

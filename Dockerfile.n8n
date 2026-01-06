@@ -1,0 +1,11 @@
+# Dockerfile para n8n (opcional, Railway template já tem isso)
+# Use apenas se quiser fazer deploy manual
+
+FROM n8nio/n8n:latest
+
+# n8n já está configurado, apenas exponha a porta
+EXPOSE 5678
+
+# Variáveis de ambiente serão passadas pelo Railway
+# Não precisa definir aqui, configure no Railway Variables
+

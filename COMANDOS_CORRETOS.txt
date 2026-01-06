@@ -1,0 +1,31 @@
+═══════════════════════════════════════════════════════════════
+COMANDOS CORRETOS - EXECUTAR UM POR VEZ NO TERMINAL
+═══════════════════════════════════════════════════════════════
+
+⚠️ IMPORTANTE: Execute CADA comando separadamente, pressionando ENTER após cada um!
+
+═══════════════════════════════════════════════════════════════
+
+1️⃣ Primeiro, vá para o diretório:
+   cd "/Users/drpgjr.../administrador de contas"
+
+2️⃣ Adicione o arquivo:
+   git add backend/src/routes/n8n.routes.ts
+
+3️⃣ Faça o commit:
+   git commit -m "fix: remove @shared alias, usa caminho relativo ../../shared/types/index"
+
+4️⃣ Faça o push:
+   git push origin main
+
+═══════════════════════════════════════════════════════════════
+
+OU execute o script diretamente:
+
+   chmod +x executar_git.sh
+   ./executar_git.sh
+
+═══════════════════════════════════════════════════════════════
+
+
+

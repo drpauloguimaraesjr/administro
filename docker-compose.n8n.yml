@@ -1,0 +1,36 @@
+# Docker Compose para n8n (referência local, Railway não usa isso diretamente)
+# Mas você pode usar como referência para configurar variáveis
+
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    ports:
+      - "5678:5678"
+    environment:
+      # Autenticação Básica (OBRIGATÓRIO)
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-change-me}
+      
+      # URL e Protocolo
+      - N8N_HOST=${N8N_HOST:-localhost:5678}
+      - N8N_PROTOCOL=${N8N_PROTOCOL:-http}
+      - WEBHOOK_URL=${WEBHOOK_URL:-http://localhost:5678/}
+      
+      # Timezone
+      - GENERIC_TIMEZONE=America/Sao_Paulo
+      
+      # Persistência (Railway já gerencia volumes)
+      - N8N_USER_FOLDER=/home/node/.n8n
+      
+      # Variável customizada para o workflow
+      - BACKEND_WEBHOOK_URL=${BACKEND_WEBHOOK_URL:-http://localhost:3001/api/n8n/create-transaction}
+    volumes:
+      - n8n_data:/home/node/.n8n
+    restart: unless-stopped
+
+volumes:
+  n8n_data:
+

@@ -1,0 +1,328 @@
+{
+  "name": "WhatsApp Receipt Processing - Com Vision OCR",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "receive-media",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-receive",
+      "name": "Webhook - Receber Mensagem",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "webhookId": "whatsapp-receive-media"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition-1",
+              "leftValue": "={{ $json.mediaType }}",
+              "rightValue": "image",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-image",
+      "name": "IF - É Imagem?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.mediaUrl }}",
+        "authentication": "none",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "download-image",
+      "name": "Download Imagem",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [650, 200],
+      "notes": "Baixa a imagem do Firebase Storage"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Converter imagem baixada para Base64\nconst binaryData = $input.first().binary;\nconst imageKey = Object.keys(binaryData)[0];\nconst imageData = binaryData[imageKey];\n\nreturn {\n  json: {\n    imageBase64: imageData.data,\n    mimeType: imageData.mimeType || 'image/jpeg',\n    fileName: imageData.fileName || 'receipt.jpg',\n    mediaUrl: $('Webhook - Receber Mensagem').item.json.mediaUrl\n  }\n};"
+      },
+      "id": "convert-base64",
+      "name": "Converter para Base64",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 200],
+      "notes": "Converte a imagem para Base64 para enviar ao GPT-4 Vision"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Preparar prompt otimizado para análise de comprovantes bancários brasileiros\nconst prompt = `Analise esta imagem de comprovante bancário, recibo ou nota fiscal brasileira.\n\nExtraia as seguintes informações em formato JSON válido (sem markdown, sem explicações):\n\n{\n  \"amount\": número (valor da transação em reais, apenas números),\n  \"type\": \"income\" ou \"expense\" (receita ou despesa),\n  \"date\": \"YYYY-MM-DD\" (data da transação),\n  \"description\": \"texto descritivo da transação\",\n  \"category\": \"categoria\" (ex: Alimentação, Transporte, Salário, Serviços, Saúde, etc.),\n  \"contextId\": \"HOME\" ou \"CLINIC\" (pessoal ou clínica),\n  \"confidence\": número de 0 a 1 (confiança na extração)\n}\n\nRegras importantes:\n- Se for depósito, transferência recebida ou salário → type: \"income\"\n- Se for pagamento, compra ou saque → type: \"expense\"\n- Se não conseguir identificar a data, use a data atual\n- Se não conseguir identificar o valor, use 0\n- Se não conseguir identificar categoria, use \"Outros\"\n- Se não conseguir identificar contexto, use \"HOME\"\n- Retorne APENAS o JSON, sem markdown, sem explicações`;\n\nreturn {\n  json: {\n    prompt: prompt,\n    imageBase64: $('Converter para Base64').item.json.imageBase64,\n    mimeType: $('Converter para Base64').item.json.mimeType\n  }\n};"
+      },
+      "id": "prepare-prompt",
+      "name": "Preparar Prompt Vision",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1050, 200],
+      "notes": "Prepara prompt otimizado para análise de comprovantes brasileiros"
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "operation": "create",
+        "modelId": "gpt-4o",
+        "options": {
+          "maxTokens": 1000,
+          "temperature": 0.1
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "user",
+              "content": "={{ $json.prompt }}",
+              "messageType": "text"
+            },
+            {
+              "role": "user",
+              "content": "data:{{ $json.mimeType }};base64,{{ $json.imageBase64 }}",
+              "messageType": "image"
+            }
+          ]
+        }
+      },
+      "id": "openai-vision",
+      "name": "GPT-4 Vision - OCR",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [1250, 200],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-api",
+          "name": "OpenAI API"
+        }
+      },
+      "notes": "Usa GPT-4 Vision para extrair dados do comprovante. Configure credenciais OpenAI."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extrai e processa JSON da resposta do GPT-4 Vision\nconst visionResponse = $input.first().json;\n\n// Extrair conteúdo da resposta\nlet content = '';\ntry {\n  if (visionResponse.choices && visionResponse.choices[0]) {\n    content = visionResponse.choices[0].message?.content || '';\n  } else if (visionResponse.content) {\n    content = visionResponse.content;\n  } else if (visionResponse.text) {\n    content = visionResponse.text;\n  } else {\n    content = JSON.stringify(visionResponse);\n  }\n} catch (e) {\n  console.error('Erro ao extrair conteúdo:', e);\n  content = JSON.stringify(visionResponse);\n}\n\n// Limpar markdown se houver\nlet jsonString = content\n  .replace(/```json\\n?/gi, '')\n  .replace(/```\\n?/gi, '')\n  .trim();\n\n// Tentar extrair JSON\nlet extractedData;\ntry {\n  // Procura por JSON no texto\n  const jsonMatch = jsonString.match(/\\{[\\s\\S]*\\}/);\n  if (jsonMatch) {\n    extractedData = JSON.parse(jsonMatch[0]);\n  } else {\n    extractedData = JSON.parse(jsonString);\n  }\n} catch (error) {\n  console.error('Erro ao parsear JSON:', error);\n  console.log('Conteúdo recebido:', content.substring(0, 500));\n  \n  // Valores padrão se falhar\n  extractedData = {\n    amount: 0,\n    type: \"expense\",\n    date: new Date().toISOString().split('T')[0],\n    description: \"Transação via WhatsApp\",\n    category: \"Outros\",\n    contextId: \"HOME\",\n    confidence: 0\n  };\n}\n\n// Valida e normaliza os dados\nconst result = {\n  amount: parseFloat(extractedData.amount) || 0,\n  type: (extractedData.type === \"income\" || extractedData.type === \"receita\") ? \"income\" : \"expense\",\n  date: extractedData.date || new Date().toISOString().split('T')[0],\n  description: extractedData.description || \"Transação via WhatsApp\",\n  category: extractedData.category || \"Outros\",\n  contextId: (extractedData.contextId === \"CLINIC\" || extractedData.contextId === \"clinica\") ? \"CLINIC\" : \"HOME\",\n  confidence: parseFloat(extractedData.confidence) || 0.5,\n  attachmentUrl: $('Webhook - Receber Mensagem').item.json.mediaUrl,\n  rawResponse: content.substring(0, 200) // Para debug\n};\n\n// Validações adicionais\nif (result.amount < 0) result.amount = Math.abs(result.amount);\nif (!result.date.match(/^\\d{4}-\\d{2}-\\d{2}$/)) {\n  result.date = new Date().toISOString().split('T')[0];\n}\n\nreturn result;"
+      },
+      "id": "process-data",
+      "name": "Processar Dados Extraídos",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1450, 200],
+      "notes": "Processa e valida os dados extraídos do OCR com GPT-4 Vision"
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.BACKEND_WEBHOOK_URL || 'http://localhost:3001/api/n8n/create-transaction' }}",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "amount",
+              "value": "={{ $json.amount }}"
+            },
+            {
+              "name": "type",
+              "value": "={{ $json.type }}"
+            },
+            {
+              "name": "date",
+              "value": "={{ $json.date }}"
+            },
+            {
+              "name": "description",
+              "value": "={{ $json.description }}"
+            },
+            {
+              "name": "category",
+              "value": "={{ $json.category }}"
+            },
+            {
+              "name": "contextId",
+              "value": "={{ $json.contextId }}"
+            },
+            {
+              "name": "attachmentUrl",
+              "value": "={{ $json.attachmentUrl }}"
+            }
+          ]
+        },
+        "options": {
+          "bodyContentType": "json"
+        }
+      },
+      "id": "create-transaction",
+      "name": "Criar Transação no Backend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1650, 200],
+      "notes": "Envia dados processados para o backend criar a transação no Firestore"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"message\": \"Comprovante processado com sucesso\", \"transactionId\": $json.transactionId, \"confidence\": $('Processar Dados Extraídos').item.json.confidence } }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Responder Sucesso",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1850, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": false, \"message\": \"Erro ao processar comprovante\", \"error\": $json.error || \"Erro desconhecido\" } }}",
+        "options": {}
+      },
+      "id": "respond-error",
+      "name": "Responder Erro",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1250, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": false, \"message\": \"Mensagem não contém imagem\" } }}",
+        "options": {}
+      },
+      "id": "respond-no-image",
+      "name": "Responder Sem Imagem",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [650, 400]
+    }
+  ],
+  "connections": {
+    "Webhook - Receber Mensagem": {
+      "main": [
+        [
+          {
+            "node": "IF - É Imagem?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - É Imagem?": {
+      "main": [
+        [
+          {
+            "node": "Download Imagem",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Responder Sem Imagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Imagem": {
+      "main": [
+        [
+          {
+            "node": "Converter para Base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Converter para Base64": {
+      "main": [
+        [
+          {
+            "node": "Preparar Prompt Vision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Prompt Vision": {
+      "main": [
+        [
+          {
+            "node": "GPT-4 Vision - OCR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT-4 Vision - OCR": {
+      "main": [
+        [
+          {
+            "node": "Processar Dados Extraídos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Processar Dados Extraídos": {
+      "main": [
+        [
+          {
+            "node": "Criar Transação no Backend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Criar Transação no Backend": {
+      "main": [
+        [
+          {
+            "node": "Responder Sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+

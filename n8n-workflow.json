@@ -1,0 +1,263 @@
+{
+  "name": "WhatsApp Receipt Processing",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "receive-media",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-receive",
+      "name": "Webhook - Receber Mensagem",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "webhookId": "whatsapp-receive-media"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition-1",
+              "leftValue": "={{ $json.mediaType }}",
+              "rightValue": "image",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-image",
+      "name": "IF - É Imagem?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.mediaUrl }}",
+        "authentication": "none",
+        "options": {}
+      },
+      "id": "download-image",
+      "name": "Download Imagem",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [650, 200],
+      "notes": "Baixa a imagem do Firebase Storage"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "prompt": "Analise esta imagem de comprovante bancário/recibo. Extraia as seguintes informações em formato JSON:\n\n{\n  \"amount\": número (valor da transação),\n  \"type\": \"income\" ou \"expense\" (receita ou despesa),\n  \"date\": \"YYYY-MM-DD\" (data da transação),\n  \"description\": \"texto descritivo\",\n  \"category\": \"categoria\" (ex: Alimentação, Transporte, Salário, etc.),\n  \"contextId\": \"HOME\" ou \"CLINIC\" (pessoal ou clínica)\n}\n\nSe não conseguir identificar alguma informação, use valores padrão:\n- amount: 0\n- type: \"expense\"\n- date: data atual\n- description: \"Transação via WhatsApp\"\n- category: \"Outros\"\n- contextId: \"HOME\"\n\nRetorne APENAS o JSON, sem explicações adicionais.",
+        "options": {
+          "maxTokens": 1000
+        }
+      },
+      "id": "openai-vision",
+      "name": "OpenAI Vision - OCR",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [850, 200],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-api",
+          "name": "OpenAI API"
+        }
+      },
+      "notes": "Usa OpenAI Vision para extrair dados do comprovante. Configure suas credenciais OpenAI."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extrai JSON da resposta do OpenAI\nconst response = $input.item.json;\nconst text = response.content || response.text || JSON.stringify(response);\n\n// Tenta extrair JSON da resposta\nlet extractedData;\ntry {\n  // Procura por JSON no texto\n  const jsonMatch = text.match(/\\{[\\s\\S]*\\}/);\n  if (jsonMatch) {\n    extractedData = JSON.parse(jsonMatch[0]);\n  } else {\n    extractedData = JSON.parse(text);\n  }\n} catch (error) {\n  // Se falhar, usa valores padrão\n  extractedData = {\n    amount: 0,\n    type: \"expense\",\n    date: new Date().toISOString().split('T')[0],\n    description: \"Transação via WhatsApp\",\n    category: \"Outros\",\n    contextId: \"HOME\"\n  };\n}\n\n// Valida e normaliza os dados\nconst result = {\n  amount: parseFloat(extractedData.amount) || 0,\n  type: (extractedData.type === \"income\" || extractedData.type === \"receita\") ? \"income\" : \"expense\",\n  date: extractedData.date || new Date().toISOString().split('T')[0],\n  description: extractedData.description || \"Transação via WhatsApp\",\n  category: extractedData.category || \"Outros\",\n  contextId: (extractedData.contextId === \"CLINIC\" || extractedData.contextId === \"clinica\") ? \"CLINIC\" : \"HOME\",\n  attachmentUrl: $('Webhook - Receber Mensagem').item.json.mediaUrl\n};\n\nreturn result;"
+      },
+      "id": "process-data",
+      "name": "Processar Dados Extraídos",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1050, 200],
+      "notes": "Processa e valida os dados extraídos do OCR"
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.BACKEND_WEBHOOK_URL || 'http://localhost:3001/api/n8n/create-transaction' }}",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "amount",
+              "value": "={{ $json.amount }}"
+            },
+            {
+              "name": "type",
+              "value": "={{ $json.type }}"
+            },
+            {
+              "name": "date",
+              "value": "={{ $json.date }}"
+            },
+            {
+              "name": "description",
+              "value": "={{ $json.description }}"
+            },
+            {
+              "name": "category",
+              "value": "={{ $json.category }}"
+            },
+            {
+              "name": "contextId",
+              "value": "={{ $json.contextId }}"
+            },
+            {
+              "name": "attachmentUrl",
+              "value": "={{ $json.attachmentUrl }}"
+            }
+          ]
+        },
+        "options": {
+          "bodyContentType": "json"
+        }
+      },
+      "id": "create-transaction",
+      "name": "Criar Transação no Backend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1250, 200],
+      "notes": "Envia dados processados para o backend criar a transação no Firestore"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"message\": \"Comprovante processado com sucesso\", \"transactionId\": $json.transactionId } }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Responder Sucesso",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1450, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": false, \"message\": \"Erro ao processar comprovante\", \"error\": $json.error || \"Erro desconhecido\" } }}",
+        "options": {}
+      },
+      "id": "respond-error",
+      "name": "Responder Erro",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [850, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": false, \"message\": \"Mensagem não contém imagem\" } }}",
+        "options": {}
+      },
+      "id": "respond-no-image",
+      "name": "Responder Sem Imagem",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [650, 400]
+    }
+  ],
+  "connections": {
+    "Webhook - Receber Mensagem": {
+      "main": [
+        [
+          {
+            "node": "IF - É Imagem?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - É Imagem?": {
+      "main": [
+        [
+          {
+            "node": "Download Imagem",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Responder Sem Imagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Imagem": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Vision - OCR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Vision - OCR": {
+      "main": [
+        [
+          {
+            "node": "Processar Dados Extraídos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Processar Dados Extraídos": {
+      "main": [
+        [
+          {
+            "node": "Criar Transação no Backend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Criar Transação no Backend": {
+      "main": [
+        [
+          {
+            "node": "Responder Sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+

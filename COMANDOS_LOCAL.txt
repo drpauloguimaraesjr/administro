@@ -1,0 +1,31 @@
+=====================================
+COMANDOS PARA TESTAR LOCALMENTE
+=====================================
+
+1. Ir para o diretório do backend:
+   cd "/Users/drpgjr.../administrador de contas/backend"
+
+2. Instalar dependências (se ainda não instalou):
+   npm install
+
+3. Testar compilação:
+   npm run build
+
+4. Se compilar sem erros, rodar localmente:
+   npm run dev
+
+5. Testar se está funcionando (em outro terminal):
+   curl http://localhost:3001/health
+
+=====================================
+SE DER ERRO:
+=====================================
+
+Envie o erro completo aqui que eu ajudo a corrigir!
+
+=====================================
+DEPOIS QUE FUNCIONAR:
+=====================================
+
+Aí sim fazemos commit e deploy no Railway!
+
