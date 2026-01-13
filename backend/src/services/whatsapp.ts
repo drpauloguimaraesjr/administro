@@ -1,6 +1,6 @@
 /**
  * Serviço WhatsApp usando Baileys
- * Baseado na implementação do Nutri-Buddy
+ * Implementação Robusta baseada no Nutri-Buddy (com Fix 9-dígitos e Backoff)
  */
 
 import makeWASocket, {
@@ -10,93 +10,96 @@ import makeWASocket, {
   WASocket,
   fetchLatestBaileysVersion,
   proto,
+  makeCacheableSignalKeyStore,
 } from '@whiskeysockets/baileys';
 import { Boom } from '@hapi/boom';
 import pino from 'pino';
 import { db } from '../config/firebaseAdmin.js';
+import path from 'path';
+import fs from 'fs';
+
+type InternalConnectionState = 'open' | 'connecting' | 'close' | 'disconnected' | 'waiting_qr';
 
 let socket: WASocket | null = null;
 let qrCode: string | null = null;
-let connectionState: ConnectionState = 'close';
+let connectionState: InternalConnectionState = 'close';
+let reconnectAttempts = 0;
+const MAX_RECONNECT_ATTEMPTS = 5;
+
+// Caminho para auth info
+const AUTH_FOLDER = path.resolve('auth_info_baileys');
 
 /**
  * Inicializa conexão WhatsApp com Baileys
  */
 export async function initializeWhatsApp() {
   try {
-    const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys');
+    const { state, saveCreds } = await useMultiFileAuthState(AUTH_FOLDER);
     const { version } = await fetchLatestBaileysVersion();
 
     socket = makeWASocket({
       version,
       printQRInTerminal: true,
-      auth: state,
+      auth: {
+        creds: state.creds,
+        keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'silent' })),
+      },
       logger: pino({ level: 'silent' }),
       browser: ['Administrador de Contas', 'Chrome', '1.0.0'],
+      generateHighQualityLinkPreview: true,
     });
 
     // Salva credenciais quando mudarem
     socket.ev.on('creds.update', saveCreds);
 
-    // Gera QR Code
+    // Gerenciamento de Conexão
     socket.ev.on('connection.update', async (update) => {
       const { connection, lastDisconnect, qr } = update;
 
       if (qr) {
         qrCode = qr;
-        console.log('📱 QR Code gerado! Escaneie com o WhatsApp:');
-        console.log(qr);
-        
-        // Salva QR no Firestore para acesso via API
-        try {
-          await db.collection('whatsapp_status').doc('connection').set({
-            qrCode: qr,
-            status: 'waiting_qr',
-            updatedAt: new Date(),
-          });
-        } catch (error) {
-          console.error('Erro ao salvar QR no Firestore:', error);
-        }
+        console.log('📱 QR Code gerado! Escaneie com o WhatsApp.');
+
+        await updateFirestoreStatus('waiting_qr', qr);
+        connectionState = 'connecting';
       }
 
       if (connection === 'close') {
-        const shouldReconnect = (lastDisconnect?.error as Boom)?.output?.statusCode !== DisconnectReason.loggedOut;
-        console.log('Conexão fechada devido a', lastDisconnect?.error, ', reconectando:', shouldReconnect);
-        
+        const error = (lastDisconnect?.error as Boom);
+        const shouldReconnect = error?.output?.statusCode !== DisconnectReason.loggedOut;
+
+        console.log(`❌ Conexão fechada: ${error?.message || 'Desconhecido'}. Reconectar? ${shouldReconnect}`);
+
         connectionState = 'close';
-        
-        // Atualiza status no Firestore
-        try {
-          await db.collection('whatsapp_status').doc('connection').set({
-            status: 'disconnected',
-            qrCode: null,
-            updatedAt: new Date(),
-          });
-        } catch (error) {
-          console.error('Erro ao atualizar status:', error);
-        }
+        await updateFirestoreStatus('disconnected', null);
 
         if (shouldReconnect) {
-          initializeWhatsApp();
+          reconnectAttempts++;
+          if (reconnectAttempts <= MAX_RECONNECT_ATTEMPTS) {
+            const delay = Math.min(3000 * reconnectAttempts, 30000); // Backoff: 3s, 6s... max 30s
+            console.log(`🔄 Reconectando em ${delay / 1000}s (Tentativa ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`);
+            setTimeout(() => initializeWhatsApp(), delay);
+          } else {
+            console.error('❌ Máximo de tentativas de reconexão atingido.');
+          }
+        } else {
+          // Logout real, limpa tudo
+          console.log('🚪 Desconectado (Logout). Limpando sessão...');
+          try {
+            if (fs.existsSync(AUTH_FOLDER)) {
+              fs.rmSync(AUTH_FOLDER, { recursive: true, force: true });
+            }
+          } catch (e) { console.error('Erro ao limpar pasta auth:', e); }
+          reconnectAttempts = 0;
         }
       } else if (connection === 'open') {
-        console.log('✅ WhatsApp conectado!');
+        console.log('✅ WhatsApp conectado com sucesso!');
         connectionState = 'open';
         qrCode = null;
-        
-        // Atualiza status no Firestore
-        try {
-          await db.collection('whatsapp_status').doc('connection').set({
-            status: 'connected',
-            qrCode: null,
-            updatedAt: new Date(),
-          });
-        } catch (error) {
-          console.error('Erro ao atualizar status:', error);
-        }
-      }
+        reconnectAttempts = 0;
 
-      connectionState = connection || 'close';
+        await updateFirestoreStatus('connected', null);
+      }
     });
 
     // Recebe mensagens
@@ -104,14 +107,29 @@ export async function initializeWhatsApp() {
       if (type !== 'notify') return;
 
       for (const message of messages) {
-        await handleIncomingMessage(message);
+        if (!message.key.fromMe && message.message) {
+          await handleIncomingMessage(message);
+        }
       }
     });
 
     console.log('🚀 WhatsApp Baileys inicializado');
   } catch (error: any) {
     console.error('❌ Erro ao inicializar WhatsApp:', error);
-    throw error;
+    // Tenta recuperar se for erro fatal
+    setTimeout(() => initializeWhatsApp(), 10000);
+  }
+}
+
+async function updateFirestoreStatus(status: string, qr: string | null) {
+  try {
+    await db.collection('whatsapp_status').doc('connection').set({
+      status,
+      qrCode: qr,
+      updatedAt: new Date(),
+    });
+  } catch (error) {
+    console.error('Erro ao atualizar status no Firestore:', error);
   }
 }
 
@@ -120,52 +138,47 @@ export async function initializeWhatsApp() {
  */
 async function handleIncomingMessage(message: proto.IWebMessageInfo) {
   try {
-    if (!message.message) return;
-
-    const messageType = Object.keys(message.message)[0];
     const from = message.key.remoteJid;
-    const messageId = message.key.id;
+    if (!from || from.includes('@g.us') || from.includes('status@broadcast')) return;
+
+    const messageId = message.key.id || undefined;
     const pushName = message.pushName || 'Usuário';
+    const msgContent = message.message;
 
-    if (!from) return;
+    if (!msgContent) return;
 
-    // Processa mensagem de texto
-    if (messageType === 'conversation' || messageType === 'extendedTextMessage') {
-      const text = message.message.conversation || message.message.extendedTextMessage?.text || '';
-      
-      // Envia para rota de processamento
+    // Detecta tipo
+    let messageType = 'unknown';
+    let text = '';
+    let mediaUrl = '';
+
+    if (msgContent.conversation || msgContent.extendedTextMessage?.text) {
+      messageType = 'text';
+      text = msgContent.conversation || msgContent.extendedTextMessage?.text || '';
       await processTextMessage(from, text, pushName, messageId);
+    } else if (msgContent.imageMessage) {
+      messageType = 'image';
+      // TODO: Implementar upload de mídia real se necessário. 
+      // Por enquanto, passamos a URL interna se disponível ou notificamos o n8n para baixar se possível.
+      // O Baileys não expõe URL pública direta sem download.
+      // Enviamos 'image' para o fluxo tentar tratar ou pedir reenvio.
+      await processMediaMessage(from, 'image', pushName, messageId, msgContent.imageMessage);
+    } else if (msgContent.audioMessage) {
+      messageType = 'audio';
+      await processMediaMessage(from, 'audio', pushName, messageId, msgContent.audioMessage);
     }
 
-    // Processa mensagem de imagem
-    if (messageType === 'imageMessage') {
-      const imageUrl = message.message.imageMessage?.url;
-      if (imageUrl) {
-        await processImageMessage(from, imageUrl, pushName, messageId);
-      }
-    }
-
-    // Processa mensagem de áudio
-    if (messageType === 'audioMessage') {
-      const audioUrl = message.message.audioMessage?.url;
-      if (audioUrl) {
-        await processAudioMessage(from, audioUrl, pushName, messageId);
-      }
-    }
   } catch (error: any) {
     console.error('Erro ao processar mensagem:', error);
   }
 }
 
-/**
- * Processa mensagem de texto
- */
 async function processTextMessage(from: string, text: string, pushName: string, messageId?: string) {
+  // Reutiliza a lógica de chamar a rota interna via axios para manter consistência com o router existente
+  const axios = (await import('axios')).default;
+  const backendUrl = `http://localhost:${process.env.PORT || 3001}`;
+
   try {
-    // Chama endpoint interno para processar
-    const axios = (await import('axios')).default;
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
-    
     await axios.post(`${backendUrl}/api/whatsapp/message`, {
       from,
       fromName: pushName,
@@ -173,59 +186,35 @@ async function processTextMessage(from: string, text: string, pushName: string, 
       text,
       messageId,
     });
-  } catch (error: any) {
-    console.error('Erro ao processar texto:', error);
+  } catch (e: any) {
+    console.error('Erro ao chamar API interna de mensagem:', e.message);
   }
 }
 
-/**
- * Processa mensagem de imagem
- */
-async function processImageMessage(from: string, imageUrl: string, pushName: string, messageId?: string) {
-  try {
-    // Baixa a imagem e envia para n8n ou processa diretamente
+async function processMediaMessage(from: string, type: string, pushName: string, messageId: string | undefined | null, mediaContent: any) {
+  // Se tivermos N8N configurado, enviamos para ele
+  if (process.env.N8N_WEBHOOK_URL) {
     const axios = (await import('axios')).default;
-    const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL;
-    
-    if (n8nWebhookUrl) {
-      // Envia para n8n processar
-      await axios.post(n8nWebhookUrl, {
+    // Nota: Sem o download/upload real, o N8N pode ter dificuldade com a mídia.
+    // Mas vamos enviar a notificação.
+    try {
+      await axios.post(process.env.N8N_WEBHOOK_URL, {
         from,
         fromName: pushName,
-        mediaUrl: imageUrl,
+        mediaType: type,
         messageId,
+        // Passamos o objeto de mídia bruto caso o N8N saiba lidar ou para debug
+        mediaContent
       });
-    } else {
-      // Processa diretamente (se implementado)
-      console.log('Imagem recebida, mas N8N_WEBHOOK_URL não configurado');
+    } catch (e: any) {
+      console.error(`Erro ao enviar mídia para N8N:`, e.message);
     }
-  } catch (error: any) {
-    console.error('Erro ao processar imagem:', error);
   }
 }
 
-/**
- * Processa mensagem de áudio
- */
-async function processAudioMessage(from: string, audioUrl: string, pushName: string, messageId?: string) {
-  try {
-    const axios = (await import('axios')).default;
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
-    
-    await axios.post(`${backendUrl}/api/whatsapp/message`, {
-      from,
-      fromName: pushName,
-      messageType: 'audio',
-      audioUrl,
-      messageId,
-    });
-  } catch (error: any) {
-    console.error('Erro ao processar áudio:', error);
-  }
-}
 
 /**
- * Envia mensagem de texto via WhatsApp
+ * Envia mensagem de texto via WhatsApp (Com correção para números BR 9 dígitos)
  */
 export async function sendTextMessage(to: string, message: string): Promise<boolean> {
   try {
@@ -234,12 +223,45 @@ export async function sendTextMessage(to: string, message: string): Promise<bool
       return false;
     }
 
-    // Formata número (adiciona @s.whatsapp.net se necessário)
-    const formattedNumber = to.includes('@') ? to : `${to}@s.whatsapp.net`;
+    // Formatação inteligente de número BR
+    let targetJid = to.includes('@s.whatsapp.net') ? to : `${to}@s.whatsapp.net`;
+    const possibleJids = [targetJid];
 
-    await socket.sendMessage(formattedNumber, { text: message });
-    console.log(`✅ Mensagem enviada para ${formattedNumber}`);
+    // Se for número brasileiro (55)
+    if (to.startsWith('55') || to.startsWith('55')) {
+      const cleanNum = to.replace(/\D/g, ''); // Garante só números
+      if (cleanNum.startsWith('55')) {
+        const ddd = cleanNum.substring(2, 4);
+        const number = cleanNum.substring(4);
+
+        if (number.length === 9 && number.startsWith('9')) {
+          // Tem 9 e começa com 9: adicionar versão SEM o 9
+          possibleJids.push(`55${ddd}${number.substring(1)}@s.whatsapp.net`);
+        } else if (number.length === 8) {
+          // Tem 8: adicionar versão COM o 9
+          possibleJids.push(`55${ddd}9${number}@s.whatsapp.net`);
+        }
+      }
+    }
+
+    // Tenta enviar para os JIDs possíveis
+    for (const jid of possibleJids) {
+      try {
+        const result = await socket.onWhatsApp(jid);
+        if (result && Array.isArray(result) && result[0]?.exists) {
+          await socket.sendMessage(result[0].jid, { text: message });
+          console.log(`✅ Mensagem enviada para ${result[0].jid}`);
+          return true;
+        }
+      } catch (e) {
+        console.warn(`Falha ao verificar/enviar para ${jid}`, e);
+      }
+    }
+
+    // Se chegou aqui, tenta enviar para o original mesmo assim (fallback)
+    await socket.sendMessage(targetJid, { text: message });
     return true;
+
   } catch (error: any) {
     console.error('❌ Erro ao enviar mensagem:', error);
     return false;
@@ -247,53 +269,29 @@ export async function sendTextMessage(to: string, message: string): Promise<bool
 }
 
 /**
- * Envia imagem via WhatsApp
+ * Envia mensagem de Imagem
  */
 export async function sendImageMessage(to: string, imageUrl: string, caption?: string): Promise<boolean> {
+  // Implementação simplificada mantendo a original
+  if (!socket || connectionState !== 'open') return false;
+  const jid = to.includes('@') ? to : `${to}@s.whatsapp.net`;
   try {
-    if (!socket || connectionState !== 'open') {
-      console.error('WhatsApp não está conectado');
-      return false;
-    }
-
-    const formattedNumber = to.includes('@') ? to : `${to}@s.whatsapp.net`;
-
-    // Baixa a imagem
-    const axios = (await import('axios')).default;
-    const imageResponse = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-    const imageBuffer = Buffer.from(imageResponse.data);
-
-    await socket.sendMessage(formattedNumber, {
-      image: imageBuffer,
-      caption: caption || '',
-    });
-
-    console.log(`✅ Imagem enviada para ${formattedNumber}`);
+    await socket.sendMessage(jid, { image: { url: imageUrl }, caption });
     return true;
-  } catch (error: any) {
-    console.error('❌ Erro ao enviar imagem:', error);
+  } catch (e) {
+    console.error('Erro ao enviar imagem:', e);
     return false;
   }
 }
 
-/**
- * Obtém QR Code atual
- */
 export function getQRCode(): string | null {
   return qrCode;
 }
 
-/**
- * Obtém status da conexão
- */
-export function getConnectionState(): ConnectionState {
+export function getConnectionState(): InternalConnectionState {
   return connectionState;
 }
 
-/**
- * Verifica se está conectado
- */
 export function isConnected(): boolean {
   return connectionState === 'open' && socket !== null;
 }
-

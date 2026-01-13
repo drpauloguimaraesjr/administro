@@ -21,6 +21,8 @@ export interface Transaction {
   attachmentUrl?: string;
   createdBy?: string; // Email do usuário que criou
   createdByName?: string; // Nome do usuário que criou
+  supplier?: string; // Fornecedor / Beneficiário
+  invoiceNumber?: string; // Número da Nota Fiscal / Recibo
   createdAt?: Date | string;
   updatedAt?: Date | string;
 }

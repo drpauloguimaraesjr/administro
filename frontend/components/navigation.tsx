@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Home, DollarSign, BarChart3, TrendingUp, Shield, LogOut } from 'lucide-react';
+import { Home, DollarSign, BarChart3, TrendingUp, Shield, LogOut, Smartphone } from 'lucide-react';
 import { useAuth } from './auth/auth-provider';
 import { Button } from './ui/button';
 
@@ -16,6 +16,7 @@ export function Navigation() {
     { href: '/transactions', label: 'Transações', icon: <DollarSign className="w-4 h-4" /> },
     { href: '/reports', label: 'Relatórios', icon: <BarChart3 className="w-4 h-4" /> },
     { href: '/investments', label: 'Investimentos', icon: <TrendingUp className="w-4 h-4" /> },
+    { href: '/whatsapp', label: 'Bot WhatsApp', icon: <Smartphone className="w-4 h-4" /> },
   ];
 
   if (user) {
@@ -37,11 +38,10 @@ export function Navigation() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                      isActive
-                        ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400'
-                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-                    }`}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${isActive
+                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400'
+                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      }`}
                   >
                     {item.icon}
                     <span className="hidden sm:inline">{item.label}</span>
