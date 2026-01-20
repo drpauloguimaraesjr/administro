@@ -78,3 +78,20 @@ export interface N8nTransactionPayload {
   createdByName?: string;
 }
 
+
+export interface Appointment {
+  id: string;
+  patientId: string;
+  patientName: string;
+  date: string; // ISO date (yyyy-mm-dd)
+  startTime: string; // HH:mm
+  endTime: string;   // HH:mm
+  duration: number; // minutes
+  type: 'first_visit' | 'return' | 'evaluation';
+  status: 'confirmed' | 'pending' | 'cancelled' | 'completed';
+  notes?: string;
+  whatsappSent: boolean;
+  reminderSent: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
