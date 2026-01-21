@@ -3,17 +3,17 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Download, Calendar, TrendingUp, PieChart, BarChart3 } from 'lucide-react';
-import { Transaction } from '../../../shared/types/index';
+import { Transaction } from '@/shared/types/index';
 import { db } from '@/lib/firebase/config';
 import { collection, query, orderBy, onSnapshot, Timestamp } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { 
-  MonthlyChart, 
-  CategoryChart, 
-  ContextComparisonChart, 
+import {
+  MonthlyChart,
+  CategoryChart,
+  ContextComparisonChart,
   TrendChart,
-  IncomeExpenseChart 
+  IncomeExpenseChart
 } from '@/components/reports/charts';
 import { ReportsTable } from '@/components/reports/reports-table';
 import { ExportOptions } from '@/components/reports/export-options';
@@ -71,7 +71,7 @@ export default function ReportsPage() {
     // Filtrar por período
     const now = new Date();
     let startDate: Date;
-    
+
     switch (dateRange) {
       case 'week':
         startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -103,7 +103,7 @@ export default function ReportsPage() {
     const income = filteredTransactions
       .filter(t => t.type === 'income')
       .reduce((sum, t) => sum + t.amount, 0);
-    
+
     const expenses = filteredTransactions
       .filter(t => t.type === 'expense')
       .reduce((sum, t) => sum + t.amount, 0);
@@ -166,8 +166,8 @@ export default function ReportsPage() {
             <p className="text-muted-foreground">Análise detalhada das suas finanças</p>
           </div>
           <div className="flex gap-2">
-            <ShareReport 
-              transactions={filteredTransactions} 
+            <ShareReport
+              transactions={filteredTransactions}
               period={dateRange}
               context={selectedContext !== 'all' ? (selectedContext === 'HOME' ? 'Casa' : 'Clínica') : undefined}
             />

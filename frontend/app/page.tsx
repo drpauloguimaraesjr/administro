@@ -6,7 +6,7 @@ import { Wallet, TrendingUp, Plus, BarChart3 } from 'lucide-react';
 import { ContextSelector } from '@/components/context-selector';
 import { StatsCards } from '@/components/stats-cards';
 import { TransactionList } from '@/components/transaction-list';
-import { Transaction, ContextType } from '../../shared/types/index';
+import { Transaction, ContextType } from '@/shared/types/index';
 import { db } from '@/lib/firebase/config';
 import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
 import { useAuth } from '@/components/auth/auth-provider';
@@ -32,7 +32,7 @@ export default function Home() {
       return;
     }
   }, [user, authLoading, router]);
-  
+
   // Verifica se Firebase está configurado
   useEffect(() => {
     if (!db && !authLoading) {
@@ -240,7 +240,7 @@ function ActionCard({
   href: string;
 }) {
   const router = useRouter();
-  
+
   return (
     <motion.button
       onClick={() => router.push(href)}

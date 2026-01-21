@@ -1,6 +1,6 @@
 'use client';
 
-import { Transaction } from '../../../shared/types/index';
+import { Transaction } from '@/shared/types/index';
 import { format } from 'date-fns';
 import { ArrowUpCircle, ArrowDownCircle, Image as ImageIcon } from 'lucide-react';
 import { ShareTransaction } from '../whatsapp/share-transaction';
@@ -30,8 +30,8 @@ export function ReportsTable({ transactions }: ReportsTableProps) {
         </thead>
         <tbody>
           {transactions.map((transaction) => {
-            const date = transaction.date instanceof Date 
-              ? transaction.date 
+            const date = transaction.date instanceof Date
+              ? transaction.date
               : new Date(transaction.date);
             const isIncome = transaction.type === 'income';
 
@@ -45,17 +45,15 @@ export function ReportsTable({ transactions }: ReportsTableProps) {
                     {transaction.contextId === 'HOME' ? 'Casa' : 'Clínica'}
                   </span>
                 </td>
-                <td className={`p-3 text-right font-semibold ${
-                  isIncome ? 'text-green-600' : 'text-red-600'
-                }`}>
+                <td className={`p-3 text-right font-semibold ${isIncome ? 'text-green-600' : 'text-red-600'
+                  }`}>
                   {isIncome ? '+' : '-'}R$ {transaction.amount.toFixed(2)}
                 </td>
                 <td className="p-3 text-center">
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    transaction.status === 'paid'
+                  <span className={`px-2 py-1 rounded-full text-xs ${transaction.status === 'paid'
                       ? 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400'
                       : 'bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-400'
-                  }`}>
+                    }`}>
                     {transaction.status === 'paid' ? 'Pago' : 'Pendente'}
                   </span>
                 </td>

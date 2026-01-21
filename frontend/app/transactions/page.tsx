@@ -8,7 +8,7 @@ import { TransactionList } from '@/components/transaction-list';
 import { TransactionFilters } from '@/components/transactions/transaction-filters';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Transaction } from '../../shared/types/index';
+import { Transaction } from '@/shared/types/index';
 
 export default function TransactionsPage() {
   const [showForm, setShowForm] = useState(false);

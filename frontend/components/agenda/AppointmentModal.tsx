@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createAppointment, updateAppointment } from '../../lib/api';
-import { Appointment } from '../../shared/types/index';
+import { Appointment } from '@/shared/types/index';
 
 // Zod schema matching the Appointment interface (excluding generated fields)
 const appointmentSchema = z.object({

@@ -16,7 +16,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import { Transaction } from '../../../shared/types/index';
+import { Transaction } from '@/shared/types/index';
 import { format, startOfMonth, eachMonthOfInterval } from 'date-fns';
 
 interface ChartProps {
@@ -31,7 +31,7 @@ export function IncomeExpenseChart({ transactions }: ChartProps) {
     const income = transactions
       .filter(t => t.type === 'income')
       .reduce((sum, t) => sum + t.amount, 0);
-    
+
     const expenses = transactions
       .filter(t => t.type === 'expense')
       .reduce((sum, t) => sum + t.amount, 0);
@@ -59,7 +59,7 @@ export function IncomeExpenseChart({ transactions }: ChartProps) {
 export function CategoryChart({ transactions }: ChartProps) {
   const data = useMemo(() => {
     const byCategory: Record<string, number> = {};
-    
+
     transactions.forEach(t => {
       if (!byCategory[t.category]) {
         byCategory[t.category] = 0;
@@ -103,14 +103,14 @@ export function MonthlyChart({ transactions }: ChartProps) {
   const data = useMemo(() => {
     if (transactions.length === 0) return [];
 
-    const dates = transactions.map(t => 
+    const dates = transactions.map(t =>
       t.date instanceof Date ? t.date : new Date(t.date)
     );
     const minDate = new Date(Math.min(...dates.map(d => d.getTime())));
     const maxDate = new Date(Math.max(...dates.map(d => d.getTime())));
 
     const months = eachMonthOfInterval({ start: minDate, end: maxDate });
-    
+
     return months.map(month => {
       const monthStart = startOfMonth(month);
       const monthEnd = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0);
@@ -123,7 +123,7 @@ export function MonthlyChart({ transactions }: ChartProps) {
       const income = monthTransactions
         .filter(t => t.type === 'income')
         .reduce((sum, t) => sum + t.amount, 0);
-      
+
       const expenses = monthTransactions
         .filter(t => t.type === 'expense')
         .reduce((sum, t) => sum + t.amount, 0);

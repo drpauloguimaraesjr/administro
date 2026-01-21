@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { Investment } from '../../../shared/types/index';
+import { Investment } from '@/shared/types/index';
 
 interface InvestmentChartProps {
   investments: Investment[];
@@ -13,7 +13,7 @@ const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
 export function InvestmentChart({ investments }: InvestmentChartProps) {
   const data = useMemo(() => {
     const byType: Record<string, number> = {};
-    
+
     investments.forEach(inv => {
       const type = inv.type.replace('_', ' ');
       if (!byType[type]) {

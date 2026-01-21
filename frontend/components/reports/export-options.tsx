@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Download, FileText, FileSpreadsheet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Transaction } from '../../../shared/types/index';
+import { Transaction } from '@/shared/types/index';
 import { format } from 'date-fns';
 
 interface ExportOptionsProps {

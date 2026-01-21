@@ -1,6 +1,6 @@
 'use client';
 
-import { Transaction } from '../../../shared/types/index';
+import { Transaction } from '@/shared/types/index';
 import { ShareButton } from './share-button';
 import { format } from 'date-fns';
 
@@ -9,8 +9,8 @@ interface ShareTransactionProps {
 }
 
 export function ShareTransaction({ transaction }: ShareTransactionProps) {
-  const date = transaction.date instanceof Date 
-    ? transaction.date 
+  const date = transaction.date instanceof Date
+    ? transaction.date
     : new Date(transaction.date);
 
   const text = `📋 *Transação Financeira*
@@ -24,7 +24,7 @@ ${transaction.status === 'pending' ? '⚠️ *Status:* Pendente' : '✅ *Status:
 ${transaction.attachmentUrl ? `📎 *Comprovante:* ${transaction.attachmentUrl}` : ''}`;
 
   return (
-    <ShareButton 
+    <ShareButton
       text={text}
       imageUrl={transaction.attachmentUrl}
       transactionId={transaction.id}

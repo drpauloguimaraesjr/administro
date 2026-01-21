@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Home, Building2, BarChart3 } from 'lucide-react';
-import { ContextType } from '../../shared/types/index';
+import { ContextType } from '@/shared/types/index';
 
 interface ContextSelectorProps {
   selectedContext: ContextType;
@@ -22,11 +22,10 @@ export function ContextSelector({ selectedContext, onContextChange }: ContextSel
         <motion.button
           key={context.value}
           onClick={() => onContextChange(context.value)}
-          className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-all ${
-            selectedContext === context.value
+          className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-all ${selectedContext === context.value
               ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-md'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-          }`}
+            }`}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >

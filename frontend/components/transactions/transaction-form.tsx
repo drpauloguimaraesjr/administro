@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { X, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Transaction, TransactionType, TransactionStatus } from '../../../shared/types/index';
+import { Transaction, TransactionType, TransactionStatus } from '@/shared/types/index';
 import { db } from '@/lib/firebase/config';
 import { collection, addDoc, updateDoc, doc } from 'firebase/firestore';
 import { useAuth } from '@/components/auth/auth-provider';

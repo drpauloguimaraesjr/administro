@@ -1,6 +1,6 @@
 'use client';
 
-import { Transaction } from '../../../shared/types/index';
+import { Transaction } from '@/shared/types/index';
 import { ShareButton } from './share-button';
 
 interface ShareReportProps {
@@ -13,7 +13,7 @@ export function ShareReport({ transactions, period, context }: ShareReportProps)
   const income = transactions
     .filter(t => t.type === 'income')
     .reduce((sum, t) => sum + t.amount, 0);
-  
+
   const expenses = transactions
     .filter(t => t.type === 'expense')
     .reduce((sum, t) => sum + t.amount, 0);

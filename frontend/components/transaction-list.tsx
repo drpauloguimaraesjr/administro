@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Transaction } from '../../shared/types/index';
+import { Transaction } from '@/shared/types/index';
 import { format } from 'date-fns';
 import { ArrowUpCircle, ArrowDownCircle, Image as ImageIcon, Edit } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
@@ -48,8 +48,8 @@ export function TransactionList({ transactions, contextId }: TransactionListProp
 function TransactionCard({ transaction }: { transaction: Transaction }) {
   const [editing, setEditing] = useState(false);
   const isIncome = transaction.type === 'income';
-  const date = transaction.date instanceof Date 
-    ? transaction.date 
+  const date = transaction.date instanceof Date
+    ? transaction.date
     : new Date(transaction.date);
 
   if (editing) {
@@ -66,18 +66,17 @@ function TransactionCard({ transaction }: { transaction: Transaction }) {
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-3 flex-1">
-            <div className={`p-2 rounded-lg ${
-              isIncome 
+            <div className={`p-2 rounded-lg ${isIncome
                 ? 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400'
                 : 'bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400'
-            }`}>
+              }`}>
               {isIncome ? (
                 <ArrowUpCircle className="w-5 h-5" />
               ) : (
                 <ArrowDownCircle className="w-5 h-5" />
               )}
             </div>
-            
+
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <p className="font-semibold truncate">{transaction.description}</p>
@@ -108,9 +107,8 @@ function TransactionCard({ transaction }: { transaction: Transaction }) {
           </div>
 
           <div className="text-right space-y-2">
-            <p className={`text-lg font-bold ${
-              isIncome ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-            }`}>
+            <p className={`text-lg font-bold ${isIncome ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+              }`}>
               {isIncome ? '+' : '-'}R$ {transaction.amount.toFixed(2)}
             </p>
             {transaction.status === 'pending' && (

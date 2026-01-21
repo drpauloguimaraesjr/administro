@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { X, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Investment } from '../../../shared/types/index';
+import { Investment } from '@/shared/types/index';
 import { db } from '@/lib/firebase/config';
 import { collection, addDoc } from 'firebase/firestore';
 import { useAuth } from '@/components/auth/auth-provider';
@@ -141,22 +141,20 @@ export function InvestmentForm({ onClose, initialData }: InvestmentFormProps) {
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, contextId: 'HOME' })}
-                className={`flex-1 p-3 rounded-lg border-2 ${
-                  formData.contextId === 'HOME'
+                className={`flex-1 p-3 rounded-lg border-2 ${formData.contextId === 'HOME'
                     ? 'border-blue-500 bg-blue-50'
                     : 'border-slate-200'
-                }`}
+                  }`}
               >
                 🏠 Casa
               </button>
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, contextId: 'CLINIC' })}
-                className={`flex-1 p-3 rounded-lg border-2 ${
-                  formData.contextId === 'CLINIC'
+                className={`flex-1 p-3 rounded-lg border-2 ${formData.contextId === 'CLINIC'
                     ? 'border-blue-500 bg-blue-50'
                     : 'border-slate-200'
-                }`}
+                  }`}
               >
                 🏥 Clínica
               </button>

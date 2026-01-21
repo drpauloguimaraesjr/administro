@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Investment } from '../../../shared/types/index';
+import { Investment } from '@/shared/types/index';
 import { Card, CardContent } from '@/components/ui/card';
 import { Building2, TrendingUp, Calendar } from 'lucide-react';
 
@@ -37,13 +37,13 @@ export function InvestmentList({ investments }: InvestmentListProps) {
 }
 
 function InvestmentCard({ investment }: { investment: Investment }) {
-  const progress = investment.totalAmount > 0 
-    ? (investment.investedAmount / investment.totalAmount) * 100 
+  const progress = investment.totalAmount > 0
+    ? (investment.investedAmount / investment.totalAmount) * 100
     : 0;
-  
+
   const profit = investment.totalAmount - investment.investedAmount;
-  const profitPercentage = investment.investedAmount > 0 
-    ? (profit / investment.investedAmount) * 100 
+  const profitPercentage = investment.investedAmount > 0
+    ? (profit / investment.investedAmount) * 100
     : 0;
 
   const installmentProgress = investment.installments && investment.installments.total > 0

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, TrendingUp, DollarSign, Calendar } from 'lucide-react';
-import { Investment } from '../../shared/types/index';
+import { Investment } from '@/shared/types/index';
 import { db } from '@/lib/firebase/config';
 import { collection, query, orderBy, onSnapshot, addDoc } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
