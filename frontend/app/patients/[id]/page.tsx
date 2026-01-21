@@ -1,34 +1,37 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Edit, Phone, Mail, Calendar, User, FileText, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PatientModal } from '@/components/patients/PatientModal';
+import { AnamnesisForm } from '@/components/patients/AnamnesisForm';
+import { EvolutionsList } from '@/components/patients/EvolutionsList';
 import api from '@/lib/api';
 import Link from 'next/link';
 
 export default function PatientDetailsPage() {
     const params = useParams();
     const router = useRouter();
+    const patientId = params.id as string;
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('perfil');
 
     const { data: patient, isLoading } = useQuery({
-        queryKey: ['patient', params.id],
+        queryKey: ['patient', patientId],
         queryFn: async () => {
-            const res = await api.get(`/patients/${params.id}`);
+            const res = await api.get(`/patients/${patientId}`);
             return res.data;
         },
     });
 
     const { data: appointments = [] } = useQuery({
-        queryKey: ['patient-appointments', params.id],
+        queryKey: ['patient-appointments', patientId],
         queryFn: async () => {
             const res = await api.get('/appointments');
-            return res.data.filter((apt: any) => apt.patientId === params.id);
+            return res.data.filter((apt: any) => apt.patientId === patientId);
         },
         enabled: activeTab === 'historico',
     });
@@ -63,8 +66,9 @@ export default function PatientDetailsPage() {
 
     const tabs = [
         { id: 'perfil', label: 'Perfil', icon: User },
-        { id: 'historico', label: 'Histórico', icon: Calendar },
-        { id: 'prontuario', label: 'Prontuário', icon: FileText },
+        { id: 'anamnese', label: 'Anamnese', icon: FileText },
+        { id: 'evolucoes', label: 'Evoluções', icon: Calendar },
+        { id: 'historico', label: 'Consultas', icon: Calendar },
         { id: 'financeiro', label: 'Financeiro', icon: CreditCard },
     ];
 
@@ -94,12 +98,12 @@ export default function PatientDetailsPage() {
                     </div>
 
                     {/* Tabs */}
-                    <div className="flex gap-2 border-b">
+                    <div className="flex gap-1 border-b overflow-x-auto">
                         {tabs.map((tab) => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center gap-2 px-4 py-2 border-b-2 transition-all ${activeTab === tab.id
+                                className={`flex items-center gap-2 px-4 py-2 border-b-2 transition-all whitespace-nowrap ${activeTab === tab.id
                                         ? 'border-teal-600 text-teal-600'
                                         : 'border-transparent text-muted-foreground hover:text-foreground'
                                     }`}
@@ -159,6 +163,14 @@ export default function PatientDetailsPage() {
                             </div>
                         )}
 
+                        {activeTab === 'anamnese' && (
+                            <AnamnesisForm patientId={patientId} />
+                        )}
+
+                        {activeTab === 'evolucoes' && (
+                            <EvolutionsList patientId={patientId} />
+                        )}
+
                         {activeTab === 'historico' && (
                             <div>
                                 <h3 className="font-semibold mb-4 text-lg">Histórico de Consultas</h3>
@@ -179,28 +191,25 @@ export default function PatientDetailsPage() {
                                                 <div className="flex justify-between">
                                                     <div>
                                                         <p className="font-medium">{apt.date} às {apt.startTime}</p>
-                                                        <p className="text-sm text-muted-foreground">{apt.type}</p>
+                                                        <p className="text-sm text-muted-foreground">
+                                                            {apt.type === 'first_visit' ? 'Primeira Consulta' :
+                                                                apt.type === 'return' ? 'Retorno' : 'Avaliação'}
+                                                        </p>
                                                     </div>
                                                     <span className={`px-2 py-1 rounded text-xs ${apt.status === 'confirmed' ? 'bg-green-100 text-green-700' :
                                                             apt.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
                                                                 apt.status === 'cancelled' ? 'bg-red-100 text-red-700' :
                                                                     'bg-blue-100 text-blue-700'
                                                         }`}>
-                                                        {apt.status}
+                                                        {apt.status === 'confirmed' ? 'Confirmado' :
+                                                            apt.status === 'pending' ? 'Pendente' :
+                                                                apt.status === 'cancelled' ? 'Cancelado' : 'Concluído'}
                                                     </span>
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
                                 )}
-                            </div>
-                        )}
-
-                        {activeTab === 'prontuario' && (
-                            <div className="text-center py-8 text-muted-foreground">
-                                <FileText className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                                <p>Prontuário em desenvolvimento</p>
-                                <p className="text-sm">Em breve: Anamnese, Evolução, Documentos</p>
                             </div>
                         )}
 
