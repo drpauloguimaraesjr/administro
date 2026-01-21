@@ -1,3 +1,5 @@
+'use client';
+
 // src/components/agenda/ReminderButton.tsx
 import React from 'react';
 import { sendReminder } from '@/lib/api';
