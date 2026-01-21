@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +18,9 @@ interface Patient {
     phone: string;
     email?: string;
     notes?: string;
+    referralSource?: string;
+    referredById?: string;
+    referredByName?: string;
 }
 
 interface PatientModalProps {
@@ -29,6 +32,9 @@ interface PatientModalProps {
 export function PatientModal({ open, onClose, patient }: PatientModalProps) {
     const queryClient = useQueryClient();
     const isEditing = !!patient?.id;
+    const [referralSource, setReferralSource] = useState('');
+    const [referrerSearch, setReferrerSearch] = useState('');
+    const [selectedReferrer, setSelectedReferrer] = useState<{ id: string; name: string } | null>(null);
 
     const { register, handleSubmit, reset, formState: { errors } } = useForm<Patient>({
         defaultValues: {
@@ -42,6 +48,17 @@ export function PatientModal({ open, onClose, patient }: PatientModalProps) {
         },
     });
 
+    // Search patients for referral dropdown
+    const { data: referrerOptions = [] } = useQuery({
+        queryKey: ['patients-for-referral', referrerSearch],
+        queryFn: async () => {
+            if (referrerSearch.length < 2) return [];
+            const res = await api.get('/patients', { params: { search: referrerSearch } });
+            return res.data.filter((p: Patient) => p.id !== patient?.id);
+        },
+        enabled: referralSource === 'indication' && referrerSearch.length >= 2,
+    });
+
     useEffect(() => {
         if (patient) {
             reset({
@@ -51,8 +68,12 @@ export function PatientModal({ open, onClose, patient }: PatientModalProps) {
                 gender: patient.gender || 'M',
                 phone: patient.phone || '',
                 email: patient.email || '',
-                notes: (patient as any).notes || '',
+                notes: patient.notes || '',
             });
+            setReferralSource(patient.referralSource || '');
+            if (patient.referredById) {
+                setSelectedReferrer({ id: patient.referredById, name: patient.referredByName || '' });
+            }
         } else {
             reset({
                 name: '',
@@ -63,6 +84,8 @@ export function PatientModal({ open, onClose, patient }: PatientModalProps) {
                 email: '',
                 notes: '',
             });
+            setReferralSource('');
+            setSelectedReferrer(null);
         }
     }, [patient, reset]);
 
@@ -78,15 +101,23 @@ export function PatientModal({ open, onClose, patient }: PatientModalProps) {
         mutationFn: (data: Patient) => api.put(`/patients/${patient?.id}`, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['patients'] });
+            queryClient.invalidateQueries({ queryKey: ['patient', patient?.id] });
             onClose();
         },
     });
 
     const onSubmit = (data: Patient) => {
+        const payload = {
+            ...data,
+            referralSource,
+            referredById: selectedReferrer?.id || null,
+            referredByName: selectedReferrer?.name || null,
+        };
+
         if (isEditing) {
-            updateMutation.mutate(data);
+            updateMutation.mutate(payload);
         } else {
-            createMutation.mutate(data);
+            createMutation.mutate(payload);
         }
     };
 
@@ -94,7 +125,7 @@ export function PatientModal({ open, onClose, patient }: PatientModalProps) {
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="max-w-lg">
+            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>
                         {isEditing ? 'Editar Paciente' : 'Novo Paciente'}
@@ -173,6 +204,74 @@ export function PatientModal({ open, onClose, patient }: PatientModalProps) {
                                 />
                             </div>
                         </div>
+
+                        {/* Como nos conheceu */}
+                        <div>
+                            <Label>Como nos conheceu?</Label>
+                            <select
+                                value={referralSource}
+                                onChange={(e) => {
+                                    setReferralSource(e.target.value);
+                                    if (e.target.value !== 'indication') {
+                                        setSelectedReferrer(null);
+                                    }
+                                }}
+                                className="w-full h-10 px-3 rounded-md border border-input bg-background"
+                            >
+                                <option value="">Selecione...</option>
+                                <option value="indication">Indicação de paciente</option>
+                                <option value="google">Google</option>
+                                <option value="instagram">Instagram</option>
+                                <option value="facebook">Facebook</option>
+                                <option value="friend">Amigo/Familiar</option>
+                                <option value="other">Outro</option>
+                            </select>
+                        </div>
+
+                        {/* Quem indicou */}
+                        {referralSource === 'indication' && (
+                            <div>
+                                <Label>Quem indicou?</Label>
+                                {selectedReferrer ? (
+                                    <div className="flex items-center justify-between p-2 border rounded-md bg-teal-50 dark:bg-teal-900/30">
+                                        <span className="font-medium">{selectedReferrer.name}</span>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => setSelectedReferrer(null)}
+                                        >
+                                            Alterar
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    <div className="relative">
+                                        <Input
+                                            value={referrerSearch}
+                                            onChange={(e) => setReferrerSearch(e.target.value)}
+                                            placeholder="Buscar paciente..."
+                                        />
+                                        {referrerOptions.length > 0 && (
+                                            <div className="absolute z-10 w-full mt-1 bg-white dark:bg-slate-800 border rounded-md shadow-lg max-h-40 overflow-y-auto">
+                                                {referrerOptions.map((p: Patient) => (
+                                                    <button
+                                                        key={p.id}
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setSelectedReferrer({ id: p.id!, name: p.name });
+                                                            setReferrerSearch('');
+                                                        }}
+                                                        className="w-full text-left px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                                    >
+                                                        {p.name}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
                         {/* Observações */}
                         <div>
