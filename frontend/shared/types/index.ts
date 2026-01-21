@@ -76,3 +76,21 @@ export interface N8nTransactionPayload {
   attachmentUrl?: string;
 }
 
+export type AppointmentStatus = 'scheduled' | 'confirmed' | 'cancelled' | 'completed' | 'no_show';
+export type AppointmentType = 'first_visit' | 'return' | 'evaluation' | 'emergency';
+
+export interface Appointment {
+  id?: string;
+  patientName: string;
+  patientPhone: string;
+  date: string | Date;
+  time: string;
+  duration: number;
+  type: AppointmentType;
+  status: AppointmentStatus;
+  notes?: string;
+  contextId?: 'CLINIC';
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+  createdBy?: string;
+}
