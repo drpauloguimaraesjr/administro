@@ -10,6 +10,7 @@ import { initializeWhatsApp } from './services/whatsapp.js';
 import appointmentsRoutes from './routes/appointments.js';
 import patientsRoutes from './routes/patients.js';
 import medicalRecordsRoutes from './routes/medicalRecords.js';
+import paymentsRoutes from './routes/payments.js';
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use('/api/whatsapp', whatsappRoutes);
 app.use('/api/appointments', appointmentsRoutes);
 app.use('/api/patients', patientsRoutes);
 app.use('/api/medical-records', medicalRecordsRoutes);
+app.use('/api/payments', paymentsRoutes);
 
 // Inicia servidor
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;

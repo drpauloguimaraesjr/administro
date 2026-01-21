@@ -11,6 +11,7 @@ import { AnamnesisForm } from '@/components/patients/AnamnesisForm';
 import { EvolutionsList } from '@/components/patients/EvolutionsList';
 import { PrescriptionsList } from '@/components/patients/PrescriptionsList';
 import { DocumentsList } from '@/components/patients/DocumentsList';
+import { PaymentsList } from '@/components/patients/PaymentsList';
 import api from '@/lib/api';
 import Link from 'next/link';
 
@@ -109,8 +110,8 @@ export default function PatientDetailsPage() {
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`flex items-center gap-2 px-3 py-2 border-b-2 transition-all whitespace-nowrap text-sm ${activeTab === tab.id
-                                        ? 'border-teal-600 text-teal-600'
-                                        : 'border-transparent text-muted-foreground hover:text-foreground'
+                                    ? 'border-teal-600 text-teal-600'
+                                    : 'border-transparent text-muted-foreground hover:text-foreground'
                                     }`}
                             >
                                 <tab.icon className="w-4 h-4" />
@@ -214,9 +215,9 @@ export default function PatientDetailsPage() {
                                                     </p>
                                                 </div>
                                                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${apt.status === 'confirmed' ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' :
-                                                        apt.status === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' :
-                                                            apt.status === 'cancelled' ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' :
-                                                                'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+                                                    apt.status === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' :
+                                                        apt.status === 'cancelled' ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' :
+                                                            'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
                                                     }`}>
                                                     {apt.status === 'confirmed' ? 'Confirmado' :
                                                         apt.status === 'pending' ? 'Pendente' :
@@ -230,11 +231,7 @@ export default function PatientDetailsPage() {
                         )}
 
                         {activeTab === 'financeiro' && (
-                            <div className="text-center py-8 text-muted-foreground">
-                                <CreditCard className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                                <p>Financeiro em desenvolvimento</p>
-                                <p className="text-sm">Em breve: Pagamentos vinculados a consultas</p>
-                            </div>
+                            <PaymentsList patientId={patientId} patientName={patient.name} />
                         )}
                     </div>
                 </motion.div>
