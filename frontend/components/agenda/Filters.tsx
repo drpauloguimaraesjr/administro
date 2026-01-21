@@ -1,3 +1,4 @@
+"use client";
 // components/agenda/Filters.tsx
 import React from 'react';
 import { useState } from 'react';
