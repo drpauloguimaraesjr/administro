@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Home, DollarSign, Smartphone, Calendar, Users, Shield, LogOut } from 'lucide-react';
+import { Home, DollarSign, Smartphone, Calendar, Users, Shield, LogOut, Share2, ClipboardList } from 'lucide-react';
 import { useAuth } from './auth/auth-provider';
 import { Button } from './ui/button';
 
@@ -15,8 +15,10 @@ export function Navigation() {
     { href: '/', label: 'Dashboard', icon: <Home className="w-4 h-4" /> },
     { href: '/agenda', label: 'Agenda', icon: <Calendar className="w-4 h-4" /> },
     { href: '/patients', label: 'Pacientes', icon: <Users className="w-4 h-4" /> },
+    { href: '/indicacoes', label: 'Indicações', icon: <Share2 className="w-4 h-4" /> },
+    { href: '/questionarios', label: 'Questionários', icon: <ClipboardList className="w-4 h-4" /> },
     { href: '/transactions', label: 'Financeiro', icon: <DollarSign className="w-4 h-4" /> },
-    { href: '/whatsapp', label: 'Bot WhatsApp', icon: <Smartphone className="w-4 h-4" /> },
+    { href: '/whatsapp', label: 'WhatsApp', icon: <Smartphone className="w-4 h-4" /> },
   ];
 
   if (user) {

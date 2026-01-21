@@ -35,3 +35,5 @@ export const sendReminder = async (id: string) => {
     const response = await api.post(`/appointments/${id}/send-reminder`);
     return response.data;
 };
+
+export default api;

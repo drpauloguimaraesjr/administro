@@ -11,6 +11,7 @@ import appointmentsRoutes from './routes/appointments.js';
 import patientsRoutes from './routes/patients.js';
 import medicalRecordsRoutes from './routes/medicalRecords.js';
 import paymentsRoutes from './routes/payments.js';
+import questionnairesRoutes from './routes/questionnaires.js';
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use('/api/appointments', appointmentsRoutes);
 app.use('/api/patients', patientsRoutes);
 app.use('/api/medical-records', medicalRecordsRoutes);
 app.use('/api/payments', paymentsRoutes);
+app.use('/api/questionnaires', questionnairesRoutes);
 
 // Inicia servidor
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
