@@ -1,6 +1,11 @@
 // app/agenda/page.tsx
 import React from 'react';
-import Calendar from '@/components/agenda/Calendar';
+import dynamic from 'next/dynamic';
+
+const Calendar = dynamic(() => import('@/components/agenda/Calendar'), {
+    ssr: false,
+    loading: () => <div className="p-4">Carregando agenda...</div>
+});
 import Sidebar from '@/components/agenda/Sidebar';
 import Filters from '@/components/agenda/Filters';
 

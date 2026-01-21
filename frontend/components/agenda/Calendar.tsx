@@ -1,3 +1,5 @@
+'use client';
+
 // components/agenda/Calendar.tsx
 import React from 'react';
 import FullCalendar from '@fullcalendar/react';
