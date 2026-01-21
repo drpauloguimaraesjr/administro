@@ -7,7 +7,7 @@ const collection = db.collection('appointments');
 export const getAllAppointments = async (): Promise<Appointment[]> => {
     const snapshot = await collection.get();
     const appointments: Appointment[] = [];
-    snapshot.forEach(doc => {
+    snapshot.forEach((doc: FirebaseFirestore.DocumentSnapshot) => {
         appointments.push({ id: doc.id, ...(doc.data() as any) });
     });
     return appointments;
@@ -45,7 +45,7 @@ export const deleteAppointment = async (id: string): Promise<boolean> => {
 export const getAppointmentsByDate = async (date: string): Promise<Appointment[]> => {
     const snapshot = await collection.where('date', '==', date).get();
     const result: Appointment[] = [];
-    snapshot.forEach(doc => {
+    snapshot.forEach((doc: FirebaseFirestore.DocumentSnapshot) => {
         result.push({ id: doc.id, ...(doc.data() as any) });
     });
     return result;
