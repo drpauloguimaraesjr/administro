@@ -8,6 +8,7 @@ import n8nRoutes from './routes/n8n.routes.js';
 import whatsappRoutes from './routes/whatsapp.routes.js';
 import { initializeWhatsApp } from './services/whatsapp.js';
 import appointmentsRoutes from './routes/appointments.js';
+import patientsRoutes from './routes/patients.js';
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.get('/healthz', (req, res) => {
 app.use('/api/n8n', n8nRoutes);
 app.use('/api/whatsapp', whatsappRoutes);
 app.use('/api/appointments', appointmentsRoutes);
+app.use('/api/patients', patientsRoutes);
 
 // Inicia servidor
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
@@ -42,6 +44,7 @@ app.listen(PORT, async () => {
   console.log(`   - POST /api/whatsapp/message`);
   console.log(`   - GET /api/whatsapp/qr`);
   console.log(`   - GET /api/whatsapp/status`);
+  console.log(`   - CRUD /api/patients`);
 
   // Inicializa WhatsApp se configurado
   if (process.env.WHATSAPP_AUTO_START === 'true') {
