@@ -25,8 +25,8 @@ export function ShareButton({ text, imageUrl, transactionId }: ShareButtonProps)
 
     setLoading(true);
     try {
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://administro-production.up.railway.app';
-      
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://administro-production.up.railway.app';
+
       if (imageUrl) {
         // Enviar imagem
         const response = await fetch(`${backendUrl}/api/whatsapp/send-image`, {
@@ -92,7 +92,7 @@ export function ShareButton({ text, imageUrl, transactionId }: ShareButtonProps)
               Exemplo: 5511999999999 (55 + DDD + número)
             </p>
           </div>
-          
+
           {text && (
             <div>
               <label className="text-sm font-medium mb-2 block">Mensagem</label>
