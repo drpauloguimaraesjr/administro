@@ -6,7 +6,11 @@ import { AuthProvider } from '@/components/auth/auth-provider';
 import Providers from '@/components/providers';
 
 const inter = Inter({ subsets: ['latin'] });
-// ... (omitted)
+
+export const metadata: Metadata = {
+  title: 'CALYX - Sistema Médico',
+  description: 'Prontuário Eletrônico e Gestão Médica',
+};
 
 export default function RootLayout({
   children,

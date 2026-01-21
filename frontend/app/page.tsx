@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Wallet, TrendingUp, Plus, BarChart3 } from 'lucide-react';
+import { Wallet, TrendingUp, Plus, BarChart3, Calendar, Users, FileText } from 'lucide-react';
 import { ContextSelector } from '@/components/context-selector';
 import { StatsCards } from '@/components/stats-cards';
 import { TransactionList } from '@/components/transaction-list';
@@ -157,14 +157,14 @@ export default function Home() {
           {/* Header */}
           <motion.div variants={itemVariants} className="text-center space-y-4">
             <motion.h1
-              className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
+              className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent"
               whileHover={{ scale: 1.05 }}
               transition={{ type: 'spring', stiffness: 300 }}
             >
-              Administrador de Contas
+              CALYX
             </motion.h1>
             <p className="text-muted-foreground">
-              Sistema de gestão financeira pessoal e empresarial
+              Prontuário Eletrônico e Gestão Médica
             </p>
           </motion.div>
 
@@ -187,22 +187,22 @@ export default function Home() {
             className="grid grid-cols-1 md:grid-cols-3 gap-4"
           >
             <ActionCard
-              icon={<Plus className="w-6 h-6" />}
-              title="Adicionar Transação"
-              description="Registre uma nova receita ou despesa"
-              href="/transactions"
+              icon={<Calendar className="w-6 h-6" />}
+              title="Agendamento"
+              description="Marcar nova consulta"
+              href="/agenda"
             />
             <ActionCard
-              icon={<BarChart3 className="w-6 h-6" />}
-              title="Ver Relatórios"
-              description="Analise seus gastos e receitas"
-              href="/reports"
+              icon={<Users className="w-6 h-6" />}
+              title="Pacientes"
+              description="Gerenciar pacientes"
+              href="/patients"
             />
             <ActionCard
               icon={<Wallet className="w-6 h-6" />}
-              title="Investimentos"
-              description="Gerencie seus investimentos"
-              href="/investments"
+              title="Financeiro"
+              description="Registrar receitas/despesas"
+              href="/transactions"
             />
           </motion.div>
 

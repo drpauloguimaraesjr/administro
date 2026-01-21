@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Home, DollarSign, BarChart3, TrendingUp, Shield, LogOut, Smartphone } from 'lucide-react';
+import { Home, DollarSign, Smartphone, Calendar, Users, Shield, LogOut } from 'lucide-react';
 import { useAuth } from './auth/auth-provider';
 import { Button } from './ui/button';
 
@@ -13,9 +13,9 @@ export function Navigation() {
 
   const navItems = [
     { href: '/', label: 'Dashboard', icon: <Home className="w-4 h-4" /> },
-    { href: '/transactions', label: 'Transações', icon: <DollarSign className="w-4 h-4" /> },
-    { href: '/reports', label: 'Relatórios', icon: <BarChart3 className="w-4 h-4" /> },
-    { href: '/investments', label: 'Investimentos', icon: <TrendingUp className="w-4 h-4" /> },
+    { href: '/agenda', label: 'Agenda', icon: <Calendar className="w-4 h-4" /> },
+    { href: '/patients', label: 'Pacientes', icon: <Users className="w-4 h-4" /> },
+    { href: '/transactions', label: 'Financeiro', icon: <DollarSign className="w-4 h-4" /> },
     { href: '/whatsapp', label: 'Bot WhatsApp', icon: <Smartphone className="w-4 h-4" /> },
   ];
 
@@ -27,8 +27,8 @@ export function Navigation() {
     <nav className="border-b bg-white dark:bg-slate-900 sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link href="/" className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            Administrador de Contas
+          <Link href="/" className="text-xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">
+            CALYX
           </Link>
           <div className="flex items-center gap-2">
             <div className="flex gap-1">
