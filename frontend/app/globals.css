@@ -4,48 +4,78 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
+    --card: #ffffff;
+    --ring: #a1a1a1;
+    --input: #e5e5e5;
+    --muted: #f5f5f5;
+    --accent: #f5f5f5;
+    --border: #e5e5e5;
+    --radius: 0.625rem;
+    --chart-1: #91c5ff;
+    --chart-2: #3a81f6;
+    --chart-3: #2563ef;
+    --chart-4: #1a4eda;
+    --chart-5: #1f3fad;
+    --popover: #ffffff;
+    --primary: #171717;
+    --sidebar: #fafafa;
+    --spacing: 0.25rem;
+    --secondary: #f5f5f5;
+    --background: #ffffff;
+    --foreground: #0a0a0a;
+    --destructive: #e7000b;
+    --sidebar-ring: #a1a1a1;
+    --sidebar-accent: #f5f5f5;
+    --sidebar-border: #e5e5e5;
+    --card-foreground: #0a0a0a;
+    --sidebar-primary: #171717;
+    --muted-foreground: #737373;
+    --accent-foreground: #171717;
+    --popover-foreground: #0a0a0a;
+    --primary-foreground: #fafafa;
+    --sidebar-foreground: #0a0a0a;
+    --secondary-foreground: #171717;
+    --destructive-foreground: #ffffff;
+    --sidebar-accent-foreground: #171717;
+    --sidebar-primary-foreground: #fafafa;
+    
+    --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    --card: #0a0a0a;
+    --ring: #525252;
+    --input: #262626;
+    --muted: #262626;
+    --accent: #262626;
+    --border: #262626;
+    --chart-1: #91c5ff;
+    --chart-2: #3a81f6;
+    --chart-3: #2563ef;
+    --chart-4: #1a4eda;
+    --chart-5: #1f3fad;
+    --popover: #0a0a0a;
+    --primary: #fafafa;
+    --sidebar: #0a0a0a;
+    --secondary: #262626;
+    --background: #0a0a0a;
+    --foreground: #fafafa;
+    --destructive: #e7000b;
+    --sidebar-ring: #525252;
+    --sidebar-accent: #262626;
+    --sidebar-border: #262626;
+    --card-foreground: #fafafa;
+    --sidebar-primary: #fafafa;
+    --muted-foreground: #a1a1a1;
+    --accent-foreground: #fafafa;
+    --popover-foreground: #fafafa;
+    --primary-foreground: #0a0a0a;
+    --sidebar-foreground: #fafafa;
+    --secondary-foreground: #fafafa;
+    --destructive-foreground: #ffffff;
+    --sidebar-accent-foreground: #fafafa;
+    --sidebar-primary-foreground: #0a0a0a;
   }
 }
 
@@ -55,6 +85,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans);
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
@@ -66,3 +97,24 @@
   }
 }
 
+/* Custom scrollbar */
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--muted) var(--background);
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: var(--background);
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: var(--muted);
+    border-radius: 3px;
+  }
+}
