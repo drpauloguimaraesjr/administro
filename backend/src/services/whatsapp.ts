@@ -1,22 +1,24 @@
 /**
  * Serviço WhatsApp usando Baileys
- * Implementação Robusta baseada no Nutri-Buddy (com Fix 9-dígitos e Backoff)
+ * Com persistência de sessão no Firestore
  */
 
 import makeWASocket, {
   ConnectionState,
   DisconnectReason,
-  useMultiFileAuthState,
   WASocket,
   fetchLatestBaileysVersion,
   proto,
   makeCacheableSignalKeyStore,
+  AuthenticationCreds,
+  AuthenticationState,
+  SignalDataTypeMap,
+  initAuthCreds,
+  BufferJSON,
 } from '@whiskeysockets/baileys';
 import { Boom } from '@hapi/boom';
 import pino from 'pino';
 import { db } from '../config/firebaseAdmin.js';
-import path from 'path';
-import fs from 'fs';
 
 type InternalConnectionState = 'open' | 'connecting' | 'close' | 'disconnected' | 'waiting_qr';
 
@@ -26,15 +28,120 @@ let connectionState: InternalConnectionState = 'close';
 let reconnectAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 5;
 
-// Caminho para auth info
-const AUTH_FOLDER = path.resolve('auth_info_baileys');
+const SESSION_COLLECTION = 'whatsapp_session';
+
+/**
+ * Auth state que persiste no Firestore
+ */
+async function useFirestoreAuthState(): Promise<{
+  state: AuthenticationState;
+  saveCreds: () => Promise<void>;
+}> {
+
+  const loadCreds = async (): Promise<AuthenticationCreds> => {
+    try {
+      const doc = await db.collection(SESSION_COLLECTION).doc('creds').get();
+      if (doc.exists) {
+        const data = doc.data();
+        if (data?.creds) {
+          console.log('✅ WhatsApp: Carregando credenciais do Firestore');
+          return JSON.parse(data.creds, BufferJSON.reviver);
+        }
+      }
+    } catch (error) {
+      console.log('📝 WhatsApp: Criando novas credenciais');
+    }
+    return initAuthCreds();
+  };
+
+  const creds = await loadCreds();
+
+  const saveCreds = async () => {
+    try {
+      await db.collection(SESSION_COLLECTION).doc('creds').set({
+        creds: JSON.stringify(creds, BufferJSON.replacer),
+        updatedAt: new Date(),
+      });
+      console.log('💾 WhatsApp: Credenciais salvas no Firestore');
+    } catch (error) {
+      console.error('Erro ao salvar credenciais:', error);
+    }
+  };
+
+  const keys = {
+    get: async (type: keyof SignalDataTypeMap, ids: string[]) => {
+      const result: { [id: string]: any } = {};
+      try {
+        for (const id of ids) {
+          const docId = `${type}-${id}`.replace(/\//g, '_');
+          const doc = await db.collection(SESSION_COLLECTION).doc(docId).get();
+          if (doc.exists) {
+            const data = doc.data();
+            if (data?.value) {
+              result[id] = JSON.parse(data.value, BufferJSON.reviver);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao carregar keys:', error);
+      }
+      return result;
+    },
+    set: async (data: { [type: string]: { [id: string]: any } }) => {
+      try {
+        const batch = db.batch();
+        for (const [type, entries] of Object.entries(data)) {
+          for (const [id, value] of Object.entries(entries)) {
+            const docId = `${type}-${id}`.replace(/\//g, '_');
+            const ref = db.collection(SESSION_COLLECTION).doc(docId);
+            if (value) {
+              batch.set(ref, {
+                type,
+                id,
+                value: JSON.stringify(value, BufferJSON.replacer),
+                updatedAt: new Date(),
+              });
+            } else {
+              batch.delete(ref);
+            }
+          }
+        }
+        await batch.commit();
+      } catch (error) {
+        console.error('Erro ao salvar keys:', error);
+      }
+    },
+  };
+
+  return {
+    state: { creds, keys },
+    saveCreds,
+  };
+}
+
+/**
+ * Limpa sessão do Firestore
+ */
+async function clearFirestoreSession() {
+  try {
+    const snapshot = await db.collection(SESSION_COLLECTION).get();
+    const batch = db.batch();
+    snapshot.docs.forEach((doc) => {
+      batch.delete(doc.ref);
+    });
+    await batch.commit();
+    console.log('🗑️ WhatsApp: Sessão limpa do Firestore');
+  } catch (error) {
+    console.error('Erro ao limpar sessão:', error);
+  }
+}
 
 /**
  * Inicializa conexão WhatsApp com Baileys
  */
 export async function initializeWhatsApp() {
   try {
-    const { state, saveCreds } = await useMultiFileAuthState(AUTH_FOLDER);
+    const { state, saveCreds } = await useFirestoreAuthState();
     const { version } = await fetchLatestBaileysVersion();
 
     socket = makeWASocket({
@@ -45,7 +152,7 @@ export async function initializeWhatsApp() {
         keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'silent' })),
       },
       logger: pino({ level: 'silent' }),
-      browser: ['Administrador de Contas', 'Chrome', '1.0.0'],
+      browser: ['CALYX', 'Chrome', '1.0.0'],
       generateHighQualityLinkPreview: true,
     });
 
@@ -76,20 +183,15 @@ export async function initializeWhatsApp() {
         if (shouldReconnect) {
           reconnectAttempts++;
           if (reconnectAttempts <= MAX_RECONNECT_ATTEMPTS) {
-            const delay = Math.min(3000 * reconnectAttempts, 30000); // Backoff: 3s, 6s... max 30s
+            const delay = Math.min(3000 * reconnectAttempts, 30000);
             console.log(`🔄 Reconectando em ${delay / 1000}s (Tentativa ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`);
             setTimeout(() => initializeWhatsApp(), delay);
           } else {
             console.error('❌ Máximo de tentativas de reconexão atingido.');
           }
         } else {
-          // Logout real, limpa tudo
           console.log('🚪 Desconectado (Logout). Limpando sessão...');
-          try {
-            if (fs.existsSync(AUTH_FOLDER)) {
-              fs.rmSync(AUTH_FOLDER, { recursive: true, force: true });
-            }
-          } catch (e) { console.error('Erro ao limpar pasta auth:', e); }
+          await clearFirestoreSession();
           reconnectAttempts = 0;
         }
       } else if (connection === 'open') {
@@ -116,7 +218,6 @@ export async function initializeWhatsApp() {
     console.log('🚀 WhatsApp Baileys inicializado');
   } catch (error: any) {
     console.error('❌ Erro ao inicializar WhatsApp:', error);
-    // Tenta recuperar se for erro fatal
     setTimeout(() => initializeWhatsApp(), 10000);
   }
 }
@@ -147,24 +248,14 @@ async function handleIncomingMessage(message: proto.IWebMessageInfo) {
 
     if (!msgContent) return;
 
-    // Detecta tipo
-    let messageType = 'unknown';
     let text = '';
-    let mediaUrl = '';
 
     if (msgContent.conversation || msgContent.extendedTextMessage?.text) {
-      messageType = 'text';
       text = msgContent.conversation || msgContent.extendedTextMessage?.text || '';
       await processTextMessage(from, text, pushName, messageId);
     } else if (msgContent.imageMessage) {
-      messageType = 'image';
-      // TODO: Implementar upload de mídia real se necessário. 
-      // Por enquanto, passamos a URL interna se disponível ou notificamos o n8n para baixar se possível.
-      // O Baileys não expõe URL pública direta sem download.
-      // Enviamos 'image' para o fluxo tentar tratar ou pedir reenvio.
       await processMediaMessage(from, 'image', pushName, messageId, msgContent.imageMessage);
     } else if (msgContent.audioMessage) {
-      messageType = 'audio';
       await processMediaMessage(from, 'audio', pushName, messageId, msgContent.audioMessage);
     }
 
@@ -174,7 +265,6 @@ async function handleIncomingMessage(message: proto.IWebMessageInfo) {
 }
 
 async function processTextMessage(from: string, text: string, pushName: string, messageId?: string) {
-  // Reutiliza a lógica de chamar a rota interna via axios para manter consistência com o router existente
   const axios = (await import('axios')).default;
   const backendUrl = `http://localhost:${process.env.PORT || 3001}`;
 
@@ -192,106 +282,116 @@ async function processTextMessage(from: string, text: string, pushName: string, 
 }
 
 async function processMediaMessage(from: string, type: string, pushName: string, messageId: string | undefined | null, mediaContent: any) {
-  // Se tivermos N8N configurado, enviamos para ele
   if (process.env.N8N_WEBHOOK_URL) {
     const axios = (await import('axios')).default;
-    // Nota: Sem o download/upload real, o N8N pode ter dificuldade com a mídia.
-    // Mas vamos enviar a notificação.
     try {
       await axios.post(process.env.N8N_WEBHOOK_URL, {
         from,
         fromName: pushName,
-        mediaType: type,
+        messageType: type,
         messageId,
-        // Passamos o objeto de mídia bruto caso o N8N saiba lidar ou para debug
-        mediaContent
+        caption: mediaContent.caption || '',
       });
     } catch (e: any) {
-      console.error(`Erro ao enviar mídia para N8N:`, e.message);
+      console.error('Erro ao enviar para N8N:', e.message);
     }
   }
 }
 
+/**
+ * Formata número para padrão WhatsApp
+ */
+function formatPhoneNumber(phone: string): string {
+  let cleaned = phone.replace(/\D/g, '');
+
+  if (cleaned.length === 11 && cleaned.startsWith('55')) {
+    cleaned = cleaned;
+  } else if (cleaned.length === 10 || cleaned.length === 11) {
+    cleaned = '55' + cleaned;
+  }
+
+  if (cleaned.length === 12 && cleaned.startsWith('55')) {
+    const ddd = cleaned.substring(2, 4);
+    const dddNum = parseInt(ddd, 10);
+    if (dddNum >= 11 && dddNum <= 28) {
+      cleaned = cleaned.substring(0, 4) + '9' + cleaned.substring(4);
+    }
+  }
+
+  return cleaned + '@s.whatsapp.net';
+}
 
 /**
- * Envia mensagem de texto via WhatsApp (Com correção para números BR 9 dígitos)
+ * Envia mensagem de texto
  */
-export async function sendTextMessage(to: string, message: string): Promise<boolean> {
+export async function sendMessage(to: string, message: string): Promise<boolean> {
+  if (!socket || connectionState !== 'open') {
+    console.error('WhatsApp não conectado');
+    return false;
+  }
+
   try {
-    if (!socket || connectionState !== 'open') {
-      console.error('WhatsApp não está conectado');
-      return false;
-    }
-
-    // Formatação inteligente de número BR
-    let targetJid = to.includes('@s.whatsapp.net') ? to : `${to}@s.whatsapp.net`;
-    const possibleJids = [targetJid];
-
-    // Se for número brasileiro (55)
-    if (to.startsWith('55') || to.startsWith('55')) {
-      const cleanNum = to.replace(/\D/g, ''); // Garante só números
-      if (cleanNum.startsWith('55')) {
-        const ddd = cleanNum.substring(2, 4);
-        const number = cleanNum.substring(4);
-
-        if (number.length === 9 && number.startsWith('9')) {
-          // Tem 9 e começa com 9: adicionar versão SEM o 9
-          possibleJids.push(`55${ddd}${number.substring(1)}@s.whatsapp.net`);
-        } else if (number.length === 8) {
-          // Tem 8: adicionar versão COM o 9
-          possibleJids.push(`55${ddd}9${number}@s.whatsapp.net`);
-        }
-      }
-    }
-
-    // Tenta enviar para os JIDs possíveis
-    for (const jid of possibleJids) {
-      try {
-        const result = await socket.onWhatsApp(jid);
-        if (result && Array.isArray(result) && result[0]?.exists) {
-          await socket.sendMessage(result[0].jid, { text: message });
-          console.log(`✅ Mensagem enviada para ${result[0].jid}`);
-          return true;
-        }
-      } catch (e) {
-        console.warn(`Falha ao verificar/enviar para ${jid}`, e);
-      }
-    }
-
-    // Se chegou aqui, tenta enviar para o original mesmo assim (fallback)
-    await socket.sendMessage(targetJid, { text: message });
+    const jid = formatPhoneNumber(to);
+    await socket.sendMessage(jid, { text: message });
+    console.log(`✅ Mensagem enviada para ${to}`);
     return true;
-
   } catch (error: any) {
-    console.error('❌ Erro ao enviar mensagem:', error);
+    console.error('Erro ao enviar mensagem:', error);
     return false;
   }
 }
 
 /**
- * Envia mensagem de Imagem
+ * Envia documento/PDF
  */
-export async function sendImageMessage(to: string, imageUrl: string, caption?: string): Promise<boolean> {
-  // Implementação simplificada mantendo a original
-  if (!socket || connectionState !== 'open') return false;
-  const jid = to.includes('@') ? to : `${to}@s.whatsapp.net`;
+export async function sendDocument(to: string, url: string, filename: string): Promise<boolean> {
+  if (!socket || connectionState !== 'open') {
+    console.error('WhatsApp não conectado');
+    return false;
+  }
+
   try {
-    await socket.sendMessage(jid, { image: { url: imageUrl }, caption });
+    const jid = formatPhoneNumber(to);
+    await socket.sendMessage(jid, {
+      document: { url },
+      mimetype: 'application/pdf',
+      fileName: filename,
+    });
+    console.log(`✅ Documento enviado para ${to}`);
     return true;
-  } catch (e) {
-    console.error('Erro ao enviar imagem:', e);
+  } catch (error: any) {
+    console.error('Erro ao enviar documento:', error);
     return false;
   }
 }
 
+/**
+ * Retorna QR Code atual
+ */
 export function getQRCode(): string | null {
   return qrCode;
 }
 
-export function getConnectionState(): InternalConnectionState {
+/**
+ * Retorna status da conexão
+ */
+export function getConnectionStatus(): InternalConnectionState {
   return connectionState;
 }
 
+/**
+ * Verifica se está conectado
+ */
 export function isConnected(): boolean {
-  return connectionState === 'open' && socket !== null;
+  return connectionState === 'open';
+}
+
+/**
+ * Desconecta WhatsApp
+ */
+export async function disconnect() {
+  if (socket) {
+    await socket.logout();
+    socket = null;
+  }
 }
