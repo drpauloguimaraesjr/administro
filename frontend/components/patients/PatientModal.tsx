@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -95,6 +95,10 @@ export function PatientModal({ open, onClose, patient }: PatientModalProps) {
             queryClient.invalidateQueries({ queryKey: ['patients'] });
             onClose();
         },
+        onError: (error) => {
+            console.error('Erro ao criar paciente:', error);
+            alert('Erro ao criar paciente. Verifique a conexão com o servidor.');
+        }
     });
 
     const updateMutation = useMutation({
@@ -104,6 +108,10 @@ export function PatientModal({ open, onClose, patient }: PatientModalProps) {
             queryClient.invalidateQueries({ queryKey: ['patient', patient?.id] });
             onClose();
         },
+        onError: (error) => {
+            console.error('Erro ao atualizar paciente:', error);
+            alert('Erro ao atualizar paciente. Verifique a conexão com o servidor.');
+        }
     });
 
     const onSubmit = (data: Patient) => {
@@ -130,6 +138,9 @@ export function PatientModal({ open, onClose, patient }: PatientModalProps) {
                     <DialogTitle>
                         {isEditing ? 'Editar Paciente' : 'Novo Paciente'}
                     </DialogTitle>
+                    <DialogDescription>
+                        Preencha os dados abaixo para {isEditing ? 'editar' : 'cadastrar'} um paciente.
+                    </DialogDescription>
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
