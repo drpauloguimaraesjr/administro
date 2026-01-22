@@ -92,8 +92,8 @@ export default function Home() {
   if (!user) return null;
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50 to-emerald-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      <div className="container mx-auto px-4 py-6 max-w-7xl">
+    <div>
+      <div className="space-y-6">
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -206,9 +206,9 @@ export default function Home() {
                       </div>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${apt.status === 'confirmed' ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' :
-                        apt.status === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' :
-                          apt.status === 'completed' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' :
-                            'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
+                      apt.status === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' :
+                        apt.status === 'completed' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' :
+                          'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
                       }`}>
                       {apt.status === 'confirmed' ? 'Confirmado' :
                         apt.status === 'pending' ? 'Pendente' :
@@ -221,7 +221,7 @@ export default function Home() {
           </motion.div>
         </motion.div>
       </div>
-    </main>
+    </div>
   );
 }
 

@@ -4,78 +4,113 @@
 
 @layer base {
   :root {
-    --card: #ffffff;
-    --ring: #a1a1a1;
-    --input: #e5e5e5;
-    --muted: #f5f5f5;
-    --accent: #f5f5f5;
-    --border: #e5e5e5;
-    --radius: 0.625rem;
-    --chart-1: #91c5ff;
-    --chart-2: #3a81f6;
-    --chart-3: #2563ef;
-    --chart-4: #1a4eda;
-    --chart-5: #1f3fad;
-    --popover: #ffffff;
-    --primary: #171717;
-    --sidebar: #fafafa;
-    --spacing: 0.25rem;
-    --secondary: #f5f5f5;
-    --background: #ffffff;
-    --foreground: #0a0a0a;
-    --destructive: #e7000b;
-    --sidebar-ring: #a1a1a1;
-    --sidebar-accent: #f5f5f5;
-    --sidebar-border: #e5e5e5;
-    --card-foreground: #0a0a0a;
-    --sidebar-primary: #171717;
-    --muted-foreground: #737373;
-    --accent-foreground: #171717;
-    --popover-foreground: #0a0a0a;
-    --primary-foreground: #fafafa;
-    --sidebar-foreground: #0a0a0a;
-    --secondary-foreground: #171717;
-    --destructive-foreground: #ffffff;
-    --sidebar-accent-foreground: #171717;
-    --sidebar-primary-foreground: #fafafa;
+    /* --- PALETA PROFISSIONAL CALYX --- */
 
-    --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
-    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    /* Cores Primárias (Azul Médico) */
+    --primary-50: #EFF6FF;
+    --primary-100: #DBEAFE;
+    --primary-200: #BFDBFE;
+    --primary-300: #93C5FD;
+    --primary-400: #60A5FA;
+    --primary-500: #3B82F6;
+    /* Principal */
+    --primary-600: #2563EB;
+    --primary-700: #1D4ED8;
+    --primary-800: #1E40AF;
+    --primary-900: #1E3A8A;
+
+    /* Cores Neutras (Cinzas) */
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    /* Bordas */
+    --gray-300: #D1D5DB;
+    --gray-400: #9CA3AF;
+    --gray-500: #6B7280;
+    /* Texto secundário */
+    --gray-600: #4B5563;
+    /* Texto corpo */
+    --gray-700: #374151;
+    --gray-800: #1F2937;
+    --gray-900: #111827;
+    /* Títulos */
+
+    /* Cores Semânticas */
+    --success: 142 76% 36%;
+    /* #16a34a - green-600 */
+    --warning: 38 92% 50%;
+    /* #f59e0b - amber-500 */
+    --error: 0 84% 60%;
+    /* #ef4444 - red-500 */
+    --info: 217 91% 60%;
+    /* #3b82f6 - blue-500 */
+
+    /* Sistema Shadcn (Mapeado) */
+    --background: 0 0% 100%;
+    /* #FFFFFF */
+    --foreground: 222 47% 11%;
+    /* Gray 900 #111827 */
+
+    --card: 0 0% 100%;
+    /* #FFFFFF */
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 217 91% 60%;
+    /* Primary 500 #3B82F6 */
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    /* Gray 50 #F9FAFB equivalent */
+    --secondary-foreground: 222 47% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Gray 500 */
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222 47% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    /* Gray 200 #E5E7EB */
+    --input: 214.3 31.8% 91.4%;
+    --ring: 217 91% 60%;
+    /* Focus Ring Blue */
+
+    --radius: 0.5rem;
+    /* 8px default */
+
+    /* Espaçamentos e Sombras Custom */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   }
 
   .dark {
-    --card: #0a0a0a;
-    --ring: #525252;
-    --input: #262626;
-    --muted: #262626;
-    --accent: #262626;
-    --border: #262626;
-    --chart-1: #91c5ff;
-    --chart-2: #3a81f6;
-    --chart-3: #2563ef;
-    --chart-4: #1a4eda;
-    --chart-5: #1f3fad;
-    --popover: #0a0a0a;
-    --primary: #fafafa;
-    --sidebar: #0a0a0a;
-    --secondary: #262626;
-    --background: #0a0a0a;
-    --foreground: #fafafa;
-    --destructive: #e7000b;
-    --sidebar-ring: #525252;
-    --sidebar-accent: #262626;
-    --sidebar-border: #262626;
-    --card-foreground: #fafafa;
-    --sidebar-primary: #fafafa;
-    --muted-foreground: #a1a1a1;
-    --accent-foreground: #fafafa;
-    --popover-foreground: #fafafa;
-    --primary-foreground: #0a0a0a;
-    --sidebar-foreground: #fafafa;
-    --secondary-foreground: #fafafa;
-    --destructive-foreground: #ffffff;
-    --sidebar-accent-foreground: #fafafa;
-    --sidebar-primary-foreground: #0a0a0a;
+    /* Adaptação Dark Mode (Opcional, focado em Light por enquanto) */
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
   }
 }
 
@@ -89,37 +124,27 @@
   }
 
   body {
-    @apply bg-background text-foreground;
-    font-family: var(--font-sans);
+    @apply bg-gray-50 text-foreground antialiased;
+    /* Fundo secundário geral */
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
-/* Mobile First - Touch Targets */
-@layer utilities {
-  .touch-target {
-    @apply min-h-[44px] min-w-[44px];
-  }
-}
+/* Utilitários de Profissionalização */
+@layer components {
 
-/* Custom scrollbar */
-@layer utilities {
-  .scrollbar-thin {
-    scrollbar-width: thin;
-    scrollbar-color: var(--muted) var(--background);
+  /* Botão Profissional */
+  .btn-hover-effect {
+    @apply transition-all duration-200 hover:-translate-y-[1px] hover:shadow-md active:translate-y-0 active:shadow-none;
   }
 
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+  /* Card Profissional */
+  .card-hover-effect {
+    @apply transition-all duration-200 hover:shadow-md border-gray-200;
   }
 
-  .scrollbar-thin::-webkit-scrollbar-track {
-    background: var(--background);
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: var(--muted);
-    border-radius: 3px;
+  /* Input Profissional */
+  .input-ring {
+    @apply focus-visible:ring-2 focus-visible:ring-primary-500/20 focus-visible:border-primary-500 transition-all duration-150;
   }
 }

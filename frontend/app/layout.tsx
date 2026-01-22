@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { Navigation } from '@/components/navigation';
+import { MainLayout } from '@/components/layout/main-layout';
 import { AuthProvider } from '@/components/auth/auth-provider';
 import Providers from '@/components/providers';
 
@@ -22,8 +22,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <Providers>
           <AuthProvider>
-            <Navigation />
-            {children}
+            <MainLayout>
+              {children}
+            </MainLayout>
           </AuthProvider>
         </Providers>
       </body>
