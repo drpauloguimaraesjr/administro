@@ -24,6 +24,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Health check
+app.get('/', (req, res) => {
+  res.send('Administro Backend Running 🚀');
+});
+
 app.get('/healthz', (req, res) => {
   res.json({
     status: 'ok',
