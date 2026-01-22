@@ -326,7 +326,7 @@ router.get('/status', async (req: Request, res: Response) => {
     const connected = isConnected();
 
     // Busca status do Firestore também
-    let firestoreStatus = null;
+    let firestoreStatus: any = null;
     try {
       const statusDoc = await db.collection('whatsapp_status').doc('connection').get();
       if (statusDoc.exists) {
