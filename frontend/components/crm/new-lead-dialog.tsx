@@ -45,7 +45,7 @@ export function NewLeadDialog() {
                 ...data,
                 stage: 'new',
                 score: 50,
-                urgency: 'medium'
+                source: data.source as any
             });
             setOpen(false);
             reset();
