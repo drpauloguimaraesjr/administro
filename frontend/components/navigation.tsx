@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Home, DollarSign, Smartphone, Calendar, Users, Shield, LogOut, Share2, ClipboardList, Target } from 'lucide-react';
+import { Home, DollarSign, Smartphone, Calendar, Users, Shield, LogOut, Share2, ClipboardList, Target, Settings } from 'lucide-react';
 import { useAuth } from './auth/auth-provider';
 import { Button } from './ui/button';
 
@@ -20,6 +20,7 @@ export function Navigation() {
     { href: '/transactions', label: 'Financeiro', icon: <DollarSign className="w-4 h-4" /> },
     { href: '/whatsapp', label: 'WhatsApp', icon: <Smartphone className="w-4 h-4" /> },
     { href: '/crm', label: 'CRM', icon: <Target className="w-4 h-4" /> },
+    { href: '/configuracoes/usuarios', label: 'Configurações', icon: <Settings className="w-4 h-4" /> },
   ];
 
   if (user) {
