@@ -293,3 +293,17 @@ export interface WhatsAppConversation {
 
   createdAt: string;
 }
+
+// --- Audit Logs ---
+
+export interface AuditLog {
+  id: string;
+  userId: string;
+  userName: string;
+  action: 'create' | 'update' | 'delete' | 'login' | 'export' | 'view';
+  module: string; // 'patients', 'financial', etc.
+  resourceId?: string; // ID do objeto afetado
+  details?: string; // Descrição human-readable
+  metadata?: any; // Dados técnicos (diff, ip, userAgent)
+  timestamp: string;
+}

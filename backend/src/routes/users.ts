@@ -1,6 +1,7 @@
 
 import { Router } from 'express';
 import { UsersService } from '../services/users.service.js';
+import { AuditLogService } from '../services/audit-log.service.js';
 
 const router = Router();
 
@@ -9,6 +10,16 @@ router.get('/', async (req, res) => {
     try {
         const users = await UsersService.getAll();
         res.json(users);
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Buscar logs do usuário
+router.get('/:id/logs', async (req, res) => {
+    try {
+        const logs = await AuditLogService.getByUser(req.params.id);
+        res.json(logs);
     } catch (error: any) {
         res.status(500).json({ error: error.message });
     }
