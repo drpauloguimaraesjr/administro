@@ -1,7 +1,8 @@
 import { KanbanBoard } from '@/components/crm/kanban-board';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Filter, Plus } from 'lucide-react';
+import { Search, Filter, BarChart3 } from 'lucide-react';
+import Link from 'next/link';
 
 export default function CRMPage() {
     return (
@@ -16,9 +17,16 @@ export default function CRMPage() {
                         </p>
                     </div>
                     <div className="flex gap-2">
-                        <Button>
-                            <Plus className="w-4 h-4 mr-2" /> Novo Lead
+                        <Button variant="ghost" size="sm">
+                            <Filter className="w-4 h-4 mr-2" />
+                            Filtrar
                         </Button>
+                        <Link href="/crm/analytics">
+                            <Button variant="ghost" size="sm">
+                                <BarChart3 className="w-4 h-4 mr-2" />
+                                Analytics
+                            </Button>
+                        </Link>
                     </div>
                 </div>
 

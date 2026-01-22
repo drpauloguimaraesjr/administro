@@ -1,6 +1,7 @@
 
 import { db } from '../config/firebaseAdmin.js';
-import { Lead } from '../shared/types/index.js'; // Assumindo que criaremos o type no shared
+import { Lead } from '../shared/types/index.js';
+import { sendMessage, isConnected } from './whatsapp.js';
 
 const collection = db.collection('leads');
 
@@ -59,15 +60,31 @@ export const LeadsService = {
         const doc = await docRef.get();
         if (!doc.exists) throw new Error('Lead not found');
 
-        const oldStage = doc.data()?.stage;
+        const leadData = doc.data() as Lead;
+        const oldStage = leadData.stage;
 
         if (oldStage !== newStage) {
             await docRef.update({
                 stage: newStage,
                 stageUpdatedAt: new Date().toISOString(),
-                // Adiciona ao histórico (atomicamente seria ideal, mas simplificado aqui)
-                // Em produção usaríamos FieldValue.arrayUnion
             });
+
+            // --- AUTOMATIONS ---
+            // Trigger: Quando move para 'scheduled'
+            if (newStage === 'scheduled' && leadData.phone) {
+                if (isConnected()) {
+                    const message = `Olá ${leadData.name || ''}, confirmamos que seu agendamento foi iniciado. Em breve enviaremos os detalhes!`;
+                    console.log(`🤖 Automação: Enviando mensagem para ${leadData.phone}`);
+                    await sendMessage(leadData.phone, message);
+                } else {
+                    console.warn('⚠️ Automação falhou: WhatsApp não conectado.');
+                }
+            }
+
+            // Trigger: Quando move para 'contacted' (exemplo de boas vindas)
+            if (newStage === 'contacted' && oldStage === 'new' && leadData.phone) {
+                // Poderia enviar outra mensagem aqui
+            }
         }
     }
 };
