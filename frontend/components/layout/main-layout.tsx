@@ -5,9 +5,13 @@ import { usePathname } from 'next/navigation';
 import { Sidebar } from './sidebar';
 import { Header } from './header';
 
+import { cn } from '@/lib/utils';
+
 export function MainLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const isPublicPage = pathname === '/login' || pathname === '/register' || pathname.startsWith('/responder');
+    // Se estiver em uma página de detalhes do paciente (Prontuário), remove o padding padrão
+    const isMedicalRecord = pathname.startsWith('/patients/') && pathname.split('/').length > 2;
 
     if (isPublicPage) {
         return <>{children}</>;
@@ -29,7 +33,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
             </header>
 
             {/* Conteúdo Principal - Com scroll e padding */}
-            <main className="overflow-y-auto p-8 relative">
+            <main className={cn("overflow-y-auto relative", isMedicalRecord ? "p-0" : "p-8")}>
                 {children}
             </main>
         </div>
