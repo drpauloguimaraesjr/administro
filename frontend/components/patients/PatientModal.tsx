@@ -110,8 +110,8 @@ export function PatientModal({ open, onClose, patient }: PatientModalProps) {
         const payload = {
             ...data,
             referralSource,
-            referredById: selectedReferrer?.id || null,
-            referredByName: selectedReferrer?.name || null,
+            referredById: selectedReferrer?.id || undefined,
+            referredByName: selectedReferrer?.name || undefined,
         };
 
         if (isEditing) {
