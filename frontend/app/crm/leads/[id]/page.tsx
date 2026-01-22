@@ -40,7 +40,7 @@ const LEAD_DATA = {
             content: 'Olá! Gostaria de saber mais sobre o tratamento de emagrecimento.',
             createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
             createdBy: 'Maria Silva (Cliente)',
-            direction: 'inbound'
+            direction: 'inbound' as const
         },
         {
             id: '102',
@@ -48,7 +48,7 @@ const LEAD_DATA = {
             content: 'Olá Maria! Claro, podemos agendar uma avaliação. Qual o melhor horário para você?',
             createdAt: new Date(Date.now() - 1000 * 60 * 60 * 1.5).toISOString(),
             createdBy: 'Atendente Ana',
-            direction: 'outbound'
+            direction: 'outbound' as const
         },
         {
             id: '103',
