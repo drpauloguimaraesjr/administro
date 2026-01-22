@@ -95,3 +95,26 @@ export interface Appointment {
   createdAt: string;
   updatedAt: string;
 }
+
+// CRM Types (Duplicated from frontend types for shared usage potentially)
+// Idealmente isso estaria em um pacote separado ou monorepo real
+// Por enquanto vamos manter a interface Lead disponível no backend também
+export type LeadStage = 'new' | 'contacted' | 'qualified' | 'scheduled' | 'converted' | 'lost';
+
+export interface Lead {
+  id: string;
+  name: string;
+  email?: string;
+  phone: string;
+  source: string;
+  stage: LeadStage;
+  stageUpdatedAt: string;
+  score?: number;
+  tags?: string[];
+  lastContactAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  // ... outros campos podem ser adicionados conforme necessidade
+  stageHistory?: any[];
+  interactions?: any[];
+}
