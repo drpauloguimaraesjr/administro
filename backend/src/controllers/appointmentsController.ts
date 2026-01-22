@@ -2,7 +2,7 @@
 import { Request, Response } from 'express';
 import { Appointment } from '../shared/types/index.js';
 import { z } from 'zod';
-import { clinicHours, holidays } from '../config/clinic.js';
+import { clinicHours, holidays } from '../config/clinicConfig.js';
 import { getAllAppointments, getAppointmentById, createAppointment as createAppointmentDb, updateAppointment as updateAppointmentDb, deleteAppointment as deleteAppointmentDb, getAppointmentsByDate } from '../services/firestore.js';
 
 // Firestore will be used for persistence; in‑memory array removed
