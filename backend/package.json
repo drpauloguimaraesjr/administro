@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "npx tsc",
+    "build": "node_modules/.bin/tsc",
     "start": "node dist/index.js",
     "test": "jest --config jest.config.cjs"
   },
@@ -35,7 +35,6 @@
     "node-cron": "^3.0.2",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.0",
-    "tsx": "^4.21.0",
-    "typescript": "^5.3.3"
+    "tsx": "^4.21.0"
   }
 }
