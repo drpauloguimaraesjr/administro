@@ -146,7 +146,6 @@ export async function initializeWhatsApp() {
 
     socket = makeWASocket({
       version,
-      printQRInTerminal: true,
       auth: {
         creds: state.creds,
         keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'silent' })),
@@ -173,9 +172,18 @@ export async function initializeWhatsApp() {
 
       if (connection === 'close') {
         const error = (lastDisconnect?.error as Boom);
-        const shouldReconnect = error?.output?.statusCode !== DisconnectReason.loggedOut;
+        const statusCode = error?.output?.statusCode;
 
-        console.log(`❌ Conexão fechada: ${error?.message || 'Desconhecido'}. Reconectar? ${shouldReconnect}`);
+        let shouldReconnect = statusCode !== DisconnectReason.loggedOut;
+
+        // Se for erro de autenticação (Sessão inválida/remota desconectada), não reconecta e limpa
+        if (statusCode === 401 || statusCode === 403) {
+          console.log('🔒 Erro de autenticação (401/403). Sessão inválida.');
+          shouldReconnect = false;
+          await clearFirestoreSession();
+        }
+
+        console.log(`❌ Conexão fechada. Status: ${statusCode}, Erro: ${error?.message || 'Desconhecido'}. Reconectar? ${shouldReconnect}`);
 
         connectionState = 'close';
         await updateFirestoreStatus('disconnected', null);
@@ -183,16 +191,20 @@ export async function initializeWhatsApp() {
         if (shouldReconnect) {
           reconnectAttempts++;
           if (reconnectAttempts <= MAX_RECONNECT_ATTEMPTS) {
-            const delay = Math.min(3000 * reconnectAttempts, 30000);
+            // Backoff exponencial para evitar flood
+            const delay = Math.min(5000 * Math.pow(2, reconnectAttempts - 1), 60000);
             console.log(`🔄 Reconectando em ${delay / 1000}s (Tentativa ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`);
             setTimeout(() => initializeWhatsApp(), delay);
           } else {
-            console.error('❌ Máximo de tentativas de reconexão atingido.');
+            console.error('❌ Máximo de tentativas de reconexão atingido. Parando serviço.');
           }
         } else {
-          console.log('🚪 Desconectado (Logout). Limpando sessão...');
-          await clearFirestoreSession();
-          reconnectAttempts = 0;
+          console.log('🚪 Desconectado (Sessão limpa ou Logout explícito).');
+          // Se limpamos a sessão por erro 401, podemos tentar iniciar uma nova limpa automaticamente
+          if (statusCode === 401 || statusCode === 403) {
+            console.log('🔄 Iniciando nova sessão limpa em 5s...');
+            setTimeout(() => initializeWhatsApp(), 5000);
+          }
         }
       } else if (connection === 'open') {
         console.log('✅ WhatsApp conectado com sucesso!');
