@@ -26,6 +26,12 @@ const userSchema = z.object({
     specialty: z.string().optional(),
     customRoleName: z.string().optional(),
 
+    // Permissions (Optional override)
+    permissions: z.array(z.object({
+        module: z.string(),
+        actions: z.array(z.string())
+    })).optional(),
+
     // Agenda
     hasAgenda: z.boolean().default(false),
     workingDays: z.array(z.number()).optional(),
@@ -52,7 +58,8 @@ export function NewUserDialog({ open, onOpenChange, userToEdit }: NewUserDialogP
             hasAgenda: false,
             canAnswerWhatsApp: false,
             workingDays: [1, 2, 3, 4, 5],
-            whatsappQueues: []
+            whatsappQueues: [],
+            permissions: []
         }
     });
 
@@ -119,6 +126,7 @@ export function NewUserDialog({ open, onOpenChange, userToEdit }: NewUserDialogP
                             <TabsTrigger value="role">Cargo</TabsTrigger>
                             <TabsTrigger value="agenda">Agenda</TabsTrigger>
                             <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
+                            <TabsTrigger value="permissions">Permissões</TabsTrigger>
                         </TabsList>
 
                         {/* ABA 1: PESSOAL */}
@@ -231,10 +239,67 @@ export function NewUserDialog({ open, onOpenChange, userToEdit }: NewUserDialogP
                             {canAnswerWhatsApp && (
                                 <div className="pl-6 border-l-2 border-slate-200 space-y-4">
                                     <Label>Filas de Atendimento</Label>
-                                    {/* TODO: Listar filas disponíveis quando a API de filas estiver pronta */}
                                     <p className="text-sm text-muted-foreground">As filas serão carregadas aqui.</p>
                                 </div>
                             )}
+                        </TabsContent>
+
+                        {/* ABA 5: PERMISSÕES */}
+                        <TabsContent value="permissions" className="space-y-4 py-4">
+                            <div className="rounded-md border">
+                                <div className="grid grid-cols-6 gap-4 p-4 bg-gray-50 font-medium text-sm border-b">
+                                    <div className="col-span-2">Módulo</div>
+                                    <div className="text-center">Ver</div>
+                                    <div className="text-center">Criar</div>
+                                    <div className="text-center">Editar</div>
+                                    <div className="text-center">Excluir</div>
+                                </div>
+                                <div className="max-h-[300px] overflow-y-auto">
+                                    {['patients', 'appointments', 'medical_records', 'prescriptions', 'financial', 'crm', 'whatsapp', 'reports', 'settings', 'users'].map(module => (
+                                        <div key={module} className="grid grid-cols-6 gap-4 p-4 border-b last:border-0 items-center hover:bg-gray-50">
+                                            <div className="col-span-2 font-medium capitalize text-sm">
+                                                {module === 'medical_records' ? 'Prontuário' :
+                                                    module === 'users' ? 'Usuários' :
+                                                        module === 'settings' ? 'Configurações' :
+                                                            module === 'patients' ? 'Pacientes' :
+                                                                module === 'appointments' ? 'Agenda' :
+                                                                    module === 'financial' ? 'Financeiro' :
+                                                                        module === 'prescriptions' ? 'Receituário' :
+                                                                            module === 'reports' ? 'Relatórios' : module}
+                                            </div>
+                                            {['view', 'create', 'edit', 'delete'].map(action => (
+                                                <div key={action} className="flex justify-center">
+                                                    <Checkbox
+                                                        checked={
+                                                            (watch('permissions') || []).find(p => p.module === module)?.actions.includes(action) || false
+                                                        }
+                                                        onCheckedChange={(checked) => {
+                                                            const currentPerms = watch('permissions') || [];
+                                                            const modPerm = currentPerms.find(p => p.module === module);
+                                                            let newPerms = [...currentPerms];
+
+                                                            if (modPerm) {
+                                                                const newActions = checked
+                                                                    ? [...modPerm.actions, action]
+                                                                    : modPerm.actions.filter(a => a !== action);
+
+                                                                if (newActions.length === 0) {
+                                                                    newPerms = newPerms.filter(p => p.module !== module);
+                                                                } else {
+                                                                    newPerms = newPerms.map(p => p.module === module ? { ...p, actions: newActions } : p);
+                                                                }
+                                                            } else if (checked) {
+                                                                newPerms.push({ module, actions: [action] });
+                                                            }
+                                                            setValue('permissions', newPerms as any, { shouldDirty: true });
+                                                        }}
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
                         </TabsContent>
 
                     </Tabs>
