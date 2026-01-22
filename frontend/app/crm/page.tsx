@@ -1,4 +1,5 @@
 import { KanbanBoard } from '@/components/crm/kanban-board';
+import { NewLeadDialog } from '@/components/crm/new-lead-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, Filter, BarChart3 } from 'lucide-react';
@@ -17,6 +18,7 @@ export default function CRMPage() {
                         </p>
                     </div>
                     <div className="flex gap-2">
+                        <NewLeadDialog />
                         <Button variant="ghost" size="sm">
                             <Filter className="w-4 h-4 mr-2" />
                             Filtrar
