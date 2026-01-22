@@ -191,4 +191,103 @@ export interface Lead {
   // ... outros campos podem ser adicionados conforme necessidade
   stageHistory?: any[];
   interactions?: any[];
+// --- WhatsApp Queues & Conversations ---
+
+export interface WhatsAppQueue {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  color: string;
+
+  // Configurações
+  isActive: boolean;
+  priority: number; // 1-5 (maior = mais prioritário)
+
+  // Atribuição
+  assignmentType: 'manual' | 'round_robin' | 'least_busy' | 'ai';
+  assignedUsers: string[]; // IDs dos usuários que podem atender
+
+  // Automação
+  autoReply?: {
+    enabled: boolean;
+    message: string;
+    delay: number; // segundos
+  };
+
+  // Horário de Funcionamento
+  workingHours?: {
+    enabled: boolean;
+    schedule: {
+      [key: string]: { // 0-6 (domingo-sábado)
+        start: string;
+        end: string;
+      };
+    };
+    outsideHoursMessage?: string;
+  };
+
+  // IA (para fila de receitas)
+  aiConfig?: {
+    enabled: boolean;
+    model: 'gpt-4' | 'gpt-4-turbo';
+    systemPrompt: string;
+    autoGenerate: boolean;
+    requireApproval: boolean;
+  };
+
+  createdAt: string;
+}
+
+export interface WhatsAppMessage {
+  id: string;
+  conversationId: string;
+
+  // Conteúdo
+  type: 'text' | 'image' | 'audio' | 'video' | 'document';
+  content: string;
+  mediaUrl?: string;
+
+  // Direção
+  direction: 'inbound' | 'outbound';
+  from: string;
+  to: string;
+
+  // Status
+  status: 'sent' | 'delivered' | 'read' | 'failed';
+
+  // IA
+  isAiGenerated?: boolean;
+  aiContext?: any;
+
+  timestamp: string;
+}
+
+export interface WhatsAppConversation {
+  id: string;
+  phone: string;
+  contactName: string;
+
+  // Atribuição
+  queueId?: string;
+  assignedTo?: string;
+  assignedAt?: string;
+
+  // Status
+  status: 'waiting' | 'in_progress' | 'resolved' | 'closed';
+
+  // Mensagens
+  messages: WhatsAppMessage[];
+  lastMessageAt: string;
+  unreadCount: number;
+
+  // Contexto
+  patientId?: string;
+  leadId?: string;
+  appointmentId?: string;
+
+  // Tags
+  tags: string[];
+
+  createdAt: string;
 }

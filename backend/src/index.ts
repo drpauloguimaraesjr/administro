@@ -14,6 +14,7 @@ import paymentsRoutes from './routes/payments.js';
 import questionnairesRoutes from './routes/questionnaires.js';
 import leadsRoutes from './routes/leads.js';
 import { usersRouter } from './routes/users.js';
+import { whatsappQueuesRouter } from './routes/whatsapp-queues.js';
 
 const app = express();
 
@@ -41,6 +42,7 @@ app.use('/api/payments', paymentsRoutes);
 app.use('/api/questionnaires', questionnairesRoutes);
 app.use('/api/leads', leadsRoutes);
 app.use('/api/users', usersRouter);
+app.use('/api/whatsapp/queues', whatsappQueuesRouter);
 
 // Inicia servidor
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
