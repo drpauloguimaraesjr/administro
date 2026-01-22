@@ -258,9 +258,9 @@ async function extractTransactionFromText(
 async function sendWhatsAppMessage(to: string, message: string): Promise<void> {
   try {
     // Tenta usar Baileys primeiro
-    const { sendTextMessage } = await import('../services/whatsapp.js');
-    const sent = await sendTextMessage(to, message);
-    
+    const { sendMessage } = await import('../services/whatsapp.js');
+    const sent = await sendMessage(to, message);
+
     if (sent) {
       return;
     }
@@ -294,7 +294,7 @@ router.get('/qr', (req: Request, res: Response) => {
   try {
     const { getQRCode } = require('../services/whatsapp.js');
     const qr = getQRCode();
-    
+
     if (!qr) {
       return res.status(404).json({
         error: 'QR Code não disponível',

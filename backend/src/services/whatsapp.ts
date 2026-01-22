@@ -126,7 +126,7 @@ async function clearFirestoreSession() {
   try {
     const snapshot = await db.collection(SESSION_COLLECTION).get();
     const batch = db.batch();
-    snapshot.docs.forEach((doc) => {
+    snapshot.docs.forEach((doc: FirebaseFirestore.QueryDocumentSnapshot) => {
       batch.delete(doc.ref);
     });
     await batch.commit();
