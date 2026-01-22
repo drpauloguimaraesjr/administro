@@ -20,7 +20,7 @@ export function Navigation() {
     { href: '/transactions', label: 'Financeiro', icon: <DollarSign className="w-4 h-4" /> },
     { href: '/whatsapp', label: 'WhatsApp', icon: <Smartphone className="w-4 h-4" /> },
     { href: '/crm', label: 'CRM', icon: <Target className="w-4 h-4" /> },
-    { href: '/configuracoes/usuarios', label: 'Configurações', icon: <Settings className="w-4 h-4" /> },
+    { href: '/configuracoes', label: 'Configurações', icon: <Settings className="w-4 h-4" /> },
   ];
 
   if (user) {
