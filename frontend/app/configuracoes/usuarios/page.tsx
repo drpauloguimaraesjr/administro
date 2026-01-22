@@ -120,8 +120,16 @@ export default function UsersPage() {
                                         <span>{user.specialty || '-'}</span>
                                     </div>
                                     <div className="flex gap-2">
-                                        {user.hasAgenda && <Calendar className="w-4 h-4 text-blue-500" title="Possui Agenda" />}
-                                        {user.canAnswerWhatsApp && <Smartphone className="w-4 h-4 text-green-500" title="Atende WhatsApp" />}
+                                        {user.hasAgenda && (
+                                            <div title="Possui Agenda">
+                                                <Calendar className="w-4 h-4 text-blue-500" />
+                                            </div>
+                                        )}
+                                        {user.canAnswerWhatsApp && (
+                                            <div title="Atende WhatsApp">
+                                                <Smartphone className="w-4 h-4 text-green-500" />
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
