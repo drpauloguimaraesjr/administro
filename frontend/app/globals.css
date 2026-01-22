@@ -38,7 +38,7 @@
     --destructive-foreground: #ffffff;
     --sidebar-accent-foreground: #171717;
     --sidebar-primary-foreground: #fafafa;
-    
+
     --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   }
@@ -83,6 +83,11 @@
   * {
     @apply border-border;
   }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
@@ -103,16 +108,16 @@
     scrollbar-width: thin;
     scrollbar-color: var(--muted) var(--background);
   }
-  
+
   .scrollbar-thin::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
-  
+
   .scrollbar-thin::-webkit-scrollbar-track {
     background: var(--background);
   }
-  
+
   .scrollbar-thin::-webkit-scrollbar-thumb {
     background: var(--muted);
     border-radius: 3px;

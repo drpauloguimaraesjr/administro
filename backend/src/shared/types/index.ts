@@ -191,6 +191,8 @@ export interface Lead {
   // ... outros campos podem ser adicionados conforme necessidade
   stageHistory?: any[];
   interactions?: any[];
+}
+
 // --- WhatsApp Queues & Conversations ---
 
 export interface WhatsAppQueue {
