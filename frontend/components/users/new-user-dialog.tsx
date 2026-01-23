@@ -255,7 +255,7 @@ export function NewUserDialog({ open, onOpenChange, userToEdit }: NewUserDialogP
                                     <div className="text-center">Excluir</div>
                                 </div>
                                 <div className="max-h-[300px] overflow-y-auto">
-                                    {['patients', 'appointments', 'medical_records', 'prescriptions', 'financial', 'crm', 'whatsapp', 'reports', 'settings', 'users'].map(module => (
+                                    {(['patients', 'appointments', 'medical_records', 'prescriptions', 'financial', 'crm', 'whatsapp', 'reports', 'settings', 'users'] as const).map(module => (
                                         <div key={module} className="grid grid-cols-6 gap-4 p-4 border-b last:border-0 items-center hover:bg-gray-50">
                                             <div className="col-span-2 font-medium capitalize text-sm">
                                                 {module === 'medical_records' ? 'Prontuário' :
