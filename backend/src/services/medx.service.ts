@@ -96,8 +96,8 @@ export class MedXService {
     }
 
     /*
-   * Sincroniza pacientes do MedX para o nosso banco de dados
-   */
+     * Sincroniza pacientes do MedX para o nosso banco de dados
+     */
     async syncPatientsToLocal() {
         console.log('🔄 Iniciando sincronização de pacientes MedX...');
 
@@ -111,11 +111,8 @@ export class MedXService {
                 return { imported: 0, total: 0, skipped: 0 };
             }
 
-            // Importando a instância configurada do Firestore (com fallback)
-            // Importação estática usada no topo do arquivo
-
-            let batch = db.batch(); // Alterado para let para permitir reatribuição
-            const batchSize = 400; // Firestore limit is 500 operations per batch
+            let batch = db.batch();
+            const batchSize = 400;
             let batchCount = 0;
             let importedCount = 0;
             let skippedCount = 0;
@@ -130,24 +127,18 @@ export class MedXService {
 
                 let existingQuery;
 
-                // Verifica duplicidade (Atenção: Query dentro de loop é lento, ideal seria cachear CPFs existentes se a base for muito grande)
+                // Verifica duplicidade
                 if (cpf) {
                     existingQuery = await patientsRef.where('cpf', '==', cpf).limit(1).get();
                 } else {
                     existingQuery = await patientsRef.where('name', '==', name).limit(1).get();
                 }
 
-                if (!existingQuery.empty) {
-                    skippedCount++;
-                    continue; // Já existe
-                }
-
-                // Prepara objeto do paciente local
-                // Usando 'any' para o objeto p pois a resposta da API pode variar e não temos a tipagem exata mapeada
+                // Usando 'any' para o objeto p pois a resposta da API pode variar
                 const payload: any = p;
 
-                const newPatientRef = patientsRef.doc();
-                const newPatientData = {
+                // Dados a serem salvos (update ou create)
+                const patientData = {
                     name: name,
                     socialName: payload.Nome_Social || '',
                     cpf: cpf.replace(/\D/g, ''),
@@ -167,11 +158,11 @@ export class MedXService {
                     zipCode: payload.Cep_Residencial || payload.Cep || '',
                     city: payload.Cidade_Residencial || payload.Cidade || '',
                     state: payload.Estado_Residencial || payload.Estado || payload.UF || '',
-                    region: payload.Regiao || '', // Campo inferido
+                    region: payload.Regiao || '',
                     complement: payload.Complemento_Residencial || payload.Complemento || '',
                     reference: payload.Referencia || '',
 
-                    // Convênio (Campos hipotéticos baseados no padrão)
+                    // Convênio
                     insurance: payload.Convenio || payload.Nome_Convenio || '',
                     insuranceNumber: payload.Matricula || payload.Numero_Carteira || '',
                     cns: payload.Cns || payload.Numero_Cns || payload.Cartao_Nacional_Saude || '',
@@ -184,8 +175,8 @@ export class MedXService {
                     religion: payload.Religiao || '',
 
                     // Origem
-                    referralSource: payload.Conheceu_Por || '', // Campo "Conheceu por"
-                    referredBy: payload.Indicado_Por || '', // Campo "Indicado por"
+                    referralSource: payload.Conheceu_Por || '',
+                    referredBy: payload.Indicado_Por || '',
 
                     // Familiares
                     fatherName: payload.Nome_Pai || payload.Pai || '',
@@ -195,11 +186,22 @@ export class MedXService {
 
                     source: 'MedX Integration',
                     medxId: payload.Id || payload.Id_do_Usuario || '',
-                    createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString()
                 };
 
-                batch.set(newPatientRef, newPatientData);
+                if (!existingQuery.empty) {
+                    // Atualiza existente (Merge)
+                    const existingDoc = existingQuery.docs[0];
+                    batch.set(existingDoc.ref, patientData, { merge: true });
+                } else {
+                    // Cria novo
+                    const newRef = patientsRef.doc();
+                    batch.set(newRef, {
+                        ...patientData,
+                        createdAt: new Date().toISOString()
+                    });
+                }
+
                 batchCount++;
                 importedCount++;
 
@@ -216,12 +218,11 @@ export class MedXService {
                 await batch.commit();
             }
 
-            console.log(`✅ Sincronização MedX concluída. Importados: ${importedCount}. Pulados: ${skippedCount}.`);
-            return { imported: importedCount, total: medxPatients.length, skipped: skippedCount };
+            console.log(`✅ Sincronização MedX concluída. Processados: ${importedCount}.`);
+            return { imported: importedCount, total: medxPatients.length };
 
         } catch (error: any) {
             console.error('❌ Erro CRÍTICO na sincronização de pacientes:', error);
-            // Retorna erro estruturado em vez de falhar a request
             throw new Error(`Falha na sincronização: ${error.message}`);
         }
     }
