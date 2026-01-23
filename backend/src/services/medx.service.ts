@@ -143,20 +143,58 @@ export class MedXService {
                 }
 
                 // Prepara objeto do paciente local
+                // Usando 'any' para o objeto p pois a resposta da API pode variar e não temos a tipagem exata mapeada
+                const payload: any = p;
+
                 const newPatientRef = patientsRef.doc();
                 const newPatientData = {
                     name: name,
-                    cpf: cpf.replace(/\D/g, ''), // Limpa CPF
-                    birthDate: p.Nascimento || p.BirthDate || '',
-                    gender: p.Sexo === 'M' ? 'M' : p.Sexo === 'F' ? 'F' : 'Outro',
-                    phone: p.Celular || p.Telefone_Residencial || '',
-                    email: p.Email || '',
-                    address: p.Endereco_Residencial || '',
-                    neighborhood: p.Bairro_Residencial || '',
-                    zipCode: p.Cep_Residencial || '',
-                    city: p.Cidade_Residencial || '',
+                    socialName: payload.Nome_Social || '',
+                    cpf: cpf.replace(/\D/g, ''),
+                    rg: payload.RG || payload.Rg || '',
+                    birthDate: payload.Nascimento || payload.BirthDate || '',
+                    gender: payload.Sexo === 'M' ? 'M' : payload.Sexo === 'F' ? 'F' : 'Outro',
+
+                    // Contato
+                    email: payload.Email || payload.Email1 || '',
+                    phone: payload.Celular || payload.Telefone_Celular || '',
+                    phoneAlternative: payload.Telefone_Residencial || payload.Phone || '',
+                    phoneWork: payload.Telefone_Comercial || '',
+
+                    // Endereço
+                    address: payload.Endereco_Residencial || payload.Endereco || '',
+                    neighborhood: payload.Bairro_Residencial || payload.Bairro || '',
+                    zipCode: payload.Cep_Residencial || payload.Cep || '',
+                    city: payload.Cidade_Residencial || payload.Cidade || '',
+                    state: payload.Estado_Residencial || payload.Estado || payload.UF || '',
+                    region: payload.Regiao || '', // Campo inferido
+                    complement: payload.Complemento_Residencial || payload.Complemento || '',
+                    reference: payload.Referencia || '',
+
+                    // Convênio (Campos hipotéticos baseados no padrão)
+                    insurance: payload.Convenio || payload.Nome_Convenio || '',
+                    insuranceNumber: payload.Matricula || payload.Numero_Carteira || '',
+                    cns: payload.Cns || payload.Numero_Cns || payload.Cartao_Nacional_Saude || '',
+
+                    // Complementares
+                    profession: payload.Profissao || '',
+                    company: payload.Empresa || '',
+                    civilStatus: payload.Estado_Civil || '',
+                    education: payload.Escolaridade || '',
+                    religion: payload.Religiao || '',
+
+                    // Origem
+                    referralSource: payload.Conheceu_Por || '', // Campo "Conheceu por"
+                    referredBy: payload.Indicado_Por || '', // Campo "Indicado por"
+
+                    // Familiares
+                    fatherName: payload.Nome_Pai || payload.Pai || '',
+                    motherName: payload.Nome_Mae || payload.Mae || '',
+                    spouseName: payload.Nome_Conjuge || payload.Conjuge || '',
+                    childrenCount: payload.Filhos ? parseInt(payload.Filhos) : 0,
+
                     source: 'MedX Integration',
-                    medxId: p.Id || p.Id_do_Usuario || '',
+                    medxId: payload.Id || payload.Id_do_Usuario || '',
                     createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString()
                 };

@@ -294,7 +294,63 @@ export interface WhatsAppConversation {
   createdAt: string;
 }
 
-// --- Audit Logs ---
+// --- Patient (Expanded for MedX) ---
+
+export interface Patient {
+  id: string;
+  name: string;
+  socialName?: string;
+  cpf: string;
+  rg?: string;
+  birthDate: string;
+  gender: 'M' | 'F' | 'Outro';
+
+  // Contato
+  email?: string;
+  phone: string;
+  phoneAlternative?: string;
+  phoneWork?: string;
+
+  // Endereço
+  address: string;
+  neighborhood: string;
+  zipCode: string;
+  city: string;
+  state?: string; // UF
+  region?: string; // Região
+  complement?: string;
+  reference?: string; // Ponto de referência
+
+  // Convênio
+  insurance?: string; // Convênio
+  insuranceNumber?: string; // Matrícula / Carteirinha
+  cns?: string; // Cartão Nacional de Saúde
+
+  // Complementares
+  profession?: string;
+  company?: string;
+  civilStatus?: string; // Estado Civil
+  education?: string; // Escolaridade
+  religion?: string; // Religião
+  marketingTags?: string[]; // VIP, Excluir do Mkt, etc
+
+  // Origem
+  referralSource?: string; // Conheceu por
+  referredBy?: string; // Indicado por (Nome de contato)
+
+  // Familiares
+  fatherName?: string;
+  motherName?: string;
+  spouseName?: string;
+  childrenCount?: number;
+
+  // Meta
+  source: 'Manual' | 'MedX Integration';
+  medxId?: string;
+  createdAt: string;
+  updatedAt: string;
+  notes?: string; // Observações gerais
+}
 
 export interface AuditLog {
   id: string;
@@ -307,3 +363,4 @@ export interface AuditLog {
   metadata?: any; // Dados técnicos (diff, ip, userAgent)
   timestamp: string;
 }
+
