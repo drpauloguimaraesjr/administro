@@ -28,8 +28,8 @@ const userSchema = z.object({
 
     // Permissions (Optional override)
     permissions: z.array(z.object({
-        module: z.string(),
-        actions: z.array(z.string())
+        module: z.enum(['patients', 'appointments', 'medical_records', 'prescriptions', 'financial', 'crm', 'whatsapp', 'reports', 'settings', 'users']),
+        actions: z.array(z.enum(['view', 'create', 'edit', 'delete', 'export']))
     })).optional(),
 
     // Agenda
