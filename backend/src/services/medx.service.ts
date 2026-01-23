@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { db } from '../config/firebaseAdmin';
+import { db } from '../config/firebaseAdmin.js';
 
 interface MedXConfig {
     apiUrl: string;
