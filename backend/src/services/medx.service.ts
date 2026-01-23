@@ -114,8 +114,8 @@ export class MedXService {
             // Importando a instância configurada do Firestore (com fallback)
             // Importação estática usada no topo do arquivo
 
-            const batch = db.batch();
-            const batchSize = 400;
+            let batch = db.batch(); // Alterado para let para permitir reatribuição
+            const batchSize = 400; // Firestore limit is 500 operations per batch
             let batchCount = 0;
             let importedCount = 0;
             let skippedCount = 0;
@@ -130,7 +130,7 @@ export class MedXService {
 
                 let existingQuery;
 
-                // Verifica duplicidade
+                // Verifica duplicidade (Atenção: Query dentro de loop é lento, ideal seria cachear CPFs existentes se a base for muito grande)
                 if (cpf) {
                     existingQuery = await patientsRef.where('cpf', '==', cpf).limit(1).get();
                 } else {
@@ -166,17 +166,14 @@ export class MedXService {
                 importedCount++;
 
                 if (batchCount >= batchSize) {
+                    console.log(`💾 Comitando batch intermediário de ${batchCount} pacientes...`);
                     await batch.commit();
-                    // Reset batch criando um novo (o objeto batch não é reutilizável após commit)
-                    // Nota: Em loop complexo, batch requer reinicialização.
-                    // Como não podemos reatribuir 'batch' const facilmente sem refactor maior,
-                    // vamos assumir que o commit final pega o resto ou que o usuário vai rodar sync várias vezes se tiver >400.
-                    // Correção rápida: Retorna aqui e pede para rodar de novo se limite atingido para segurança.
-                    console.log('⚠️ Limite de batch atingido (400). Comitando parcial.');
-                    return { imported: importedCount, total: medxPatients.length, skipped: skippedCount, partial: true };
+                    batch = db.batch(); // Inicia novo batch
+                    batchCount = 0;
                 }
             }
 
+            // Comita o restante
             if (batchCount > 0) {
                 await batch.commit();
             }
