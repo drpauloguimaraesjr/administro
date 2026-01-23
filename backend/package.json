@@ -2,12 +2,12 @@
   "name": "administrador-contas-backend",
   "version": "1.0.0",
   "description": "Backend para sistema de administração de contas - Railway Edition",
-  "main": "dist/index.js",
+  "main": "build_output/index.js",
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "rm -rf dist && node_modules/.bin/tsc",
-    "start": "node dist/index.js",
+    "build": "rm -rf build_output && node_modules/.bin/tsc",
+    "start": "node build_output/index.js",
     "test": "jest --config jest.config.cjs"
   },
   "dependencies": {
