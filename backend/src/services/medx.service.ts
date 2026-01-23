@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { db } from '../config/firebaseAdmin';
 
 interface MedXConfig {
     apiUrl: string;
@@ -103,7 +104,7 @@ export class MedXService {
             }
 
             // Importando a instância configurada do Firestore (com fallback)
-            const { db } = await import('../config/firebaseAdmin.js');
+            // Importação estática usada no topo do arquivo
 
             const batch = db.batch();
             const batchSize = 400;
