@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { Plus, Search, Phone, Mail, Edit, Trash2, User } from 'lucide-react';
+import { Plus, Search, Phone, Mail, Edit, Trash2, User, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PatientModal } from '@/components/patients/PatientModal';
@@ -24,6 +24,7 @@ interface Patient {
 export default function PatientsPage() {
     const [search, setSearch] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isSyncing, setIsSyncing] = useState(false);
     const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
     const queryClient = useQueryClient();
 
@@ -41,6 +42,21 @@ export default function PatientsPage() {
             queryClient.invalidateQueries({ queryKey: ['patients'] });
         },
     });
+
+    const handleMedxSync = async () => {
+        try {
+            setIsSyncing(true);
+            const res = await api.post('/medx/sync');
+            const { total, imported, skipped } = res.data.details;
+            alert(`Sincronização concluída!\n\nTotal lido: ${total}\n✅ Importados: ${imported}\n⏭️ Pulados (já existiam): ${skipped}`);
+            queryClient.invalidateQueries({ queryKey: ['patients'] });
+        } catch (error) {
+            console.error('Erro na sincronização:', error);
+            alert('Falha ao sincronizar com MedX. Verifique os logs.');
+        } finally {
+            setIsSyncing(false);
+        }
+    };
 
     const handleEdit = (patient: Patient) => {
         setEditingPatient(patient);
@@ -88,13 +104,24 @@ export default function PatientsPage() {
                                 Gerencie seus pacientes
                             </p>
                         </div>
-                        <Button
-                            onClick={() => setIsModalOpen(true)}
-                            className="bg-teal-600 hover:bg-teal-700"
-                        >
-                            <Plus className="w-4 h-4 mr-2" />
-                            Novo Paciente
-                        </Button>
+                        <div className="flex gap-2">
+                            <Button
+                                onClick={handleMedxSync}
+                                variant="outline"
+                                disabled={isSyncing}
+                                className="border-teal-600 text-teal-600 hover:bg-teal-50"
+                            >
+                                <RefreshCw className={`w-4 h-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
+                                {isSyncing ? 'Sincronizando...' : 'Sincronizar MedX'}
+                            </Button>
+                            <Button
+                                onClick={() => setIsModalOpen(true)}
+                                className="bg-teal-600 hover:bg-teal-700"
+                            >
+                                <Plus className="w-4 h-4 mr-2" />
+                                Novo Paciente
+                            </Button>
+                        </div>
                     </div>
 
                     {/* Search */}

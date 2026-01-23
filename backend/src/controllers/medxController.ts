@@ -39,3 +39,20 @@ export const getMedxAppointments = async (req: Request, res: Response) => {
         });
     }
 };
+
+export const syncMedxPatients = async (req: Request, res: Response) => {
+    try {
+        const result = await medxService.syncPatientsToLocal();
+        res.json({
+            success: true,
+            message: 'Sincronização concluída',
+            details: result
+        });
+    } catch (error: any) {
+        console.error('Error syncing MedX patients:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message || 'Failed to sync patients from MedX'
+        });
+    }
+};

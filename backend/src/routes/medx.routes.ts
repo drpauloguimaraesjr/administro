@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getMedxPatients, getMedxAppointments } from '../controllers/medxController.js';
+import { getMedxPatients, getMedxAppointments, syncMedxPatients } from '../controllers/medxController.js';
 
 const router = Router();
 
@@ -10,5 +10,9 @@ router.get('/patients', getMedxPatients);
 // Rota para buscar agenda
 // GET /api/medx/appointments?start=2024-01-01&end=2024-01-31
 router.get('/appointments', getMedxAppointments);
+
+// Rota para sincronizar pacientes (Salvar no banco local)
+// POST /api/medx/sync
+router.post('/sync', syncMedxPatients);
 
 export default router;
