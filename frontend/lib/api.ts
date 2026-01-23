@@ -1,8 +1,15 @@
 // lib/api.ts
 import axios from 'axios';
 
+let baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+
+// Garante que a URL tenha protocolo (https por padrão em produção)
+if (process.env.NODE_ENV === 'production' && !baseURL.startsWith('http')) {
+    baseURL = `https://${baseURL}`;
+}
+
 const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api',
+    baseURL,
     headers: { 'Content-Type': 'application/json' },
 });
 
