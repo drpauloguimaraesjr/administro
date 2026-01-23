@@ -47,6 +47,7 @@ app.use('/api/questionnaires', questionnairesRoutes);
 app.use('/api/leads', leadsRoutes);
 app.use('/api/users', usersRouter);
 app.use('/api/whatsapp/queues', whatsappQueuesRouter);
+app.use('/api/medx', medxRoutes);
 
 // Inicia servidor
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
