@@ -267,7 +267,7 @@ export function NewUserDialog({ open, onOpenChange, userToEdit }: NewUserDialogP
                                                                         module === 'prescriptions' ? 'Receituário' :
                                                                             module === 'reports' ? 'Relatórios' : module}
                                             </div>
-                                            {['view', 'create', 'edit', 'delete'].map(action => (
+                                            {(['view', 'create', 'edit', 'delete'] as const).map(action => (
                                                 <div key={action} className="flex justify-center">
                                                     <Checkbox
                                                         checked={
