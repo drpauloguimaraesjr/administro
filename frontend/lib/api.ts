@@ -6,6 +6,21 @@ const api = axios.create({
     headers: { 'Content-Type': 'application/json' },
 });
 
+// Interceptor para debugging
+api.interceptors.response.use(
+    response => response,
+    error => {
+        console.error('❌ API Error:', {
+            url: error.config?.url,
+            baseURL: error.config?.baseURL,
+            method: error.config?.method,
+            status: error.response?.status,
+            message: error.message
+        });
+        return Promise.reject(error);
+    }
+);
+
 // Appointments
 export const fetchAppointments = async () => {
     const response = await api.get('/appointments');
