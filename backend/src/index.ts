@@ -4,8 +4,9 @@
 
 import express from 'express';
 import cors from 'cors';
-import n8nRoutes from './routes/n8n.routes.js';
 import whatsappRoutes from './routes/whatsapp.routes.js';
+import n8nRoutes from './routes/n8n.routes.js';
+import medxRoutes from './routes/medx.routes.js';
 import { initializeWhatsApp } from './services/whatsapp.js';
 import appointmentsRoutes from './routes/appointments.js';
 import patientsRoutes from './routes/patients.js';
