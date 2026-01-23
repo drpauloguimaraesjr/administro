@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { Plus, Search, Phone, Mail, Edit, Trash2, User, RefreshCw } from 'lucide-react';
+import { Plus, Search, Phone, Mail, Edit, Trash2, User, RefreshCw, FileDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PatientModal } from '@/components/patients/PatientModal';
@@ -59,6 +59,47 @@ export default function PatientsPage() {
         }
     };
 
+    const handleExportCSV = () => {
+        if (!patients || patients.length === 0) {
+            alert('Não há pacientes para exportar.');
+            return;
+        }
+
+        // Definir cabeçalho
+        const headers = ['Nome', 'CPF', 'Nascimento', 'Gênero', 'Telefone', 'Email', 'Criado em', 'Endereço', 'Convênio', 'MedX ID'];
+
+        // Mapear linhas
+        const rows = patients.map((p: any) => [
+            `"${p.name || ''}"`,
+            `"${p.cpf || ''}"`,
+            `"${p.birthDate || ''}"`,
+            `"${p.gender || ''}"`,
+            `"${p.phone || ''}"`,
+            `"${p.email || ''}"`,
+            `"${p.createdAt ? new Date(p.createdAt).toLocaleDateString() : ''}"`,
+            `"${p.address || ''}"`,
+            `"${p.insurance || ''}"`,
+            `"${p.medxId || ''}"`
+        ]);
+
+        // Juntar tudo em uma string CSV
+        const csvContent = [
+            headers.join(','),
+            ...rows.map((r: any[]) => r.join(','))
+        ].join('\n');
+
+        // Criar Blob e link de download
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', `pacientes_export_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     const handleEdit = (patient: Patient) => {
         setEditingPatient(patient);
         setIsModalOpen(true);
@@ -106,6 +147,15 @@ export default function PatientsPage() {
                             </p>
                         </div>
                         <div className="flex gap-2">
+                            <Button
+                                onClick={handleExportCSV}
+                                variant="outline"
+                                className="border-gray-300 text-gray-600 hover:bg-gray-100"
+                                title="Exportar CSV"
+                            >
+                                <FileDown className="w-4 h-4 mr-2" />
+                                Exportar
+                            </Button>
                             <Button
                                 onClick={handleMedxSync}
                                 variant="outline"
@@ -156,7 +206,7 @@ export default function PatientsPage() {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {patients.map((patient: Patient) => (
+                            {patients.map((patient: any) => (
                                 <motion.div
                                     key={patient.id}
                                     initial={{ opacity: 0, scale: 0.95 }}
@@ -221,7 +271,7 @@ export default function PatientsPage() {
             <PatientModal
                 open={isModalOpen}
                 onClose={handleCloseModal}
-                patient={editingPatient}
+                patient={editingPatient as any}
             />
         </main>
     );
