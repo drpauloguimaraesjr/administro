@@ -50,9 +50,10 @@ export default function PatientsPage() {
             const { total, imported, skipped } = res.data.details;
             alert(`Sincronização concluída!\n\nTotal lido: ${total}\n✅ Importados: ${imported}\n⏭️ Pulados (já existiam): ${skipped}`);
             queryClient.invalidateQueries({ queryKey: ['patients'] });
-        } catch (error) {
-            console.error('Erro na sincronização:', error);
-            alert('Falha ao sincronizar com MedX. Verifique os logs.');
+        } catch (error: any) {
+            console.error('❌ Erro na sincronização:', error);
+            const errorMessage = error.response?.data?.error || error.message || 'Erro desconhecido';
+            alert(`Falha ao sincronizar com MedX: ${errorMessage}. Verifique o console para mais detalhes.`);
         } finally {
             setIsSyncing(false);
         }

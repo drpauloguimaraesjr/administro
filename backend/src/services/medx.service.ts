@@ -16,6 +16,7 @@ export class MedXService {
     private tokenExpiration: Date | null = null;
 
     constructor(apiUrl: string = 'https://v65.medx.med.br', token: string) {
+        console.log(`🔧 MedX Service Initialized. API URL: ${apiUrl}, Token Present: ${!!token}`);
         this.config = { apiUrl, token };
     }
 
@@ -29,6 +30,7 @@ export class MedXService {
         }
 
         try {
+            console.log('🔑 Requesting MedX Auth Token...');
             const response = await axios.get(`${this.config.apiUrl}/api/integration/GetAuthorizedToken`, {
                 params: { token: this.config.token }
             });
@@ -37,11 +39,15 @@ export class MedXService {
             this.bearerToken = response.data;
             this.tokenExpiration = new Date(Date.now() + 175 * 60000); // Validade de 180 min, renovamos em 175
 
-            console.log('✅ MedX: Token de autenticação renovado com sucesso.');
+            console.log('✅ MedX: Token obtained successfully:', this.bearerToken ? 'Token received' : 'No token in body');
             return this.bearerToken || '';
-        } catch (error) {
-            console.error('❌ MedX: Falha ao obter token de autenticação.', error);
-            throw new Error('Falha na autenticação com MedX');
+        } catch (error: any) {
+            console.error('❌ MedX Auth Failed:', {
+                status: error.response?.status,
+                data: error.response?.data,
+                message: error.message
+            });
+            throw new Error(`Falha na autenticação com MedX: ${error.message}`);
         }
     }
 
@@ -96,10 +102,12 @@ export class MedXService {
         console.log('🔄 Iniciando sincronização de pacientes MedX...');
 
         try {
+            console.log('📡 Fetching patients from MedX API...');
             const medxPatients = await this.getPatients();
+            console.log(`📦 Patients fetched: ${medxPatients?.length || 0}`);
 
             if (!medxPatients || !Array.isArray(medxPatients)) {
-                console.warn('⚠️ Nenhum paciente retornado do MedX ou formato inválido.');
+                console.warn('⚠️ Invalid response from MedX (not an array or empty).');
                 return { imported: 0, total: 0, skipped: 0 };
             }
 
