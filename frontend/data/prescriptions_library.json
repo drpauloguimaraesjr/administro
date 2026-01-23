@@ -1,0 +1,674 @@
+[
+    {
+        "name": "ZINCO SULFATO",
+        "usage": "ID",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Participa do metabolismo (síntese e quebra) de carboidratos, lipídeos, proteínas e ácidos nucléicos, além de regular a expressão de alguns genes. O zinco ativa mais de duzentos sistemas enzimáticos. Auxilia na preservação do DNA, sistema imune, desenvolvimento e crescimento normais, produção de hormônios e de prostaglandinas. Melhora da lesões da pele, alopecia entre outros distúrbios em quadros de deficiência.",
+        "dosage": "20mg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "VITAMINA B6",
+        "usage": "EV, IM",
+        "presentation": "ampola 1ml (cx com 10 ampolas)",
+        "description": "Coenzima necessária para produção de neurotransmissores vitais ao seu funcionamento. Funciona melhor para o metabolismo de aminoácidos, além de participar da quebra do glicogênio muscular. Auxiliar no tratamento da alopécia seborreica e acne. Quando associada ao Zinco, potencializa a ação deste sobre a 5 Alfa Redutase. Possui ação antioxidante. Coenzima importante nas reações de oxi-redução Auxilia na redução dos níveis de colesterol, triglicerídeos , pressão sanguínea alta; desintoxicadora contra poluentes, álcool e narcóticos. Coenzima necessária em reações metabólicas. Essencial ao metabolismo de todas as células especialmente as do trato gastrointestinal, as da medula óssea e as do sistema nervoso. Junto com o ferro, acido fólico, cobre, vitamina C e B6 e necessária a formação de hemácias.",
+        "dosage": "2.500mcg / 5000mcg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "VITAMINA B12",
+        "usage": "SC",
+        "presentation": "ampola 1ml (cx com 10 ampolas) ampola 2ml (cx com 10 ampolas)",
+        "description": "Coenzima necessária em reações metabólicas. Essencial ao metabolismo de todas as células especialmente as do trato gastrointestinal, as da medula óssea e as do sistema nervoso. Junto com o ferro, acido fólico, cobre, vitamina C e B6 e necessária a formação de hemácias.",
+        "dosage": "2500mcg / 5000mcg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "VANÁDIO",
+        "usage": "EV, IM",
+        "presentation": "ampola 1ml (cx com 10 ampolas)",
+        "description": "Auxiliar na manutenção da glicemia juntamente com o cromo, no transtorno afetivo bipolar, psicose maníaco depressiva.",
+        "dosage": "50mcg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "ULTRA LIPO",
+        "usage": "SC",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Blend de ativos com ação efetiva e rápida na redução de gordura localizada. Atua como lipolítico, drenante e antiinflamatório local. Sua ação é ainda mais potencializada se associada a Cafeína e Arginina ID.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "UBIQUINOL",
+        "usage": "IM",
+        "presentation": "AMPOLAS de 20mg e 40mg",
+        "description": "Potente antioxidante natural; Atua como energético ao nível das mitocôndrias; Reduz a fadiga praticante de esportes intensivos Protege a saúde cardiovascular em geral e o bom funcionamento celular",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "TRIPTOFANO L",
+        "usage": "EV, IM",
+        "presentation": "ampola 10ml (cx com 10 ampolas)",
+        "description": "Aminoácido essencial, precursor da serotonina, da niacina (vitamina B3)e melatonina. Diminui a avidez por carboidratos quando administrado antes das refeições e auxilia na sensação de saciedade. Auxilia a indução do sono em pacientes estressados e insônia; reduz o percentual de sensibilidade a dor; auxilia no tratamento da enxaqueca; diminui os estados de ansiedade e tensão psíquica, atua como hepatoprotetor em pacientes com altos níveis de bilirrubina.",
+        "dosage": "100mg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "TRIPEPTÍDEO 41 PLUS",
+        "usage": "SC",
+        "presentation": "ampola 2ml (cx com 5 ou 10 ampolas)",
+        "description": "Peptídeo com potente ação ativadora potencializadora da lipólise, ativa fator de necrose tumoral (TNF), aumento do AMP-c em adipócitos, bloqueio de PPAR; redução da expressão de E/EBP, fatores de transcrição relacionados ao aumento adipócitos, redução dos adipócitos.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "TRIANCINOLONA",
+        "usage": "ID, SC,INTRALESIONAL",
+        "presentation": "2ml (Ampola)",
+        "description": "Corticosteróide. Antiinflamatório esteróide imunossupressor. Inflamação não-reumática, doenças respiratórias, episódios agudos de doenças reumáticas, artrite gotosa aguda, tratamento do choque, doenças alérgicas (reações anafiláticas e anafilactóides), doenças dermatológicas (dermatite,lúpus, psoríase, Síndrome de Stevens-Johnson, alopecia areata), doenças gastrintestinais e hematológicas e insuficiência adrenocortical.",
+        "dosage": "40mg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "TRATAMENTO DA QUEDA E RECUPERAÇÃO CAPILAR",
+        "usage": "IM",
+        "presentation": "",
+        "description": "(aquoso) BIOTINA 10mg D-PANTENOL 100mg MELATONINA 3mg POOL CAPILAR VITS LIDOCAINA 2%",
+        "dosage": "1x/semana ou quinzenal",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "TIROSINA",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "A Tirosina é um aminoácido aromático e participa da síntese de epinefrina, dopamina, melanina, e nas funções da adrenal, tireóide e pituitária. A tirosina é formada a partir da fenilalanina pela ação da fenilalanina hidroxilase. Ela é convertida em ácido fumárico e finalmente em ácido acetoacético através de várias reações. A Tirosina L é um precursor de dois neuro-transmissores essenciais: a dopamina que contribui para o sentimento de bem estar e a noradrenalina (ou norepinefrina) que é o estimulante cerebral natural. É usada para estimular os estados de alerta, a sensação de bem estar e retardar o cansaço físico e mental especialmente durante exercícios intensos. Possui efeito antioxidante, ajudando a proteger as membranas celulares dos danos causados pelos radicais livres. A deficiência de Tirosina pode causar vários problemas de saúde incluindo perda muscular, fraqueza, deficiência de proteína, alterações do humor e dano hepático.",
+        "dosage": "100mg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "TIMOMODULINA",
+        "usage": "50mg",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Imunomodulador, imunoestimulante, com ação sobre as células sangüíneas e a medula óssea; recuperação do número de leucócitos e plaquetas em pacientes submetidos a quimioterapia e radioterapia, permitindo estender ou completar os ciclos de tratamento antineoplásico eventualmente suspenso em função da acentuada diminuição das células brancas.Tratamento de Herpes, reduz a intensidade e a duração da neuropatia.",
+        "dosage": "50mg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "TEANINA L",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Produz em efeito calmante no cérebro por bloquear a ligação do acido L-Glutâmico aos receptores de glutamato. Dessa forma, induz o relaxamento e possui efeito calmante e mo-dulador do humor, aumentando a sensação de bem-estar, uma vez que promove aumento das ondas alfa cerebrais. A LTeanina, rapidamente ultrapassa a barreira hematoencefalica, causando mudanças bioquímicas. Não causa sonolência e não interfere na habilidade de pensar.",
+        "dosage": "50mg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "TEACRINA",
+        "usage": "SC",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Melhora o foco, a ação cognitiva, a motivação e humor por estimular neurotransmissores em especial a dopamina. Permite que atletas e pessoas com atividades intelectuais melhorem o seu desempenho físico e mental. Diminuição da fadiga e cansaço. Ação antioxidante e anti-inflamatória.",
+        "dosage": "50mg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "TAURINA L",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Esta ligada ao aumento do metabolismo de gordura, relacionados com a prática simultânea de exercício e com o caráter oxidativo.",
+        "dosage": "7,5%",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "TAURINA + INOSITOL",
+        "usage": "ID, SC",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Aumento do metabolismo de gordura e com o caráter lipolítico.",
+        "dosage": "Taurina 10% + Inositol 10%",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "SILÍCIO ORGÂNICO",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Aumenta o tônus, elasticidade da pele e a densidade mineral óssea; reduz a fragilidade das unhas; fortalece os fios de cabelo. Auxilia na redução das dores e rigidez das articulações.",
+        "dosage": "200mg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "SILÍCIO LIPO",
+        "usage": "SC",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Age como lipolítico, drenante e anti inflamatório. Aumenta o tônus e elasticidade da pele.",
+        "dosage": "0,5%",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "SELÊNIO",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Importante mineral para o tratamento de doenças hepáticas e musculares. Tem ação (prin-cipalmente na destruição de peróxidos) e é fundamental para o bom funcionamento do sistema imunológico e da glândula tireóide. Melhora também a condição física do indiví-duo. Participa na prevenção de processos degenerativos de artrite reumatóide, degenerações da retina, aterosclerose, distrofia muscular e degeneração do miocárdio; estimula o sistema imunológico; protege contra doenças cardíacas e processos cardiovasculares; antioxidante; benéfico na doença de Alzheimer e nos sintomas da menopausa; reduz significativamente a toxicidade de drogas anticancerígenas, efeito antiinflamatório (usado para pacientes com artrite reumatóide). Essencial na formação de proteínas, hormônios e neurotransmissores. SAME é doador de metil para fosfatidiletanolamina na formação da fosfatidilcolina (FC). Aumenta a produção intracelular de glutationa. SAMe é uma substância presente naturalmente no corpo humano e faz parte de mais de 30 reações metabólicas ocorridas nele. Entre outras funções, ele tem importância fundamental na formação de proteínas, hormônios e neurotransmissores. O SAMe é produzido pelo organismo, a partir de ATP e do aminoácido Metionina. O S adenosil L metionina disulfato tosilato é a forma mais estável de ademetionina, a qual é utilizada terapeuticamente. É indicado, em algumas doenças hepáticas - cirrose hepática aguda e crônica, do tipo biliar, hepatite e colestases, cirrose por intoxicação medicamentosa e alimentícia. No tratamento de depressão, estudase que o item aumenta a quantidade de serotonina no cérebro. Já para na Osteoartrite, o SAMe foi efetivo para diminuição da dor e da inflamação, pois causa uma diminuição da rigidez matinal, diminuindo a dor e reduzindo o inchaço. E estudos também sugerem que ele apresenta menos efeitos colaterais que os AINEs. Na fibromialgia, estudos demonstraram eficácia na redução dos sintomas incluindo a dor, fadiga e rigidez matinal.",
+        "dosage": "200mg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "RUTINA + BENZOPIRONA",
+        "usage": "ID, SC",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Vasodilatadores e estimulantes da circulação periférica, com efeitos drenantes. Melhora o funcionamento da microcirculação da pele e áreas edemaciadas.",
+        "dosage": "Rutina 50mg + Benzopirona 1mg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "REDUÇÃO PAPADA",
+        "usage": "SC",
+        "presentation": "ULTRA LIPO 1 amp 2ml ARGININA ID 20% 1 amp 2ml CARNITINA 600mg 1 amp 2ml RUTINA-BENZOPIRONA 1 amp 2ml SILICIO LIPO 0,5% 1 amp 2ml",
+        "description": "REDUÇÃO FLACIDEZ LOCAL (APÓS REDUÇÃO PAPADA) Manutenção mensal",
+        "dosage": "2 meses Após, aplicação 1x/30 dias, 3 meses",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "PROCAÍNA",
+        "usage": "ID, SC",
+        "presentation": "ampola 2ml (cx com 10 ampolas) ampola 5ml (cx com 5 ampolas) ampola 2ml (cx com 5 ampolas)",
+        "description": "Anestésico local. Eutrófico celular. Efeito anestésico é reversível, uma vez que a ação paralisante sobre as fibras sensitivas do sistema nervoso desaparece, ao término de certo tempo de aplicação.",
+        "dosage": "2% / 4%",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "POOL MODULADOR DE ANSIEDADE",
+        "usage": "EV ou IM",
+        "presentation": "Ampolas de2ml",
+        "description": "Pool dos ativos potencializadores contendo: Taurina, Teanina, Glicina, Hexanicotinato de Inositol. Ativos que atuam no funcionamento do sistema nervoso, no metabolismo de carboidratos, lipídeos e proteínas e na produção de ácido clorídrico para o sistema digestivo. Estimula o sistema imune na produção de imunoglobulinas. Ativa formação de GABA. A Teanina aumenta serotonina e dopamina no SNC. Induz o relaxamento e possui efeito calmante e modulador do humor, aumentando a sensação de bem-estar e melhora do sistema cognitivo.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "PIRUVATO SÓDICO",
+        "usage": "ID, SC",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Estimula a atividade celular e diminuição de flacidez.",
+        "dosage": "1%",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "PIRACETAM",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Excelente vasodilatador cerebral. Melhora a oxigenação cerebral e a função do neurotransmissor acetilcolina. Tem efeito sobre os receptores glutamatérgicos tipo NMDA, envolvidos na aquisição de memória e aprendizado. Auxilia no equilíbrio das vertigens.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "PENTOXIFILINA",
+        "usage": "ID, SC",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Vasodilatador, venolinfocinético. Melhora o fluxo sanguíneo.",
+        "dosage": "40mg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "PANTOTENATO DE CÁLCIO",
+        "usage": "ID",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Também pertence ao grupo das vitaminas B. Componente da coenzima A, essencial no metabolismo de carboidratos, lipídios e proteínas O pantotenato de cálcio é administrado como um suplemento nutricional e geralmente com outras vitaminas do grupo B.",
+        "dosage": "100mg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "ORNITINA L",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas) ampola 5ml (cx com 05 ampolas)",
+        "description": "Aminoácido que estimula a produção do hormônio do crescimento, incrementa a massa muscular, diminui a quantidade de tecido gorduroso, ativa o sistema imune e a função hepática. A função da L-ornitina no organismo é participar do ciclo da uréia, via pela qual a uréia é retirada dos aminoácidos e eliminada através da urina pelo organismo. Além disso, é também convertida no aminoácido L-arginina, assim como o inverso também ocorre. A L-ornitina é utilizada como hepatoprotetor (evitando danos ao fígado) e suplemento alimentar em formulações contendo outros aminoácidos, como a L-citrulina e a L-arginina. Composto formado pela união de duas moléculas de L-ornitina e uma molécula do radical alfa-cetoglutarato, intermediário importante no ciclo dos ácidos tricarboxílicos. Promove aumento da síntese protéica e diminuição do catabolismo muscular, sendo, portanto, bastante utilizado por atletas como estimulador do hormônio de crescimento e do IGF-1. Outros estudos relatam efeito da OKG nos m ecanismos de desintoxicação amoniacal, uma vez que o ativo e capaz de remover a amônia produzida durante o esforço muscular e, dessa forma, minimizar a fadiga muscular durante e após o exercício intenso.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "METIONINA L",
+        "usage": "ID",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Nutricionalmente essencial. É um aminoácido sulfurado. Juntamente com L-Cistina é a principal fonte de enxofre orgânico para o organismo. Graças a presença do enxofre em sua estrutura, esta indicada na prevenção das patologias do couro cabeludo, pele e unhas. Atua como um agente lipotrópico, especialmente quando associada a colina e ao inositol. A Metionina é um aminoácido com propriedade antioxidante.",
+        "dosage": "100mg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "METILFOLATO",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Adjuvante no tratamento de doenças cardiovasculares e distúrbios cognitivos. Desintoxicante. Reduz a ocorrência da deficiência do tubo neural. Promove redução dos níveis plasmáticos de homocisteína. Antidepressivo. O Metilfolato é a forma ativa do ácido fólico. O 5-MTHF esta envolvido em muitos processos do organismo, incluindo a redução de homocisteína, desintoxicação de muitas toxinas, produção de diversos neurotransmissores, esta ligado diretamente com a função cognitiva, manutenção do humor e como coadjuvante no tratamento do câncer, melhora do sistema imune. Reduz o cansaço e a fadiga, normaliza as funções psicológicas do humor e da depressão, contribui para uma formação sanguínea normal, contribui para o crescimento normal do tecido materno durante a gestação. Cofator na produção de neurotransmissores, na síntese de aminoácidos. Necessário para o bom funcionamento cardíaco e neural. Melhora  memória, TPM, juntamente com outras substâncias (B9,B6,B3,B1). Necessário para as reações de metilação no organismo.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "METILCOBALAMINA",
+        "usage": "SC",
+        "presentation": "ampola 2ml (cx com 8 ampolas) ampola 1ml (cx com 8 ampolas) ampola 1ml (cx com 10 ampolas) ampola 1ml (cx com 10 ampolas)",
+        "description": "Utilizado no tratamento do Autismo, ELA e outras doenças degenerativas, Paralisia Facial Ediopática, Dores musculares Crônicas e Distúrbios do Sono. Atua como doador de grupos metil, aumentando o número de células metiladas deficientes; promove regeneração dos terminais nervosos motores, melhora as funções intelectuais; protege contra a toxicidade do glutamato causado pelo L-dopa; contribui para o aumento da atividade das células T quando expostas a determinados antígenos.",
+        "dosage": "50mg 25mg 5mg 2,5mg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "MELATONINA",
+        "usage": "EV, IM",
+        "presentation": "(cx com 10 ampolas) ampola 2ml (cx com 10 ampolas)",
+        "description": "Imprescindível no auxilio regeneração celular da pele. Auxilia o estímulo e extensão da fase anágena no bulbo capilar e melhora da densidade dos fios. Melhora a qualidade do sono, auxilia no reequilíbrio hormonal e neuronal. De preferência, a administração deve ser feita final de tarde ou a noite.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "MANGANÊS SULFATO",
+        "usage": "EV, IM",
+        "presentation": "ampola 1ml (cx com 10 ampolas) ampola 2ml",
+        "description": "Importante para a formação da enzima superóxido dismutase de origem mitocondrial e como cofator na produção de diversos aminoácidos, entre eles a arginina. Atua como cofator no metabolismo protéico e de ácidos graxos; também participa como co-fator das vitaminas do complexo B. Melhora os reflexos musculares. Um catalisador importante na conversão da glucosamina em condroitina sulfato, forma necessária para a cartilagem ser estimulada a crescer. É importante para o funcionamento normal do sistema nervoso central.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "MAGNÉSIO SULFATO",
+        "usage": "EV",
+        "presentation": "ampola 5ml (cx com 5 ampolas)",
+        "description": "Este mineral participa de mais de 300 reações metabólicas importantes no organismo e é fundamental para o bom funcionamento orgânico.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "LISINA L",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Baixos níveis reduzem a síntese protéica. Estimula o sistema imune e é utilizado para a síntese de carnitina. Essencial para o tecido muscular; usado na profilaxia do herpes simples ou genital",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "LIDOCAÍNA",
+        "usage": "ID, SC",
+        "presentation": "ampola 2ml (cx com 10 ampolas) ampola 2ml (cx com 10 ampolas)",
+        "description": "Anestésico local.Age no bloqueio tanto da iniciação como da condução dos impulsos nervosos, mediante diminuição da permeabilidade da membrana neuronal aos íons de sódio.",
+        "dosage": "1%/2%",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "LEUCINA L",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Suplemento dietético. Aumenta a capacidade de cicatrização dos ossos, pele e tecido muscular. Síntese e armazenamento de proteínas musculares e proteção dos músculos das lesões por esforço excessivo. A Leucina L é uma das principais fontes de energia durante exercícios prolongados. A Leucina L faz parte dos aminoácidos de cadeia contínua, estes são metabolizados somente no tecido muscular, tornando-os um importante componente de qualquer programa de exercícios físicos. Protege os músculos de lesões por esforço excessivo, através da promoção da síntese (produção) de proteínas e da redução do catabolismo protéico. Participa como substrato para a gliconeogênese (síntese de energia) e podem ser convertida em componentes essenciais à produção de energia, principalmente na musculatura esquelética, onde também estimulam a produção dos aminoácidos L-alanina e L-glutamina.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "IOIMBINA",
+        "usage": "EV, IM",
+        "presentation": "ampola 1ml (cx com 10 ampolas)",
+        "description": "Lipolítico e Vasodilatador. Alcalóide que pertence à classe farmacológica dos bloqueadores alfa-adrenérgicos. Bloqueia os receptores alfa 2-adrenérgicos, desenvolve ação antidiurética, aumenta a atividade cardíaca e pode desencadear hipotensão ortostática. Tem-se observado sua ação afrodisíaca e estimulante da função sexual em indivíduos com impotência.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "INOSITOL",
+        "usage": "SC",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Ação lipolítica, ligada ao aumento do metabolismo de gordura. Relacionado com a prática simultânea de exercício.",
+        "dosage": "10%",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "IMUNIDADE STRESS HERPES",
+        "usage": "EV, IM",
+        "presentation": "diluir em 250ml soro, 30-35 gotas/min",
+        "description": "Metabólito da Leucina,ativa a síntese protéica e diminui a proteólise.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "GLUTATIONA",
+        "usage": "ID, SC",
+        "presentation": "ampola 1ml (cx com 10 ampolas)",
+        "description": "Ação antioxidante de radicais peróxido e aldeídicos.Potente ação antioxidante contra radicais livres. Prevenção do envelhecimento. Prevenção de diversos fatores acarretados pela oxidação celular. Participação no metabolismo endógeno. Atua como neurotransmissor, neuromodulador, auxilia na reciclagem de outros antioxidantes, estimula a produção de interleucina 1 e 2, protege as estruturas protéicas e enzimáticas e evita a glicação de proteínas importantes. Esta envolvida na síntese de proteínas, prostaglandinas e síntese de DNA.",
+        "dosage": "40mg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "GLUCOSAMINOGLICANO (GAG)",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas) ampola 5ml (cx com 5 ampolas)",
+        "description": "Agente eutrófico. As moléculas de glicosaminoglicanos e proteoglicanos no tecido conjuntivo formam uma substância gelatinosa, altamente hidratada, na qual as proteínas fibrosas estão embutidas; o gel resiste à força compressora exercida sobre a matriz e as fibras de colágeno fornecem força tensora.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "GLICINA",
+        "usage": "EV",
+        "presentation": "600mg Cx 10 ampolas de 2ml 3000mg Cx 5 ampolas de 10ml",
+        "description": "Indicada no tratamento de acidez gástrica, distrofia muscular gástrica, deficiência protéica, hipoproteinemia, desnutrição",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "FINASTERIDA",
+        "usage": "ID",
+        "presentation": "ampola 1ml (cx com 5 ou 10 ampolas)",
+        "description": "Inibidor da 5 a-redutase tipo II e formação da DHT nos folículos do couro cabeludo de portadores de alopecia androgenética. A finasteride não altera os níveis de testosterona.",
+        "dosage": "0,05%",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "FENILETILAMINA (FEA)",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Metabólito precursor da formação de Dopamina. A Dopamina é necessária para mantermos as atividades físicas e mentais saudáveis e durante toda a vida. Pode ser aplicado diariamente, porem protocolo médico sugere aplicação de mescla 1 a 2x/semana.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "FENILALANINA L",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Participa na formação de neuromediadores químicos; ativa o mecanismo de memória permanente; combate os estados depressivos. É um aminoácido essencial precursor da Tirosina e também das catecolaminas (tiramina, dopamina, epinefrina e norepinefrina).",
+        "dosage": "1 a 2x/semana.",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "DUTASTERIDA",
+        "usage": "ID",
+        "presentation": "ampola 1ml     (cx com 5 ou 10 ampolas)",
+        "description": "Ação inibitória de 5-alfa redutase I e II e consequentemente inibitória da formação de DHT no folículo piloso e inibe o fator chave responsável por esta miniaturização. Não altera os níveis hormonais. Indicado para",
+        "dosage": "0,1%",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "D-PANTENOL",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Desenvolve um efeito eutrófico dérmico e cicatrizante aumentando a resistência das fibras colágenas. É indicado como regenerador cutâneo e como eutrófico dérmico.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "DMAE",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Agente eutrófico;precursor da colina e acetilcolina; melhora a aparência da pele, reduz rugas e flacidez através do aumento da acetilcolina, uma vez que o envelhecimento começa, a quantidade de acetilcolina produzida e seu efeito no músculo está diminuída.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "D RIBOSE",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Estimula a energia (ATP) celular. Indicado nas mesclas Anti Aging, Capilar, Recuperação de energia cardíaca e condicionamento físico. Potencializa a ação de qualquer outro ativo associado a ele.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "D PANTENOL",
+        "usage": "ID",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Desenvolve um efeito eutrófico dérmico e cicatrizante aumentando a resistência das fibras colágenas. É indicado como regenerador cutâneo e como eutrófico dérmico.",
+        "dosage": "100mg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "CROMO PICOLINATO",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Atua como co-fator essencial no metabolismo; tem sido postulado que a suplementação die-tética de cromo afeta a composição corpórea, inclusive reduzindo a massa gorda e aumen-tado a massa magra. Esse mecanismo envolve a potencialização da sinalização insulínica e controle da resistência a insulina.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "CRISINA",
+        "usage": "ID, SC",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Venolinfocinético que apresenta atividade antioxidante e efeito inibidor sobre a enzima aromatase. Possui atividade lipolítica.",
+        "dosage": "100mcg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "CONDROITINA SULFATO",
+        "usage": "SC",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Glicosaminoglicana endógena, parte estrutural para a formação da estrutura da matriz articular e pertence a família de heteropolissacarídeos, também conhecidos como glicosaminoglicanas (GAGs). O Sulfato de condroitina é encontrado em seres humanos na cartilagem, nos ossos, na pele e na parede arterial. Evidências demonstram que o uso de condroitina por longo período pode retardar o estreitamento do espaço entre as articulações, sugerindo que também, retarda a progressão da doença. Complexo vitamínico com função ativadora do metabolismo celular. Fundamental como percursor na produção de diversos co-fatores enzimáticos, sendo necessário em diversos processos metabólicos do organismo. Complexo vitamínico com função ativadora do metabolismo celular. Fundamental como percursor na produção de diversos co-fatores enzimáticos, sendo necessário em diversos processos metabólicos do organismo.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "COMPLEXO B",
+        "usage": "SC",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Complexo vitamínico com função ativadora do metabolismo celular. Fundamental como percursor na produção de diversos co-fatores enzimáticos, sendo necessário em diversos processos metabólicos do organismo.",
+        "dosage": "64mg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "COLINA CITRATO",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Precursora de Acetilcolina. Do ponto de vista qualitativo, a colina exerce as mesmas ações farmacológicas que a acetilcolina, porém é bem menos ativa. A colina desempenha várias funções no organismo. Trata-se de um importante componente de fosfolipídios; além disso, afeta a mobilização das gorduras do fígado (ação lipotrópica), sendo essencial na formação de acetilcolina. É utilizada para distúrbios da memória, doença de Alzheimer e para aliviar os sintomas de lesões hepáticas. A colina é necessária à transmissão nervosa, regulação biliar e funcionamento do fígado e formação de lecitina. Ajuda a produção de hormônio e é necessária ao metabolismo de lipídeos e colesterol.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "COLÁGENO",
+        "usage": "SC",
+        "presentation": "ampola 2ml (cx com 10 ampolas) ampola 2ml (cx com 10 ampolas)",
+        "description": "Agente eutrófico. È um dos principais constituintes das fibras do tecido conjuntivo e um dos responsáveis pela sua elasticidade,propriedade que confere sustentação e firmeza a pele. É sintetizado pelos fibroblastos e secretado no espaço intercelular,na forma de colágeno solúvel.",
+        "dosage": "2%/10%",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "COBRE ELEMENTAR",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Cofator imprescindível no transporte de oxigênio junto à hemoglobina, da síntese de colágeno, cartilagens, pele e tendões; da elastina, molécula-chave para o funcionamento do sistema nervoso; e da formação de melanina.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "CLORETO DE CÁLCIO",
+        "usage": "",
+        "presentation": "10% ampola 1ml (cx com 10 ampolas)",
+        "description": "O Cloreto de Cálcio é essencial para a manutenção de diversos sistemas (nervoso, muscular, esquelético) e funções (cardíaca, renal, respiratória). Participa da coagulação sanguínea, da permeabilidade capilar, da membrana celular e de inúmeros outros eventos essenciais para a manutenção orgânica.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "CITRULINA MALATO",
+        "usage": "SC",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Indicado nas mesclas Anti Aging, Capilar, Potencializa a ação de qualquer outro ativo associado a ele. Estimula a energia (ATP) celular, podendo atuar como potencializador lipolítico, de regeneração celular, de aumento de nutrição capilar.",
+        "dosage": "600mg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "CARNOSINA L",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Aumenta a capacidade de recuperação muscular e é substrato para produção de óxido nítrico. Ação antioxidante e antiglicante.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "CARNITINA-L",
+        "usage": "ID, SC",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "É substrato para a reciclagem da molécula de ATP mitocondrial e geração de energia; estimula o uso de gorduras como fontes de energia, evitando o depósito de ácidos graxos.",
+        "dosage": "600mg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "CARNITINA L",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "É substrato para a reciclagem da molécula de ATP mitocondrial e geração de energia. Transporta os ácidos graxos de cadeia longa, que são utilizados dentro das células para prover energia; estimula o uso de gorduras como fontes de energia, evitando o depósito de ácidos graxos, principalmente no coração, fígado e músculo esquelético; reduz os riscos secundários e provenientes do metabolismo deficiente de gorduras associadas ao diabetes; inibe o efeito indutor de depósitos de gordura no fígado provocado pelo álcool e diminui o risco de doenças cardíacas, mantêm a atividade da musculatura lisa periférica e da muscu-latura estriada não voluntaria; aumenta a força muscular, principalmente em pacientes com desordens musculares.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "CAFEÍNA",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Aumenta os níveis de dopamina e adrenalina endógenos e a disponibilidade de ácidos graxos para quebra (lise). Melhora a disposição a cognição e o foco.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "BUFLOMEDIL",
+        "usage": "ID, SC",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Venolinfocinético. Melhora no fluxo sanguíneo nutricional em tecidos isquêmicos sem a produção de efeitos sistêmicos. Derivado pirrolidínico da butirofenona. Produz uma série de efeitos farmacológicos, tais como: inibição inespecífica dos a-adrenoceptores na musculatura lisa vascular, inibição da agregação plaquetária, melhora da deformabilidade eritrocitária, antagonismo inespecífico do cálcio e atividade poupadora de oxigênio.",
+        "dosage": "1%",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "BLEND DE AMINOÁCIDOS",
+        "usage": "ID",
+        "presentation": "ampola 2ml ou 10ml (cx com 10 ampolas)",
+        "description": "Blend de aminoácidos específicos que irão nutrir a pele e estimular a síntese de colágeno e elastina.",
+        "dosage": "4,6%",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "BIOTINA",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Substância imprescindível para cabelos, pele e unhas saudáveis, atua de forma regulatória do metabolismo saudável, na intolerância a glicose, proteção da função cerebral da memória cognitiva e neurodegenerativa, manutenção sistema cardiovascular saudável, regulação da tireoide e função adrenal, reparador de tecidos e músculos.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "BICARBONATO DE SÓDIO",
+        "usage": "ID",
+        "presentation": "ampola 2ml ou 10ml (cx com 10 ampolas)",
+        "description": "Alcanilizante. Utilizado também na hiperidrose por sua ação anti-séptica.",
+        "dosage": "8,4%",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "BETA HIDROXI BUTIRATO (BHB)",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Auxiliar no gerenciamento do peso. Aumento da função cognitiva. Aumento da função cardíaca. Aumento da performance esportiva – Foco e massa muscular. Energia cetônica para Performance Física e Mental. Substrato metabólico imediato para a produção de energia ATP. Beta HidroxiButirato é uma substância cetônica apresentada na forma de um blend de sódio, potássio e magnésio, que age como fonte de energia para o organismo e produção de substâncias cetogênicas. Favorece o alcance da Cetose em dietas com restrição de carboidratos, tornando-se um aliado fundamental no gerenciamento do peso. Promove o aumento da performance esportiva , aumento da função cognitiva e cardíaca. Isto ocorre porque os corpos cetônicos fornecem mais energia celular quando comparado aos carboidratos, sendo assim considerado uma fonte de energia mais potente.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "BETA ALANINA",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Beta-aminoácido, isômero de posição da alanina. É formada in vivo pela degradação de diidrouracila e carnosina. É um componente dos peptídeos carnosina e anserina, que ocorrem naturalmente e também do ácido pantotênico (vitamina B5), o qual é um componente da coenzima ß-alanina é o precursor limitante de taxa da carnosina. A suplementação com ß-alanina tem sido evidenciada como propiciando o aumento da concentração de carnosina nos músculos, reduzindo a fadiga em atletas e aumentando o trabalho muscular total realizado. Irá servir para aumentar resistência, força e consequentemente desenvolvimento muscular. Aumenta a resistência anaeróbica do músculo. Aumentar a Capacidade nos Exercícios. Aumentar a resistência aeróbica. Aumento de massa muscular.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "BENZOPIRONA",
+        "usage": "ID, SC",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Venolinfocinético, vasodilatador e estimulante da circulação periférica, com efeito drenante. Melhora o funcionamento da microcirculação da pele e áreas edemaciadas.",
+        "dosage": "10mg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "ASIATICOSÍDEO",
+        "usage": "ID, SC",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Ação eutrófica e normalizadora da circulação. Auxiliar no processo de fragilidade capilar .",
+        "dosage": "0,04%",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "ARGININA L",
+        "usage": "EV, IM",
+        "presentation": "ampola 5ml (cx com 5 ampolas) ampola 2ml (cx com 10 ampolas)",
+        "description": "Aminoácido de extrema importância para esportistas profissionais e também todos que praticam atividade física. A Arginina esta envolvida na ativação e aumento da biogênese mitocondrial; na estimulação do receptor PGC-1 alfa, que e estimulador da produção do hormônio irisina; no aumento da produção de oxido nítrico, molécula mensageira direta-mente envolvida na desintoxicação / neutralização da amônia; na produção de energia; no aumento da síntese protéica de creatina e insulina. Importante para o processo de metaboli-zação das gorduras orgânicas e manutenção do tônus muscular. Promove a manutenção do estado de alerta e clareza mental, auxiliando a manutenção da memória em pacientes mais idosos.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "ARGININA ID",
+        "usage": "SC",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Age como lipolítico através do aumento da produção de Óxido Nítrico no tecido conjuntivo. Atua como drenante de líquidos. Diminui flacidez característica em celulite de grau avançado. Atua também na síntese de novas fibras de colágeno. favorece a drenagem de toxinas. Efeito lipolítico sem a ocorrência de edemas, inchaço ou dor.",
+        "dosage": "20%",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "ANASTROZOL",
+        "usage": "EV",
+        "presentation": "2ml (Frasco ampola)",
+        "description": "Inibidor seletivo da aromatase. Antagonistas de hormônios citostáticos. Potente inibidor da aromatase não-hormonal e muito seletivo. Anastrozol não possui atividade progestogênica, androgênica ou estrogênica. Utilizado no tratamento do câncer de mama avançado em mu-lheres pós-menopáusicas; Tratamento do câncer de mama inicial em mulheres na pós-me-nopausa; Redução da incidência de câncer de mama contralateral em pacientes recebendo anastrozol como tratamento adjuvante para câncer de mama inicial.",
+        "dosage": "1x/sem/ 3 a 6 meses",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "ÁCIDO TRANEXÂMICO",
+        "usage": "ID",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Potente ativo na redução da pigmentação da pele resultante de cicatrizes de acne; manchas senis, hormonais, medicamentosas e por exposição solar. Reduz a atividade da tirosinase; impede que plasminogênio se converta a plasmina.",
+        "dosage": "8mg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "ÁCIDO PANTOTÊNICO",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas",
+        "description": "O ácido pantotênico é administrado na forma de sal de cálcio e em conjunto com outras vitaminas do grupo B, como suplemento nutricional. Tem sido considerado como uma vitamina do grupo B, sendo componente da coenzima A, essencial no metabolismo de carboidratos, lipídeos e proteínas. Cofator para a produção de cortisol. Em termos “macroscópicos” o ácido pantotênico está relacionado com a síntese de hormônios adrenais, com a resposta do organismo frente a estresses produzindo cortisona, na síntese de esteroides, na formação de anticorpos, e na geração de energia a partir de lipídios, açucares e proteínas.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "ÁCIDO HIALURÔNICO",
+        "usage": "ID, SC",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Agente eutrófico de visco-elasticidade. Hidratante Controla hidratação na derme, o tônus dos tecidos da pele e a manutenção do colágeno.",
+        "dosage": "120mg",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "ÁCIDO GLICÓLICO",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Eutrófico,acelera o “turnover” da epiderme, estimula a síntese de colágeno. Indicado nas hipercromias, acne, queratose actínica e atenuação de rugas finas e linhas de expressão. Diminui a compactação do estrato córneo. Atua no equilíbrio das funções cerebrais, saúde mental e emocional; atua na transformação da homocisteina em metionina. Auxiliar no tratamento de depressão.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "ACIDO FÓLICO",
+        "usage": "EV",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Atua no equilíbrio das funções cerebrais, saúde mental e emocional; atua na transformação da homocisteina em metionina. Auxiliar no tratamento de depressão. Suplementação nutricional no tratamento de anemias. Possui capacidade de quelação de chumbo e mercúrio. Sugerimos que na via endovenosa aplique o Ácido Alfa Lipóico sozinho e em seguida nutrientes. Conhecido como “antioxidante mitocondrial”. Está diretamente envolvido no metabolismo celular e estado “redox”, varre uma variedade de espécies reativas oxigenadas (ROS) enquanto recicla as vitaminas C, E e glutationa. Atravessa a barreira hematoencefálica. Ação reguladora de citoquinas pró-inflamatórias. É recomendado para o tratamento de diabetes, neuropatias e como neuroprotetor; reduz glicação de proteína; reduz a oxidação do LDL.",
+        "dosage": "1 a 2x/semana",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "ÁCIDO ALFA LIPÓICO",
+        "usage": "EV, IM",
+        "presentation": "Ampolas 10ml (cx com 10 ampolas)",
+        "description": "Agente quelante de metais tóxicos, antioxidante mitocondrial, regenerador das vitaminas C, E e glutationa. Ação reguladora de citoquinas pró-inflamatórias, neuroprotetor, anti-glicante de proteínas.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "ACETIL L CARNITINA",
+        "usage": "EV, IM, ID e SC",
+        "presentation": "Ampola 600mg – 2ml",
+        "description": "vNeurotrófico e Reativador Neural vAuxiliar na prevenção do envelhecimento cerebral vAuxiliar nos distúrbios cognitivos (atenção, memória, concentração) vProcessos involutivos cerebrais v Mal de Alzheimer",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "5-HIDROXITRIPTOFANO",
+        "usage": "EV, IM",
+        "presentation": "ampola 2ml (cx com 10 ampolas)",
+        "description": "Substrato para biossíntese de serotonina. Promove bem estar, regulação do sono, da depressão e ansiedade, diminuição da compulsão por comida, redução da TPM e demais alterações de humor.",
+        "dosage": "",
+        "supplier": "Pineda"
+    },
+    {
+        "name": "17-BETA ESTRADIOL",
+        "usage": "ID, SC",
+        "presentation": "ampola 1ml (cx com 5 ou 10 ampolas)",
+        "description": "Atividade proliferativa de células matrizes capilares, antagoniza dediidrotestosterona sobre folículos anágenos.",
+        "dosage": "0,1%",
+        "supplier": "Pineda"
+    }
+]

@@ -1,21 +1,31 @@
-'use client';
-
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { Search, ArrowLeft, Printer, Copy, Plus, ArrowRightCircle } from 'lucide-react';
+import { Search, ArrowLeft, Printer, Copy, Plus, ArrowRightCircle, FileWarning } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import api from '@/lib/api';
 
 import { PatientHeader } from '@/components/medical-record/patient-header';
-import { RichEditor } from '@/components/medical-record/rich-editor';
+import { RichEditor, RichEditorRef } from '@/components/medical-record/rich-editor';
+import { PrintParameters, PrintParametersModal } from '@/components/prescription/PrintParametersModal';
+import { PrescriptionPreviewModal } from '@/components/prescription/PrescriptionPreviewModal';
+import { FormulasPanel } from '@/components/prescription/FormulasPanel';
+import { PrescriptionFormula } from '@/types/prescription';
+import { toast } from 'sonner';
 
 export default function PrescriptionPage() {
     const params = useParams();
     const router = useRouter();
     const patientId = params.id as string;
+    const editorRef = useRef<RichEditorRef>(null);
+
+    const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+    const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+    const [printParams, setPrintParams] = useState<PrintParameters | null>(null);
+    const [editorContent, setEditorContent] = useState('');
+    const [prescriptionType, setPrescriptionType] = useState<'simples' | 'controlada'>('simples');
 
     const { data: patient } = useQuery({
         queryKey: ['patient', patientId],
@@ -34,6 +44,44 @@ export default function PrescriptionPage() {
             age--;
         }
         return age;
+    };
+
+    const handleSelectFormula = (formula: PrescriptionFormula) => {
+        if (editorRef.current) {
+            // Extract usage route (simplified logic: take first part before comma or space)
+            const via = formula.usage ? formula.usage.split(/[, ]/)[0] : '';
+
+            const text = `
+            <p><strong><span style="font-size: 14px">USO INJETÁVEL</span></strong></p>
+            <p></p>
+            <p><strong>${formula.name} ${formula.dosage || ''}</strong> - 1 amp ${via} a cada 30 dias.</p>
+            <p></p>
+            <p>${formula.description || ''}</p>
+            <p></p>
+            <p><strong>Posologia:</strong> ${formula.dosage || '-'}</p>
+            <p><strong>Fornecedor:</strong> ${formula.supplier || '-'}</p>
+            <p><strong>Uso:</strong> ${formula.usage || ''} ${formula.presentation || ''}</p>
+            <p>────────────────────────────────</p>
+            <p></p>
+            `;
+
+            editorRef.current.insertContent(text);
+            toast.success(`${formula.name} adicionado!`);
+        }
+    };
+
+    const handleOpenPrintParams = (type: 'simples' | 'controlada') => {
+        setPrescriptionType(type);
+        if (editorRef.current) {
+            setEditorContent(editorRef.current.getHTML());
+        }
+        setIsPrintModalOpen(true);
+    };
+
+    const handleGeneratePreview = (params: PrintParameters) => {
+        setPrintParams(params);
+        setIsPrintModalOpen(false);
+        setIsPreviewModalOpen(true);
     };
 
     if (!patient) return null;
@@ -57,7 +105,10 @@ export default function PrescriptionPage() {
                             Receituário Simples
                         </div>
                         <div className="h-full">
-                            <RichEditor placeholder="Digite a prescrição..." />
+                            <RichEditor
+                                ref={editorRef}
+                                placeholder="Digite a prescrição..."
+                            />
                         </div>
                     </div>
                     {/* Footer Actions */}
@@ -66,10 +117,16 @@ export default function PrescriptionPage() {
                             <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
                         </Button>
                         <div className="flex gap-2">
-                            <Button variant="outline">
-                                <Printer className="w-4 h-4 mr-2" /> Imprimir
+                            <Button variant="ghost" className="text-orange-600 hover:text-orange-700 hover:bg-orange-50" onClick={() => handleOpenPrintParams('controlada')}>
+                                <FileWarning className="w-4 h-4 mr-2" /> Controle Especial
                             </Button>
-                            <Button className="bg-purple-600 hover:bg-purple-700">
+                            <Button variant="outline" onClick={() => handleOpenPrintParams('simples')}>
+                                <Printer className="w-4 h-4 mr-2" /> Imprimir Simples
+                            </Button>
+                            <Button
+                                className="bg-purple-600 hover:bg-purple-700"
+                                onClick={() => handleOpenPrintParams('simples')}
+                            >
                                 <Copy className="w-4 h-4 mr-2" /> Salvar e Finalizar
                             </Button>
                         </div>
@@ -77,41 +134,26 @@ export default function PrescriptionPage() {
                 </div>
 
                 {/* Direita: Presets (40%) */}
-                <div className="w-[400px] border-l border-gray-200 bg-white flex flex-col h-full overflow-hidden">
-                    <div className="p-2 bg-purple-50 border-b border-purple-100">
-                        <Tabs defaultValue="meus_docs" className="w-full">
-                            <TabsList className="w-full grid grid-cols-3 h-8 bg-purple-100/50">
-                                <TabsTrigger value="meus_docs" className="text-xs">Meus Docs</TabsTrigger>
-                                <TabsTrigger value="farmacias" className="text-xs">Farmácias</TabsTrigger>
-                                <TabsTrigger value="injetaveis" className="text-xs">Injetáveis</TabsTrigger>
-                            </TabsList>
-                        </Tabs>
-                    </div>
-
-                    <div className="p-3 border-b">
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                            <Input placeholder="Buscar fórmulas..." className="pl-9 h-9 text-sm" />
-                        </div>
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto p-2 space-y-1">
-                        <p className="text-xs font-semibold text-gray-500 px-2 py-1 uppercase">Todas as Minhas Fórmulas</p>
-                        {['Amoxicilina 500mg', 'Dipirona 1g', 'Nimesulida', 'Prednisolona (Xarope)', 'Azitromicina 3 dias'].map((item) => (
-                            <button key={item} className="w-full text-left px-3 py-2 hover:bg-gray-50 rounded-md flex justify-between items-center group transition-colors">
-                                <span className="text-sm text-gray-700 font-medium">{item}</span>
-                                <ArrowRightCircle className="w-4 h-4 text-gray-300 group-hover:text-purple-600" />
-                            </button>
-                        ))}
-                    </div>
-
-                    <div className="p-3 border-t bg-gray-50 flex justify-center">
-                        <Button variant="ghost" size="sm" className="text-purple-600 hover:text-purple-700 hover:bg-purple-50">
-                            <Plus className="w-4 h-4 mr-2" /> Nova Fórmula
-                        </Button>
-                    </div>
-                </div>
+                <FormulasPanel onSelectFormula={handleSelectFormula} />
             </div>
+
+            {/* Modals */}
+            <PrintParametersModal
+                open={isPrintModalOpen}
+                onClose={() => setIsPrintModalOpen(false)}
+                onGenerate={handleGeneratePreview}
+                doctorName="Dr. Paulo Guimarães Jr."
+                patientName={patient.name}
+                type={prescriptionType}
+            />
+
+            <PrescriptionPreviewModal
+                open={isPreviewModalOpen}
+                onClose={() => setIsPreviewModalOpen(false)}
+                content={editorContent}
+                params={printParams}
+                patient={patient}
+            />
         </div>
     );
 }
