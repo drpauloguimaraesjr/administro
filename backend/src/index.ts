@@ -20,7 +20,12 @@ import { whatsappQueuesRouter } from './routes/whatsapp-queues.js';
 const app = express();
 
 // Middlewares
-app.use(cors());
+// Middlewares
+app.use(cors({
+  origin: '*', // Permite qualquer origem temporariamente para debug
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
