@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { FORMULAS_DATA } from '@/data/formulas-db';
 
 interface FormulasPanelProps {
     onSelectFormula: (formula: PrescriptionFormula) => void;
@@ -18,28 +19,25 @@ export function FormulasPanel({ onSelectFormula }: FormulasPanelProps) {
     const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
     const { formulas: dbFormulas, loading } = usePrescriptionFormulas(searchTerm);
 
-    // Mock Fallback Data (Injected if DB is empty)
-    const MOCK_FORMULAS: PrescriptionFormula[] = [
-        { id: '1', name: 'Vitamina B12', category: 'Injetáveis', usage: 'IM/EV', dosage: '1 amp', description: 'Cianocobalamina 5000mcg', supplier: 'Laboratório X', presentation: 'Ampola 1ml', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), createdBy: 'system', clinicId: 'demo' },
-        { id: '2', name: 'Vitamina D3', category: 'Injetáveis', usage: 'IM', dosage: '600.000 UI', description: 'Colecalciferol', supplier: 'PharmApp', presentation: 'Frasco 5ml', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), createdBy: 'system', clinicId: 'demo' },
-        { id: '3', name: 'Testosterona Base', category: 'Hormônios', usage: 'Transdérmico', dosage: '50mg/pump', description: 'Gel Pentravan', supplier: 'PharmApp', presentation: 'Pump 50g', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), createdBy: 'system', clinicId: 'demo' },
-        { id: '4', name: 'Nandrolona', category: 'Injetáveis', usage: 'IM', dosage: '50mg', description: 'Decanoato', supplier: 'Laboratório Y', presentation: 'Ampola 1ml', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), createdBy: 'system', clinicId: 'demo' },
-    ];
-
-    const allFormulas = dbFormulas.length > 0 ? dbFormulas : MOCK_FORMULAS;
+    // Fallback to local full database if API is empty
+    const allFormulas = dbFormulas.length > 0 ? dbFormulas : FORMULAS_DATA;
 
     const filteredFormulas = allFormulas.filter(f => {
-        const matchesSearch = f.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            f.usage?.toLowerCase().includes(searchTerm.toLowerCase());
+        const term = searchTerm.toLowerCase();
+        const matchesSearch = f.name?.toLowerCase().includes(term) ||
+            f.usage?.toLowerCase().includes(term) ||
+            f.category?.toLowerCase().includes(term);
+
         const matchesCategory = categoryFilter ? f.category === categoryFilter || f.usage?.includes(categoryFilter) : true;
 
         // Special case for "Injetáveis" button mapping to usage or category
         if (categoryFilter === 'Injetáveis') {
-            return (f.category === 'Injetáveis' || f.usage?.includes('IM') || f.usage?.includes('EV')) && matchesSearch;
+            return (f.category === 'Injetáveis' || f.usage?.includes('IM') || f.usage?.includes('EV') || f.usage?.includes('SC')) && matchesSearch;
         }
 
         return matchesSearch && matchesCategory;
     });
+
 
     return (
         <div className="w-[400px] border-l border-gray-200 bg-gray-50 flex flex-col h-full overflow-hidden">
