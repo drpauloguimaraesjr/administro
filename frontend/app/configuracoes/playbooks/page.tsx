@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Plus, Edit2, Trash2, MessageSquare, ListCheck, Save, ArrowLeft } from 'lucide-react';
+import { Plus, Edit2, Trash2, MessageSquare, CheckSquare, Save, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -45,7 +45,7 @@ export default function PlaybooksConfigPage() {
                         <CardContent className="p-5">
                             <div className="flex justify-between items-start mb-4">
                                 <div className="p-2.5 bg-teal-50 rounded-xl group-hover:bg-teal-100 transition-colors">
-                                    <ListCheck className="w-6 h-6 text-teal-600" />
+                                    <CheckSquare className="w-6 h-6 text-teal-600" />
                                 </div>
                                 <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
                                     <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
