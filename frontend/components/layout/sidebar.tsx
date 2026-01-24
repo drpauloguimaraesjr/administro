@@ -33,15 +33,16 @@ export function Sidebar() {
     return (
         <div className="flex flex-col h-full">
             {/* Brand */}
-            <div className="h-16 flex items-center px-6 border-b border-[var(--gray-200)]">
-                <Link href="/" className="text-xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent flex items-center gap-2">
-                    {/* Pode adicionar logo aqui */}
-                    CALYX
+            <div className="h-16 flex items-center px-6 border-b border-white/10">
+                <Link href="/" className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                    <div className="w-8 h-8 rounded bg-teal-600 flex items-center justify-center text-white font-mono text-xs">CX</div>
+                    <span>CALYX</span>
                 </Link>
             </div>
 
             {/* Navigation */}
             <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+                <div className="mb-4 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Menu</div>
                 {navItems.map((item) => {
                     const isActive = pathname === item.href;
                     const Icon = item.icon;
@@ -51,21 +52,24 @@ export function Sidebar() {
                             key={item.href}
                             href={item.href}
                             className={cn(
-                                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group relative overflow-hidden",
+                                "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-all duration-200 group relative",
                                 isActive
-                                    ? "bg-primary-50 text-primary-700"
-                                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                                    ? "bg-teal-500/10 text-teal-400"
+                                    : "text-slate-400 hover:bg-white/5 hover:text-white"
                             )}
                         >
                             {isActive && (
-                                <span className="absolute left-0 top-0 bottom-0 w-1 bg-primary-500 rounded-r-full" />
+                                <span className="absolute left-0 top-1.5 bottom-1.5 w-1 bg-teal-500 rounded-r-full shadow-[0_0_10px_rgba(20,184,166,0.5)]" />
                             )}
-                            <Icon className={cn("w-5 h-5 flex-shrink-0", isActive ? "text-primary-600" : "text-gray-400 group-hover:text-gray-600")} />
+                            <Icon className={cn("w-5 h-5 flex-shrink-0 transition-colors", isActive ? "text-teal-400" : "text-slate-500 group-hover:text-white")} />
                             <span>{item.label}</span>
 
                             {/* Badge opcional exemplo - Pacientes */}
                             {item.label === 'Pacientes' && (
-                                <span className="ml-auto bg-primary-100 text-primary-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                                <span className={cn(
+                                    "ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full",
+                                    isActive ? "bg-teal-500/20 text-teal-300" : "bg-slate-800 text-slate-400"
+                                )}>
                                     12
                                 </span>
                             )}
@@ -75,8 +79,16 @@ export function Sidebar() {
             </nav>
 
             {/* Footer / User Mini Profile if needed or just version */}
-            <div className="p-4 border-t border-[var(--gray-200)]">
-                <p className="text-xs text-gray-400 text-center">v0.2.0 • Calyx System</p>
+            <div className="p-4 border-t border-white/5 bg-black/20">
+                <div className="flex items-center gap-3 px-2">
+                    <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs text-white font-bold">
+                        {user?.displayName?.charAt(0) || user?.email?.charAt(0) || 'D'}
+                    </div>
+                    <div className="overflow-hidden">
+                        <p className="text-sm font-medium text-white truncate">{user?.displayName || user?.email || 'Dr. Usuario'}</p>
+                        <p className="text-xs text-slate-500 truncate">Sessão Ativa</p>
+                    </div>
+                </div>
             </div>
         </div>
     );

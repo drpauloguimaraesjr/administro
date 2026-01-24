@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
+import { Manrope } from 'next/font/google';
 import './globals.css';
 import { MainLayout } from '@/components/layout/main-layout';
 import { AuthProvider } from '@/components/auth/auth-provider';
 import Providers from '@/components/providers';
 
-const inter = Inter({ subsets: ['latin'] });
+const font = Manrope({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'CALYX - Sistema Médico',
@@ -19,7 +19,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body className={inter.className}>
+      <body className={font.className}>
         <Providers>
           <AuthProvider>
             <MainLayout>

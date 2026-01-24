@@ -4,107 +4,84 @@
 
 @layer base {
   :root {
-    /* --- PALETA PROFISSIONAL CALYX --- */
+    /* --- IDENTITY: CLINICAL PRECISION (NAVY + TEAL) --- */
 
-    /* Cores Primárias (Azul Médico) */
-    --primary-50: #EFF6FF;
-    --primary-100: #DBEAFE;
-    --primary-200: #BFDBFE;
-    --primary-300: #93C5FD;
-    --primary-400: #60A5FA;
-    --primary-500: #3B82F6;
-    /* Principal */
-    --primary-600: #2563EB;
-    --primary-700: #1D4ED8;
-    --primary-800: #1E40AF;
-    --primary-900: #1E3A8A;
+    /* Primary: Medical Navy (Trust, Authority) */
+    --primary-50: #F0F4F8;
+    --primary-100: #D9E2EC;
+    --primary-200: #BCCCDC;
+    --primary-300: #9FB3C8;
+    --primary-400: #829AB1;
+    --primary-500: #627D98;
+    --primary-600: #486581;
+    --primary-700: #334E68;
+    --primary-800: #243B53;
+    --primary-900: #102A43;
+    /* Deep Navy */
 
-    /* Cores Neutras (Cinzas) */
-    --gray-50: #F9FAFB;
-    --gray-100: #F3F4F6;
-    --gray-200: #E5E7EB;
-    /* Bordas */
-    --gray-300: #D1D5DB;
-    --gray-400: #9CA3AF;
-    --gray-500: #6B7280;
-    /* Texto secundário */
-    --gray-600: #4B5563;
-    /* Texto corpo */
-    --gray-700: #374151;
-    --gray-800: #1F2937;
-    --gray-900: #111827;
-    /* Títulos */
+    /* Accent: Clinical Teal (Modern, Clean) */
+    --accent-color: #0D9488;
+    /* Teal 600 */
 
-    /* Cores Semânticas */
-    --success: 142 76% 36%;
-    /* #16a34a - green-600 */
-    --warning: 38 92% 50%;
-    /* #f59e0b - amber-500 */
-    --error: 0 84% 60%;
-    /* #ef4444 - red-500 */
-    --info: 217 91% 60%;
-    /* #3b82f6 - blue-500 */
-
-    /* Sistema Shadcn (Mapeado) */
-    --background: 0 0% 100%;
-    /* #FFFFFF */
-    --foreground: 222 47% 11%;
-    /* Gray 900 #111827 */
+    /* SHADCN MAPPING REFAC */
+    --background: 210 20% 98%;
+    /* Slightly cool gray/white */
+    --foreground: 217 33% 17%;
+    /* Navy-ish Black */
 
     --card: 0 0% 100%;
-    /* #FFFFFF */
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 217 33% 17%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 217 33% 17%;
 
-    --primary: 217 91% 60%;
-    /* Primary 500 #3B82F6 */
+    --primary: 216 65% 11%;
+    /* Navy #0A192F (approx) */
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%;
-    /* Gray 50 #F9FAFB equivalent */
+    --secondary: 210 20% 94%;
+    /* Cool Light Gray */
     --secondary-foreground: 222 47% 11.2%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    /* Gray 500 */
+    --muted: 210 20% 94%;
+    --muted-foreground: 215 16% 47%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222 47% 11.2%;
+    --accent: 175 84% 32%;
+    /* Teal */
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    /* Gray 200 #E5E7EB */
-    --input: 214.3 31.8% 91.4%;
-    --ring: 217 91% 60%;
-    /* Focus Ring Blue */
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 216 65% 11%;
+    /* Navy Ring */
 
-    --radius: 0.5rem;
-    /* 8px default */
+    /* GEOMETRY: SHARP PRECISION */
+    --radius: 0.25rem;
+    /* 4px - Crisp */
 
-    /* Espaçamentos e Sombras Custom */
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    /* SHADOWS: DEPTH */
+    --shadow-sm: 0 1px 2px 0 rgb(16 42 67 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(16 42 67 / 0.1), 0 2px 4px -2px rgb(16 42 67 / 0.1);
   }
 
   .dark {
-    /* Adaptação Dark Mode (Opcional, focado em Light por enquanto) */
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
+    --card: 217 33% 10%;
+    /* Dark Navy Card */
     --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
+    --popover: 217 33% 10%;
     --popover-foreground: 210 40% 98%;
-    --primary: 217 91% 60%;
+    --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
+    --accent: 175 84% 32%;
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
@@ -124,27 +101,23 @@
   }
 
   body {
-    @apply bg-gray-50 text-foreground antialiased;
-    /* Fundo secundário geral */
+    @apply bg-background text-foreground antialiased;
+    /* Dot pattern background for depth (Subtle) */
+    background-image: radial-gradient(var(--border) 1px, transparent 1px);
+    background-size: 24px 24px;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
-/* Utilitários de Profissionalização */
 @layer components {
 
-  /* Botão Profissional */
+  /* BOTÃO PRECISION */
   .btn-hover-effect {
-    @apply transition-all duration-200 hover:-translate-y-[1px] hover:shadow-md active:translate-y-0 active:shadow-none;
+    @apply transition-all duration-200 hover:-translate-y-[1px] hover:shadow-md active:translate-y-0 active:shadow-none hover:bg-opacity-90;
   }
 
-  /* Card Profissional */
+  /* CARD PRECISION */
   .card-hover-effect {
-    @apply transition-all duration-200 hover:shadow-md border-gray-200;
-  }
-
-  /* Input Profissional */
-  .input-ring {
-    @apply focus-visible:ring-2 focus-visible:ring-primary-500/20 focus-visible:border-primary-500 transition-all duration-150;
+    @apply transition-all duration-300 hover:shadow-lg hover:border-accent/30 border border-border/60 bg-white/80 backdrop-blur-sm;
   }
 }
