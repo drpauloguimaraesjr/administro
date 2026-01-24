@@ -124,6 +124,60 @@ export const RichEditor = forwardRef<RichEditorRef, RichEditorProps>(({ content 
             {editable && (
                 <div className="border-b border-gray-200 bg-gray-50 p-2 flex gap-1 flex-wrap items-center sticky top-0 z-10">
 
+                    {/* Voice Dictation (New Feature) */}
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-teal-600 hover:text-teal-700 hover:bg-teal-50 mr-1"
+                        onClick={() => {
+                            if (!('webkitSpeechRecognition' in window)) {
+                                alert('Seu navegador não suporta reconhecimento de voz.');
+                                return;
+                            }
+                            const SpeechRecognition = (window as any).webkitSpeechRecognition;
+                            const recognition = new SpeechRecognition();
+                            recognition.lang = 'pt-BR';
+                            recognition.interimResults = false;
+                            recognition.maxAlternatives = 1;
+
+                            recognition.start();
+
+                            recognition.onresult = (event: any) => {
+                                const transcript = event.results[0][0].transcript;
+                                editor.chain().focus().insertContent(` ${transcript} `).run();
+                            };
+
+                            recognition.onerror = (event: any) => {
+                                console.error('Erro no reconhecimento de voz', event.error);
+                            };
+                        }}
+                        title="Ditar (Microfone)"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-mic"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" x2="12" y1="19" y2="22" /></svg>
+                    </Button>
+
+                    {/* Templates Macro (New Feature) */}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 mr-2 text-xs font-medium">
+                                + Modelo
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuItem onClick={() => editor.chain().focus().insertContent('<p><strong>Avaliação Geral:</strong> Paciente em bom estado geral, corado, hidratado.</p>').run()}>
+                                Avaliação Padrão
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => editor.chain().focus().insertContent('<p><strong>Anamnese Gripe:</strong> Febre, tosse e coriza há 3 dias.</p>').run()}>
+                                Protocolo Gripe
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => editor.chain().focus().insertContent('<p><strong>Retorno:</strong> Traz exames solicitados anteriormente.</p>').run()}>
+                                Retorno Simples
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <div className="w-px h-6 bg-gray-300 mx-1" />
+
                     {/* Typography */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -181,6 +235,24 @@ export const RichEditor = forwardRef<RichEditorRef, RichEditorProps>(({ content 
                     >
                         <UnderlineIcon className="w-4 h-4" />
                     </Button>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => editor.chain().focus().toggleBulletList().run()}
+                        className={editor.isActive('bulletList') ? 'bg-gray-200 text-gray-900' : ''}
+                        title="Lista com Marcadores"
+                    >
+                        <List className="w-4 h-4" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                        className={editor.isActive('orderedList') ? 'bg-gray-200 text-gray-900' : ''}
+                        title="Lista Numerada"
+                    >
+                        <ListOrdered className="w-4 h-4" />
+                    </Button>
 
                     <div className="w-px h-6 bg-gray-300 mx-1" />
 
@@ -228,113 +300,6 @@ export const RichEditor = forwardRef<RichEditorRef, RichEditorProps>(({ content 
                             </Button>
                         </DropdownMenuContent>
                     </DropdownMenu>
-
-
-                    <div className="w-px h-6 bg-gray-300 mx-1" />
-
-                    {/* Alignment */}
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => editor.chain().focus().setTextAlign('left').run()}
-                        className={editor.isActive({ textAlign: 'left' }) ? 'bg-gray-200 text-gray-900' : ''}
-                        title="Alinhar à Esquerda"
-                    >
-                        <AlignLeft className="w-4 h-4" />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => editor.chain().focus().setTextAlign('center').run()}
-                        className={editor.isActive({ textAlign: 'center' }) ? 'bg-gray-200 text-gray-900' : ''}
-                        title="Centralizar"
-                    >
-                        <AlignCenter className="w-4 h-4" />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => editor.chain().focus().setTextAlign('right').run()}
-                        className={editor.isActive({ textAlign: 'right' }) ? 'bg-gray-200 text-gray-900' : ''}
-                        title="Alinhar à Direita"
-                    >
-                        <AlignRight className="w-4 h-4" />
-                    </Button>
-
-                    <div className="w-px h-6 bg-gray-300 mx-1" />
-
-                    {/* Lists & Checkbox */}
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => editor.chain().focus().toggleBulletList().run()}
-                        className={editor.isActive('bulletList') ? 'bg-gray-200 text-gray-900' : ''}
-                        title="Lista com Marcadores"
-                    >
-                        <List className="w-4 h-4" />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => editor.chain().focus().toggleOrderedList().run()}
-                        className={editor.isActive('orderedList') ? 'bg-gray-200 text-gray-900' : ''}
-                        title="Lista Numerada"
-                    >
-                        <ListOrdered className="w-4 h-4" />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => editor.chain().focus().toggleTaskList().run()}
-                        className={editor.isActive('taskList') ? 'bg-gray-200 text-gray-900' : ''}
-                        title="Lista de Tarefas (Checkbox)"
-                    >
-                        <CheckSquare className="w-4 h-4" />
-                    </Button>
-
-                    <div className="w-px h-6 bg-gray-300 mx-1" />
-
-                    {/* Scripts */}
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => editor.chain().focus().toggleSubscript().run()}
-                        className={editor.isActive('subscript') ? 'bg-gray-200 text-gray-900' : ''}
-                        title="Subscrito"
-                    >
-                        <SubIcon className="w-4 h-4" />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => editor.chain().focus().toggleSuperscript().run()}
-                        className={editor.isActive('superscript') ? 'bg-gray-200 text-gray-900' : ''}
-                        title="Sobrescrito"
-                    >
-                        <SupIcon className="w-4 h-4" />
-                    </Button>
-
-                    <div className="w-px h-6 bg-gray-300 mx-1" />
-
-                    {/* Undo/Redo */}
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => editor.chain().focus().undo().run()}
-                        disabled={!editor.can().chain().focus().undo().run()}
-                        title="Desfazer"
-                    >
-                        <Undo className="w-4 h-4" />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => editor.chain().focus().redo().run()}
-                        disabled={!editor.can().chain().focus().redo().run()}
-                        title="Refazer"
-                    >
-                        <Redo className="w-4 h-4" />
-                    </Button>
                 </div>
             )}
             <div className="flex-1 overflow-y-auto cursor-text p-4" onClick={() => editor.chain().focus().run()}>
