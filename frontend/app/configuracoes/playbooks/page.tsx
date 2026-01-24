@@ -41,25 +41,34 @@ export default function PlaybooksConfigPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {MOCK_PLAYBOOKS.map((pb) => (
-                    <Card key={pb.id} className="group hover:shadow-md transition-shadow cursor-pointer border-slate-200">
-                        <CardHeader className="flex flex-row items-start justify-between pb-2">
-                            <div className="p-2 bg-teal-50 rounded-lg">
-                                <ListCheck className="w-6 h-6 text-teal-600" />
+                    <Card key={pb.id} className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-slate-200 hover:border-teal-200 hover:-translate-y-1">
+                        <CardContent className="p-5">
+                            <div className="flex justify-between items-start mb-4">
+                                <div className="p-2.5 bg-teal-50 rounded-xl group-hover:bg-teal-100 transition-colors">
+                                    <ListCheck className="w-6 h-6 text-teal-600" />
+                                </div>
+                                <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
+                                        <Edit2 className="w-4 h-4" />
+                                    </Button>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg">
+                                        <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                </div>
                             </div>
-                            <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-blue-600">
-                                    <Edit2 className="w-4 h-4" />
-                                </Button>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-600">
-                                    <Trash2 className="w-4 h-4" />
-                                </Button>
+
+                            <h3 className="text-lg font-bold text-slate-800 mb-2 leading-tight group-hover:text-teal-700 transition-colors">
+                                {pb.name}
+                            </h3>
+
+                            <div className="flex flex-wrap gap-2 mb-4">
+                                <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100 uppercase tracking-wide">
+                                    {pb.department}
+                                </span>
                             </div>
-                        </CardHeader>
-                        <CardContent>
-                            <CardTitle className="text-lg font-semibold text-slate-800 mb-1">{pb.name}</CardTitle>
-                            <p className="text-sm text-slate-500 mb-4">{pb.department}</p>
-                            <div className="flex items-center gap-2 text-xs font-medium text-slate-400 bg-slate-50 py-1 px-2 rounded-md w-fit">
-                                <MessageSquare className="w-3 h-3" />
+
+                            <div className="flex items-center gap-2 text-xs font-medium text-slate-500 pt-3 border-t border-slate-100">
+                                <MessageSquare className="w-3.5 h-3.5 text-slate-400" />
                                 {pb.steps} passos configurados
                             </div>
                         </CardContent>
