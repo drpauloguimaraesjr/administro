@@ -15,7 +15,31 @@ interface FormulasPanelProps {
 
 export function FormulasPanel({ onSelectFormula }: FormulasPanelProps) {
     const [searchTerm, setSearchTerm] = useState('');
-    const { formulas, loading } = usePrescriptionFormulas(searchTerm);
+    const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+    const { formulas: dbFormulas, loading } = usePrescriptionFormulas(searchTerm);
+
+    // Mock Fallback Data (Injected if DB is empty)
+    const MOCK_FORMULAS: PrescriptionFormula[] = [
+        { id: '1', name: 'Vitamina B12', category: 'Injetáveis', usage: 'IM/EV', dosage: '1 amp', description: 'Cianocobalamina 5000mcg', supplier: 'Laboratório X', presentation: 'Ampola 1ml', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), createdBy: 'system', clinicId: 'demo' },
+        { id: '2', name: 'Vitamina D3', category: 'Injetáveis', usage: 'IM', dosage: '600.000 UI', description: 'Colecalciferol', supplier: 'PharmApp', presentation: 'Frasco 5ml', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), createdBy: 'system', clinicId: 'demo' },
+        { id: '3', name: 'Testosterona Base', category: 'Hormônios', usage: 'Transdérmico', dosage: '50mg/pump', description: 'Gel Pentravan', supplier: 'PharmApp', presentation: 'Pump 50g', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), createdBy: 'system', clinicId: 'demo' },
+        { id: '4', name: 'Nandrolona', category: 'Injetáveis', usage: 'IM', dosage: '50mg', description: 'Decanoato', supplier: 'Laboratório Y', presentation: 'Ampola 1ml', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), createdBy: 'system', clinicId: 'demo' },
+    ];
+
+    const allFormulas = dbFormulas.length > 0 ? dbFormulas : MOCK_FORMULAS;
+
+    const filteredFormulas = allFormulas.filter(f => {
+        const matchesSearch = f.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            f.usage?.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesCategory = categoryFilter ? f.category === categoryFilter || f.usage?.includes(categoryFilter) : true;
+
+        // Special case for "Injetáveis" button mapping to usage or category
+        if (categoryFilter === 'Injetáveis') {
+            return (f.category === 'Injetáveis' || f.usage?.includes('IM') || f.usage?.includes('EV')) && matchesSearch;
+        }
+
+        return matchesSearch && matchesCategory;
+    });
 
     return (
         <div className="w-[400px] border-l border-gray-200 bg-gray-50 flex flex-col h-full overflow-hidden">
@@ -26,7 +50,7 @@ export function FormulasPanel({ onSelectFormula }: FormulasPanelProps) {
                         📚 Biblioteca de Fórmulas
                     </h3>
                     <Badge variant="secondary" className="text-xs bg-purple-50 text-purple-700 hover:bg-purple-100">
-                        {formulas.length} itens
+                        {filteredFormulas.length} itens
                     </Badge>
                 </div>
 
@@ -42,18 +66,38 @@ export function FormulasPanel({ onSelectFormula }: FormulasPanelProps) {
                     />
                 </div>
 
-                {/* Quick Filters (Mockup for now) */}
+                {/* Quick Filters */}
                 <div className="flex gap-2 mt-3 overflow-x-auto pb-1 scrollbar-none">
-                    <Button variant="outline" size="sm" className="h-6 text-[10px] px-2 rounded-full border-gray-300 text-gray-600">
+                    <Button
+                        variant={categoryFilter === null ? 'outline' : 'ghost'}
+                        size="sm"
+                        onClick={() => setCategoryFilter(null)}
+                        className={`h-6 text-[10px] px-2 rounded-full ${categoryFilter === null ? 'border-purple-200 bg-purple-50 text-purple-700' : 'text-gray-500'}`}
+                    >
                         Todos
                     </Button>
-                    <Button variant="ghost" size="sm" className="h-6 text-[10px] px-2 rounded-full text-gray-500 hover:text-purple-600 hover:bg-purple-50">
+                    <Button
+                        variant={categoryFilter === 'Injetáveis' ? 'outline' : 'ghost'}
+                        size="sm"
+                        onClick={() => setCategoryFilter('Injetáveis')}
+                        className={`h-6 text-[10px] px-2 rounded-full ${categoryFilter === 'Injetáveis' ? 'border-blue-200 bg-blue-50 text-blue-700' : 'text-gray-500'}`}
+                    >
                         Injetáveis
                     </Button>
-                    <Button variant="ghost" size="sm" className="h-6 text-[10px] px-2 rounded-full text-gray-500 hover:text-purple-600 hover:bg-purple-50">
+                    <Button
+                        variant={categoryFilter === 'Vitaminas' ? 'outline' : 'ghost'}
+                        size="sm"
+                        onClick={() => setCategoryFilter('Vitaminas')}
+                        className={`h-6 text-[10px] px-2 rounded-full ${categoryFilter === 'Vitaminas' ? 'border-green-200 bg-green-50 text-green-700' : 'text-gray-500'}`}
+                    >
                         Vitaminas
                     </Button>
-                    <Button variant="ghost" size="sm" className="h-6 text-[10px] px-2 rounded-full text-gray-500 hover:text-purple-600 hover:bg-purple-50">
+                    <Button
+                        variant={categoryFilter === 'Hormônios' ? 'outline' : 'ghost'}
+                        size="sm"
+                        onClick={() => setCategoryFilter('Hormônios')}
+                        className={`h-6 text-[10px] px-2 rounded-full ${categoryFilter === 'Hormônios' ? 'border-orange-200 bg-orange-50 text-orange-700' : 'text-gray-500'}`}
+                    >
                         Hormônios
                     </Button>
                 </div>
@@ -73,7 +117,7 @@ export function FormulasPanel({ onSelectFormula }: FormulasPanelProps) {
                             </div>
                         ))}
                     </div>
-                ) : formulas.length === 0 ? (
+                ) : filteredFormulas.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-48 text-gray-400 text-center p-4">
                         <Search className="w-8 h-8 mb-2 opacity-20" />
                         <p className="text-sm">Nenhuma fórmula encontrada para &quot;{searchTerm}&quot;</p>
@@ -84,7 +128,7 @@ export function FormulasPanel({ onSelectFormula }: FormulasPanelProps) {
                             <span>Resultados</span>
                             <span className="text-gray-300 text-[9px]">Clique na seta para inserir</span>
                         </div>
-                        {formulas.map((formula) => (
+                        {filteredFormulas.map((formula) => (
                             <FormulaCard
                                 key={formula.id}
                                 formula={formula}
