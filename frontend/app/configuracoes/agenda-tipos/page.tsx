@@ -1,6 +1,6 @@
 'use client';
 import ConstructionPage from '@/components/ui/construction-page';
 
-export default function Agenda-tiposPage() {
+export default function AgendaTiposPage() {
     return <ConstructionPage title="Agenda-tipos" />;
 }
