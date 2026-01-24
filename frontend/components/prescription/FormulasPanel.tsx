@@ -28,11 +28,20 @@ export function FormulasPanel({ onSelectFormula }: FormulasPanelProps) {
             f.usage?.toLowerCase().includes(term) ||
             f.category?.toLowerCase().includes(term);
 
-        const matchesCategory = categoryFilter ? f.category === categoryFilter || f.usage?.includes(categoryFilter) : true;
+        const matchesCategory = categoryFilter
+            ? (f.category?.includes(categoryFilter) || f.usage?.includes(categoryFilter) || f.name?.toUpperCase().includes(categoryFilter.toUpperCase().slice(0, -1)))
+            : true;
 
-        // Special case for "Injetáveis" button mapping to usage or category
         if (categoryFilter === 'Injetáveis') {
             return (f.category === 'Injetáveis' || f.usage?.includes('IM') || f.usage?.includes('EV') || f.usage?.includes('SC')) && matchesSearch;
+        }
+
+        if (categoryFilter === 'Vitaminas') {
+            return (f.name.includes('VITAMINA') || f.category === 'Vitaminas') && matchesSearch;
+        }
+
+        if (categoryFilter === 'Hormônios') {
+            return (f.category === 'Hormônios' || f.name.includes('TESTOSTERONA') || f.name.includes('ESTRADIOL') || f.name.includes('HORMONIO')) && matchesSearch;
         }
 
         return matchesSearch && matchesCategory;

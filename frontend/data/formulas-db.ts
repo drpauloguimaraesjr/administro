@@ -20,7 +20,7 @@ export const FORMULAS_DATA: PrescriptionFormula[] = [
         description: "Coenzima necessária para produção de neurotransmissores vitais ao seu funcionamento. Funciona melhor para o metabolismo de aminoácidos, além de participar da quebra do glicogênio muscular. Auxiliar no tratamento da alopécia seborreica e acne.",
         dosage: "2.500mcg / 5000mcg",
         supplier: "Pineda",
-        category: "Vitaminas",
+        category: "Injetáveis",
         createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), createdBy: 'system', clinicId: 'demo'
     },
     {
@@ -31,7 +31,7 @@ export const FORMULAS_DATA: PrescriptionFormula[] = [
         description: "Coenzima necessária em reações metabólicas. Essencial ao metabolismo de todas as células especialmente as do trato gastrointestinal, as da medula óssea e as do sistema nervoso.",
         dosage: "2500mcg / 5000mcg",
         supplier: "Pineda",
-        category: "Vitaminas",
+        category: "Injetáveis",
         createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), createdBy: 'system', clinicId: 'demo'
     },
     {
@@ -361,7 +361,7 @@ export const FORMULAS_DATA: PrescriptionFormula[] = [
         description: "Também pertence ao grupo das vitaminas B. Componente da coenzima A, essencial no metabolismo de carboidratos.",
         dosage: "100mg",
         supplier: "Pineda",
-        category: "Vitaminas",
+        category: "Injetáveis",
         createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), createdBy: 'system', clinicId: 'demo'
     },
     {
@@ -427,7 +427,7 @@ export const FORMULAS_DATA: PrescriptionFormula[] = [
         description: "Adjuvante no tratamento de doenças cardiovasculares e distúrbios cognitivos. Desintoxicante. Reduz a ocorrência da deficiência do tubo neural.",
         dosage: "",
         supplier: "Pineda",
-        category: "Vitaminas",
+        category: "Injetáveis",
         createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), createdBy: 'system', clinicId: 'demo'
     },
     {
@@ -449,7 +449,7 @@ export const FORMULAS_DATA: PrescriptionFormula[] = [
         description: "Estimula a regeneração celular da pele - Auxilia no reequilíbrio hormonal e neuronal - Potente ação antioxidante",
         dosage: "",
         supplier: "Pineda",
-        category: "Hormônios",
+        category: "Injetáveis",
         createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), createdBy: 'system', clinicId: 'demo'
     },
     {
@@ -460,7 +460,7 @@ export const FORMULAS_DATA: PrescriptionFormula[] = [
         description: "Imprescindível no auxilio regeneração celular da pele. Auxilia o estímulo e extensão da fase anágena no bulbo capilar e melhora da densidade dos fios.",
         dosage: "",
         supplier: "Pineda",
-        category: "Hormônios",
+        category: "Injetáveis",
         createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), createdBy: 'system', clinicId: 'demo'
     },
     {
@@ -592,7 +592,7 @@ export const FORMULAS_DATA: PrescriptionFormula[] = [
         description: "Desenvolve um efeito eutrófico dérmico e cicatrizante aumentando a resistência das fibras colágenas.",
         dosage: "100mg",
         supplier: "Pineda",
-        category: "Vitaminas",
+        category: "Injetáveis",
         createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), createdBy: 'system', clinicId: 'demo'
     },
     {
@@ -625,7 +625,7 @@ export const FORMULAS_DATA: PrescriptionFormula[] = [
         description: "Complexo vitamínico com função ativadora do metabolismo celular. Fundamental como percursor na produção de diversos co-fatores enzimáticos.",
         dosage: "64mg",
         supplier: "Pineda",
-        category: "Vitaminas",
+        category: "Injetáveis",
         createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), createdBy: 'system', clinicId: 'demo'
     },
     {
@@ -680,7 +680,7 @@ export const FORMULAS_DATA: PrescriptionFormula[] = [
         description: "Substância imprescindível para cabelos, pele e unhas saudáveis, atua de forma regulatória do metabolismo saudável.",
         dosage: "",
         supplier: "Pineda",
-        category: "Vitaminas",
+        category: "Injetáveis",
         createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), createdBy: 'system', clinicId: 'demo'
     },
     {
@@ -746,7 +746,7 @@ export const FORMULAS_DATA: PrescriptionFormula[] = [
         description: "Inibidor seletivo da aromatase. Antagonistas de hormônios citostáticos.",
         dosage: "1x/sem/ 3 a 6 meses",
         supplier: "Pineda",
-        category: "Hormônios",
+        category: "Injetáveis",
         createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), createdBy: 'system', clinicId: 'demo'
     },
     {
@@ -768,7 +768,7 @@ export const FORMULAS_DATA: PrescriptionFormula[] = [
         description: "O ácido pantotênico é administrado na forma de sal de cálcio e em conjunto com outras vitaminas do grupo B, como suplemento nutricional.",
         dosage: "",
         supplier: "Pineda",
-        category: "Vitaminas",
+        category: "Injetáveis",
         createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), createdBy: 'system', clinicId: 'demo'
     },
     {
@@ -801,7 +801,7 @@ export const FORMULAS_DATA: PrescriptionFormula[] = [
         description: "Atua no equilíbrio das funções cerebrais, saúde mental e emocional; atua na transformação da homocisteina em metionina.",
         dosage: "1 a 2x/semana",
         supplier: "Pineda",
-        category: "Vitaminas",
+        category: "Injetáveis",
         createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), createdBy: 'system', clinicId: 'demo'
     },
     {
@@ -845,7 +845,7 @@ export const FORMULAS_DATA: PrescriptionFormula[] = [
         description: "Atividade proliferativa de células matrizes capilares, antagoniza dediidrotestosterona sobre folículos anágenos.",
         dosage: "0,1%",
         supplier: "Pineda",
-        category: "Hormônios",
+        category: "Injetáveis",
         createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), createdBy: 'system', clinicId: 'demo'
     }
 ];
