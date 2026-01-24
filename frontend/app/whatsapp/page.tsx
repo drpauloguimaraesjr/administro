@@ -42,7 +42,7 @@ function PlaybookSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
 
                             {step.type === 'script' ? (
                                 <div className="bg-slate-50 p-3 rounded-md border border-slate-200 text-sm text-slate-600 cursor-pointer hover:bg-teal-50 hover:border-teal-200 hover:text-teal-800 transition-all"
-                                    onClick={() => navigator.clipboard.writeText(step.content)}
+                                    onClick={() => navigator.clipboard.writeText(step.content || '')}
                                     title="Clique para copiar">
                                     &quot;{step.content}&quot;
                                 </div>
