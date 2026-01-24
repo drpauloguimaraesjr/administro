@@ -45,10 +45,6 @@ export default function CRMPage() {
                     <Button variant="outline" size="sm" className="h-9">
                         <Filter className="w-4 h-4 mr-2" /> Filtros
                     </Button>
-                    <div className="ml-auto flex items-center gap-2 text-sm text-muted-foreground">
-                        <span className="hidden sm:inline-block">Total no Pipeline:</span>
-                        <span className="font-semibold text-green-600">R$ 21.500,00</span>
-                    </div>
                 </div>
             </div>
 
@@ -58,6 +54,6 @@ export default function CRMPage() {
                     <KanbanBoard />
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
