@@ -76,7 +76,7 @@ export function FormulasPanel({ onSelectFormula }: FormulasPanelProps) {
                 ) : formulas.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-48 text-gray-400 text-center p-4">
                         <Search className="w-8 h-8 mb-2 opacity-20" />
-                        <p className="text-sm">Nenhuma fórmula encontrada para "{searchTerm}"</p>
+                        <p className="text-sm">Nenhuma fórmula encontrada para &quot;{searchTerm}&quot;</p>
                     </div>
                 ) : (
                     <div className="space-y-1">
