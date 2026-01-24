@@ -118,6 +118,6 @@
 
   /* CARD PRECISION */
   .card-hover-effect {
-    @apply transition-all duration-300 hover:shadow-lg hover:border-accent/30 border border-border/60 bg-white/80 backdrop-blur-sm;
+    @apply transition-all duration-300 hover:shadow-lg hover:border-accent border border-border/60 bg-white/80 backdrop-blur-sm;
   }
 }
