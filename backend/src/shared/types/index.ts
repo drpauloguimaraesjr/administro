@@ -54,6 +54,7 @@ export interface Wallet {
   createdAt?: Date | string;
 }
 
+<<<<<<< HEAD
 // --- User & Permissions ---
 
 export type UserRole = 'owner' | 'doctor' | 'nurse' | 'nursing_tech' | 'receptionist' | 'spouse' | 'secretary' | 'custom';
@@ -62,11 +63,15 @@ export interface Permission {
   module: 'patients' | 'appointments' | 'medical_records' | 'prescriptions' | 'financial' | 'crm' | 'whatsapp' | 'reports' | 'settings' | 'users';
   actions: ('view' | 'create' | 'edit' | 'delete' | 'export')[];
 }
+=======
+export type UserRole = 'master' | 'doctor' | 'nurse' | 'receptionist' | 'admin';
+>>>>>>> b90ac17 (feat: Knowledge Base Module - Notion+Firebase Sync)
 
 export interface User {
   id: string;
   name: string;
   email: string;
+<<<<<<< HEAD
   phone?: string;
   avatar?: string;
 
@@ -136,6 +141,34 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     { module: 'crm', actions: ['view', 'create', 'edit'] }
   ]
 };
+=======
+  // role: UserRole; // Commented out to avoid breaking existing code immediately, will use string for flexibility or union
+  role: UserRole | 'owner' | 'spouse' | 'secretary'; // Backwards compatibility
+  permissions: string[];
+  specialty?: string;
+  phone?: string;
+  isActive: boolean;
+  contexts: ContextType[];
+  createdAt?: Date | string;
+}
+
+export interface Intercurrence {
+  id: string;
+  patientId: string;
+  patientName: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  status: 'open' | 'investigating' | 'resolved';
+  description: string;
+  aiAnalysis?: {
+    summary: string;
+    suggestion: string;
+    riskScore: number;
+  };
+  chatContext?: string; // Log ID or text
+  createdAt: string;
+  updatedAt: string;
+}
+>>>>>>> b90ac17 (feat: Knowledge Base Module - Notion+Firebase Sync)
 
 /**
  * Payload recebido do n8n após processamento OCR

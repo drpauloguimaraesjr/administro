@@ -1,0 +1,153 @@
+{
+    "name": "CALYX_Editor_AI_V1",
+    "nodes": [
+        {
+            "parameters": {
+                "path": "editor-webhook",
+                "responseMode": "lastNode",
+                "options": {}
+            },
+            "id": "trigger-webhook",
+            "name": "Webhook (From Plaud/Zapier)",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                0,
+                0
+            ]
+        },
+        {
+            "parameters": {
+                "modelId": {
+                    "__rl": true,
+                    "value": "gpt-4o",
+                    "mode": "list",
+                    "cachedResultName": "gpt-4-o"
+                },
+                "messages": {
+                    "values": [
+                        {
+                            "role": "system",
+                            "content": "=Você é um Editor Médico Sênior da clínica Calyx. Sua missão é estruturar o conhecimento do Dr. Paulo para alimentar a IA Sophia.\n\n### OBJETIVO\nReceba a transcrição bruta e transforme-a em um JSON rico e estruturado, seguindo estritamente este schema:\n\n{\n  \"tema\": \"Título curto (max 10 palavras)\",\n  \"pergunta_paciente\": \"Como um paciente perguntaria isso? (Linguagem natural)\",\n  \"resposta_sophia\": \"Resposta empática, didática e completa da Sophia (2-4 parágrafos).\",\n  \"contexto_clinico\": \"Resumo técnico para médicos (termos técnicos, hipóteses).\",\n  \"causa_efeito\": \"Cadeia lógica: Causa → Efeito → Sintoma.\",\n  \"orientacoes\": \"Lista numerada de ações práticas e prescrições.\",\n  \"palavras_chave\": \"8-12 keywords para busca (sintomas, exames, etc).\",\n  \"categoria\": \"Uma das opções: Sintoma, Tratamento, Exame, Suplemento, Estilo de Vida, Hormônio\",\n  \"principio_why\": \"Filosofia/Motivo clínico (Por que?)\",\n  \"acao_pratica_what\": \"Resumo da conduta (O que?)\",\n  \"nuance_tom_how\": \"Tom de voz, analogias usadas (Como?)\"\n}\n\n### INSTRUÇÕES DE QUALIDADE\n- **Resposta Sophia**: É o campo mais importante. Deve ser pronto para uso: acolhedor, claro, sem 'mediquês' desnecessário.\n- **Contexto Clínico**: Use para guardar os dados técnicos que não vão para o paciente.\n- **Princípio/Ação/Nuance**: Mantenha a distinção clara entre filosofia, prática e estilo."
+                        },
+                        {
+                            "content": "={{ $json.body.transcription }}"
+                        }
+                    ]
+                },
+                "jsonOutput": true
+            },
+            "id": "ai-editor",
+            "name": "AI Editor (GPT-4o)",
+            "type": "n8n-nodes-base.openAi",
+            "typeVersion": 1,
+            "position": [
+                250,
+                0
+            ],
+            "credentials": {
+                "openAiApi": {
+                    "id": "YOUR_OPENAI_CREDENTIAL_ID",
+                    "name": "OpenAI account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "resource": "databasePage",
+                "operation": "create",
+                "databaseId": "2f342023207580049c5fe31e9b4c19be",
+                "propertiesUi": {
+                    "propertyValues": [
+                        {
+                            "key": "Tópico|title",
+                            "title": "={{ $json.tema }}"
+                        },
+                        {
+                            "key": "Pergunta Paciente|rich_text",
+                            "textContent": "={{ $json.pergunta_paciente }}"
+                        },
+                        {
+                            "key": "Resposta Sophia|rich_text",
+                            "textContent": "={{ $json.resposta_sophia }}"
+                        },
+                        {
+                            "key": "Contexto Clínico|rich_text",
+                            "textContent": "={{ $json.contexto_clinico }}"
+                        },
+                        {
+                            "key": "Causa e Efeito|rich_text",
+                            "textContent": "={{ $json.causa_efeito }}"
+                        },
+                        {
+                            "key": "Orientações|rich_text",
+                            "textContent": "={{ $json.orientacoes }}"
+                        },
+                        {
+                            "key": "Palavras-Chave|rich_text",
+                            "textContent": "={{ $json.palavras_chave }}"
+                        },
+                        {
+                            "key": "Categoria|select",
+                            "selectOption": "={{ $json.categoria }}"
+                        },
+                        {
+                            "key": "1. Princípio (Why)|rich_text",
+                            "textContent": "={{ $json.principio_why }}"
+                        },
+                        {
+                            "key": "2. Ação Prática (What)|rich_text",
+                            "textContent": "={{ $json.acao_pratica_what }}"
+                        },
+                        {
+                            "key": "3. Nuance/Tom (How)|rich_text",
+                            "textContent": "={{ $json.nuance_tom_how }}"
+                        },
+                        {
+                            "key": "Status|status",
+                            "statusValue": "Aprovado"
+                        }
+                    ]
+                }
+            },
+            "id": "save-notion",
+            "name": "Save to Notion (Already Approved)",
+            "type": "n8n-nodes-base.notion",
+            "typeVersion": 2,
+            "position": [
+                500,
+                0
+            ],
+            "credentials": {
+                "notionApi": {
+                    "id": "YOUR_NOTION_CREDENTIAL_ID",
+                    "name": "Notion account"
+                }
+            }
+        }
+    ],
+    "connections": {
+        "Webhook (From Plaud/Zapier)": {
+            "main": [
+                [
+                    {
+                        "node": "AI Editor (GPT-4o)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "AI Editor (GPT-4o)": {
+            "main": [
+                [
+                    {
+                        "node": "Save to Notion (Already Approved)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

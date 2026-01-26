@@ -1,0 +1,195 @@
+{
+    "name": "CALYX_Sentinel_V1",
+    "nodes": [
+        {
+            "parameters": {
+                "path": "sentinel-webhook",
+                "responseMode": "lastNode",
+                "options": {}
+            },
+            "id": "trigger-webhook",
+            "name": "Webhook (WhatsApp)",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                0,
+                0
+            ]
+        },
+        {
+            "parameters": {
+                "resource": "databasePage",
+                "operation": "getAll",
+                "databaseId": "2f34202320758075adebdb61586d4c79",
+                "returnAll": true
+            },
+            "id": "notion-rules",
+            "name": "Fetch Sentinel Rules",
+            "type": "n8n-nodes-base.notion",
+            "typeVersion": 2,
+            "position": [
+                200,
+                200
+            ],
+            "credentials": {
+                "notionApi": {
+                    "id": "YOUR_NOTION_CREDENTIAL_ID",
+                    "name": "Notion account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "modelId": {
+                    "__rl": true,
+                    "value": "gpt-4o-mini",
+                    "mode": "list",
+                    "cachedResultName": "gpt-4o-mini"
+                },
+                "messages": {
+                    "values": [
+                        {
+                            "content": "=Você é o SENTINEL, um sistema de vigilância médica para uma clínica de emagrecimento.\n\nSua tarefa é analisar a mensagem do paciente e verificar se ela corresponde a alguma das REGRAS DE RISCO abaixo.\n\nREGRAS ATIVAS:\n{{ JSON.stringify($('Fetch Sentinel Rules').item.json) }}\n\nMENSAGEM DO PACIENTE:\n\"{{ $('Webhook (WhatsApp)').item.json.body.text.message }}\"\n\nResponda APENAS um JSON:\n{\n  \"isRisk\": boolean,\n  \"severity\": \"low\" | \"medium\" | \"high\" | \"critical\",\n  \"summary\": \"Resumo curto do problema\",\n  \"matchedRule\": \"Qual regra foi ativada\"\n}"
+                        }
+                    ]
+                },
+                "jsonOutput": true
+            },
+            "id": "ai-analysis",
+            "name": "AI Analysis (GPT-4o Mini)",
+            "type": "n8n-nodes-base.openAi",
+            "typeVersion": 1,
+            "position": [
+                450,
+                100
+            ],
+            "credentials": {
+                "openAiApi": {
+                    "id": "YOUR_OPENAI_CREDENTIAL_ID",
+                    "name": "OpenAI account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "boolean": [
+                        {
+                            "value1": "={{ $json.isRisk }}",
+                            "value2": true
+                        }
+                    ],
+                    "string": [
+                        {
+                            "value1": "={{ $json.severity }}",
+                            "value2": "medium"
+                        },
+                        {
+                            "value1": "={{ $json.severity }}",
+                            "value2": "high"
+                        },
+                        {
+                            "value1": "={{ $json.severity }}",
+                            "value2": "critical"
+                        }
+                    ]
+                },
+                "combineOperation": "any"
+            },
+            "id": "filter-risk",
+            "name": "Is Risk Medium+?",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 1,
+            "position": [
+                650,
+                100
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://backendcalyx.up.railway.app/api/intercurrences",
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "patientId",
+                            "value": "={{ $('Webhook (WhatsApp)').item.json.body.phone || 'unknown' }}"
+                        },
+                        {
+                            "name": "patientName",
+                            "value": "={{ $('Webhook (WhatsApp)').item.json.body.senderName || 'Paciente WhatsApp' }}"
+                        },
+                        {
+                            "name": "description",
+                            "value": "={{ $('Webhook (WhatsApp)').item.json.body.text.message }}"
+                        },
+                        {
+                            "name": "severity",
+                            "value": "={{ $json.severity }}"
+                        },
+                        {
+                            "name": "aiAnalysis",
+                            "value": "={{ {\"summary\": $json.summary, \"suggestion\": \"Verificar protocolo: \" + $json.matchedRule, \"riskScore\": ($json.severity==\"critical\"?4:($json.severity==\"high\"?3:2)) } }}"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "backend-api",
+            "name": "Create Alert in App",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                900,
+                80
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook (WhatsApp)": {
+            "main": [
+                [
+                    {
+                        "node": "Fetch Sentinel Rules",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Fetch Sentinel Rules": {
+            "main": [
+                [
+                    {
+                        "node": "AI Analysis (GPT-4o Mini)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "AI Analysis (GPT-4o Mini)": {
+            "main": [
+                [
+                    {
+                        "node": "Is Risk Medium+?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Is Risk Medium+?": {
+            "main": [
+                [
+                    {
+                        "node": "Create Alert in App",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

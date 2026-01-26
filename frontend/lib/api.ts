@@ -71,9 +71,69 @@ export const fetchAvailableSlots = async (date: string) => {
     return response.data;
 };
 
+
 export const sendReminder = async (id: string) => {
     const response = await api.post(`/appointments/${id}/send-reminder`);
     return response.data;
 };
 
+<<<<<<< HEAD
 export default api;
+=======
+// Users
+export const fetchUsers = async () => {
+    const response = await api.get('/users');
+    return response.data;
+};
+
+export const fetchUser = async (id: string) => {
+    const response = await api.get(`/users/${id}`);
+    return response.data;
+};
+
+export const createUser = async (user: any) => {
+    const response = await api.post('/users', user);
+    return response.data;
+};
+
+export const updateUser = async (id: string, data: any) => {
+    const response = await api.put(`/users/${id}`, data);
+    return response.data;
+};
+
+export const deleteUser = async (id: string) => {
+    await api.delete(`/users/${id}`);
+};
+
+// Intercurrences (Sentinel)
+export const fetchIntercurrences = async () => {
+    const response = await api.get('/intercurrences');
+    return response.data;
+};
+
+export const createIntercurrence = async (data: any) => {
+    const response = await api.post('/intercurrences', data);
+    return response.data;
+};
+
+export const updateIntercurrenceStatus = async (id: string, status: string, aiAnalysis?: any) => {
+    const response = await api.put(`/intercurrences/${id}`, { status, aiAnalysis });
+    return response.data;
+};
+
+// Knowledge Base
+export const generateKnowledge = async (rawText: string) => {
+    const response = await api.post('/knowledge/generate', { rawText });
+    return response.data;
+};
+
+export const saveKnowledge = async (data: any) => {
+    const response = await api.post('/knowledge', data);
+    return response.data;
+};
+
+export const fetchKnowledge = async () => {
+    const response = await api.get('/knowledge');
+    return response.data;
+};
+>>>>>>> b90ac17 (feat: Knowledge Base Module - Notion+Firebase Sync)

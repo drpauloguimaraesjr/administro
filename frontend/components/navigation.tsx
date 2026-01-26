@@ -3,7 +3,11 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
+<<<<<<< HEAD
 import { Home, DollarSign, Smartphone, Calendar, Users, Shield, LogOut, Share2, ClipboardList, Target, Settings } from 'lucide-react';
+=======
+import { Home, DollarSign, BarChart3, TrendingUp, Shield, LogOut, Smartphone, Users, Activity, Brain } from 'lucide-react';
+>>>>>>> b90ac17 (feat: Knowledge Base Module - Notion+Firebase Sync)
 import { useAuth } from './auth/auth-provider';
 import { Button } from './ui/button';
 
@@ -12,6 +16,8 @@ export function Navigation() {
   const { user, logout } = useAuth();
 
   const navItems = [
+    { href: '/knowledge', label: 'Cérebro', icon: <Brain className="w-4 h-4 text-purple-500" /> },
+    { href: '/intercurrences', label: 'Alertas', icon: <Activity className="w-4 h-4 text-red-500" /> },
     { href: '/', label: 'Dashboard', icon: <Home className="w-4 h-4" /> },
     { href: '/agenda', label: 'Agenda', icon: <Calendar className="w-4 h-4" /> },
     { href: '/patients', label: 'Pacientes', icon: <Users className="w-4 h-4" /> },
@@ -24,6 +30,7 @@ export function Navigation() {
   ];
 
   if (user) {
+    navItems.push({ href: '/users', label: 'Equipe', icon: <Users className="w-4 h-4" /> });
     navItems.push({ href: '/admin', label: 'Admin', icon: <Shield className="w-4 h-4" /> });
   }
 

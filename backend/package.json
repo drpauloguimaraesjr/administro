@@ -12,10 +12,12 @@
   },
   "dependencies": {
     "@hapi/boom": "^10.0.1",
+    "@notionhq/client": "^5.8.0",
     "@types/node-cron": "^3.0.7",
     "@whiskeysockets/baileys": "^6.7.0",
     "axios": "^1.6.0",
     "cors": "^2.8.5",
+<<<<<<< HEAD
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "firebase-admin": "^12.0.0",
@@ -23,18 +25,32 @@
     "pino": "^8.17.2",
     "typescript": "^5.3.3",
     "zod": "^3.22.4"
+=======
+    "express": "^4.18.2",
+    "firebase-admin": "^12.0.0",
+    "form-data": "^4.0.0",
+    "openai": "^6.16.0",
+    "zod": "^4.3.6"
+>>>>>>> b90ac17 (feat: Knowledge Base Module - Notion+Firebase Sync)
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.10.0",
+<<<<<<< HEAD
     "@types/pino": "^7.0.5",
+=======
+>>>>>>> b90ac17 (feat: Knowledge Base Module - Notion+Firebase Sync)
     "@types/supertest": "^2.0.12",
     "jest": "^29.7.0",
     "node-cron": "^3.0.2",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.0",
+<<<<<<< HEAD
     "tsx": "^4.21.0"
+=======
+    "typescript": "^5.3.3"
+>>>>>>> b90ac17 (feat: Knowledge Base Module - Notion+Firebase Sync)
   }
 }

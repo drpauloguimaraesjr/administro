@@ -1,13 +1,22 @@
+<<<<<<< HEAD
 'use client';
 
 // components/agenda/Calendar.tsx
 import React from 'react';
 import FullCalendar from '@fullcalendar/react';
 import { EventApi, DateSelectArg, EventClickArg } from '@fullcalendar/core';
+=======
+"use client";
+// components/agenda/Calendar.tsx
+import React from 'react';
+import FullCalendar from '@fullcalendar/react';
+>>>>>>> b90ac17 (feat: Knowledge Base Module - Notion+Firebase Sync)
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { fetchAppointments, createAppointment, updateAppointment, deleteAppointment } from '@/lib/api';
 
 export default function Calendar() {
@@ -32,7 +41,7 @@ export default function Calendar() {
         backgroundColor: a.status === 'confirmed' ? '#34D399' : a.status === 'pending' ? '#FBBF24' : '#EF4444',
     }));
 
-    const handleDateSelect = (selectInfo: DateSelectArg) => {
+    const handleDateSelect = (selectInfo: any) => {
         const title = prompt('Nome do paciente');
         if (title) {
             const newAppt = {
@@ -50,7 +59,7 @@ export default function Calendar() {
         }
     };
 
-    const handleEventClick = (clickInfo: EventClickArg) => {
+    const handleEventClick = (clickInfo: any) => {
         if (window.confirm(`Excluir o agendamento "${clickInfo.event.title}"?`)) {
             deleteMut.mutate(clickInfo.event.id);
         }

@@ -54,13 +54,37 @@ export interface Wallet {
   createdAt?: Date | string;
 }
 
+export type UserRole = 'master' | 'doctor' | 'nurse' | 'receptionist' | 'admin';
+
 export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'owner' | 'spouse' | 'secretary';
+  // role: UserRole; 
+  role: UserRole | 'owner' | 'spouse' | 'secretary';
+  permissions: string[];
+  specialty?: string;
+  phone?: string;
+  isActive: boolean;
   contexts: ContextType[];
   createdAt?: Date | string;
+}
+
+export interface Intercurrence {
+  id: string;
+  patientId: string;
+  patientName: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  status: 'open' | 'investigating' | 'resolved';
+  description: string;
+  aiAnalysis?: {
+    summary: string;
+    suggestion: string;
+    riskScore: number;
+  };
+  chatContext?: string; // Log ID or text
+  createdAt: string;
+  updatedAt: string;
 }
 
 /**

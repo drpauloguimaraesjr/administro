@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 'use client';
 
+=======
+"use client";
+>>>>>>> b90ac17 (feat: Knowledge Base Module - Notion+Firebase Sync)
 // components/agenda/Sidebar.tsx
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
