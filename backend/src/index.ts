@@ -9,7 +9,6 @@ import n8nRoutes from './routes/n8n.routes.js';
 import medxRoutes from './routes/medx.routes.js';
 import { initializeWhatsApp } from './services/whatsapp.js';
 import appointmentsRoutes from './routes/appointments.js';
-<<<<<<< HEAD
 import patientsRoutes from './routes/patients.js';
 import medicalRecordsRoutes from './routes/medicalRecords.js';
 import paymentsRoutes from './routes/payments.js';
@@ -17,15 +16,11 @@ import questionnairesRoutes from './routes/questionnaires.js';
 import leadsRoutes from './routes/leads.js';
 import { usersRouter } from './routes/users.js';
 import { whatsappQueuesRouter } from './routes/whatsapp-queues.js';
-=======
-import usersRoutes from './routes/usersRoutes.js';
 import intercurrencesRoutes from './routes/intercurrencesRoutes.js';
 import knowledgeRoutes from './routes/knowledgeRoutes.js';
->>>>>>> b90ac17 (feat: Knowledge Base Module - Notion+Firebase Sync)
 
 const app = express();
 
-// Middlewares
 // Middlewares
 app.use(cors({
   origin: '*', // Permite qualquer origem temporariamente para debug
@@ -52,7 +47,6 @@ app.get('/healthz', (req, res) => {
 app.use('/api/n8n', n8nRoutes);
 app.use('/api/whatsapp', whatsappRoutes);
 app.use('/api/appointments', appointmentsRoutes);
-<<<<<<< HEAD
 app.use('/api/patients', patientsRoutes);
 app.use('/api/medical-records', medicalRecordsRoutes);
 app.use('/api/payments', paymentsRoutes);
@@ -61,11 +55,8 @@ app.use('/api/leads', leadsRoutes);
 app.use('/api/users', usersRouter);
 app.use('/api/whatsapp/queues', whatsappQueuesRouter);
 app.use('/api/medx', medxRoutes);
-=======
-app.use('/api/users', usersRoutes);
 app.use('/api/intercurrences', intercurrencesRoutes);
 app.use('/api/knowledge', knowledgeRoutes);
->>>>>>> b90ac17 (feat: Knowledge Base Module - Notion+Firebase Sync)
 
 // Inicia servidor
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
@@ -79,13 +70,10 @@ app.listen(PORT, async () => {
   console.log(`   - POST /api/whatsapp/message`);
   console.log(`   - GET /api/whatsapp/qr`);
   console.log(`   - GET /api/whatsapp/status`);
-<<<<<<< HEAD
   console.log(`   - CRUD /api/patients`);
-=======
   console.log(`   - /api/users`);
   console.log(`   - /api/intercurrences`);
   console.log(`   - /api/knowledge`);
->>>>>>> b90ac17 (feat: Knowledge Base Module - Notion+Firebase Sync)
 
   // Inicializa WhatsApp se configurado
   if (process.env.WHATSAPP_AUTO_START === 'true') {
