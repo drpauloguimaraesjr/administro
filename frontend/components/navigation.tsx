@@ -3,11 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
-<<<<<<< HEAD
-import { Home, DollarSign, Smartphone, Calendar, Users, Shield, LogOut, Share2, ClipboardList, Target, Settings } from 'lucide-react';
-=======
-import { Home, DollarSign, BarChart3, TrendingUp, Shield, LogOut, Smartphone, Users, Activity, Brain } from 'lucide-react';
->>>>>>> b90ac17 (feat: Knowledge Base Module - Notion+Firebase Sync)
+import { Home, DollarSign, Smartphone, Calendar, Users, Shield, LogOut, Share2, ClipboardList, Target, Settings, Activity, Brain } from 'lucide-react';
 import { useAuth } from './auth/auth-provider';
 import { Button } from './ui/button';
 
