@@ -1,16 +1,7 @@
-<<<<<<< HEAD
-'use client';
-
-// components/agenda/Calendar.tsx
-import React from 'react';
-import FullCalendar from '@fullcalendar/react';
-import { EventApi, DateSelectArg, EventClickArg } from '@fullcalendar/core';
-=======
 "use client";
-// components/agenda/Calendar.tsx
 import React from 'react';
 import FullCalendar from '@fullcalendar/react';
->>>>>>> b90ac17 (feat: Knowledge Base Module - Notion+Firebase Sync)
+import { EventApi } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';

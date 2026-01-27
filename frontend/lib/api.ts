@@ -77,9 +77,6 @@ export const sendReminder = async (id: string) => {
     return response.data;
 };
 
-<<<<<<< HEAD
-export default api;
-=======
 // Users
 export const fetchUsers = async () => {
     const response = await api.get('/users');
@@ -136,4 +133,5 @@ export const fetchKnowledge = async () => {
     const response = await api.get('/knowledge');
     return response.data;
 };
->>>>>>> b90ac17 (feat: Knowledge Base Module - Notion+Firebase Sync)
+
+export default api;
