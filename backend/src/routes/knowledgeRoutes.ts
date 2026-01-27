@@ -6,6 +6,7 @@ import {
 } from "../controllers/knowledgeController.js";
 
 const router = Router();
+console.log("✅ Loading Knowledge Routes");
 
 // Route to generate structured data from raw text using AI
 router.post("/generate", requestKnowledgeGeneration);

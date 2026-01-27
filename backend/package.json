@@ -1,6 +1,6 @@
 {
   "name": "administrador-contas-backend",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Backend para sistema de administração de contas - Railway Edition",
   "main": "build_output/index.js",
   "type": "module",
