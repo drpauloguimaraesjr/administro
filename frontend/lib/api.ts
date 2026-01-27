@@ -134,4 +134,19 @@ export const fetchKnowledge = async () => {
     return response.data;
 };
 
+// Knowledge Drafts
+export const saveKnowledgeDraft = async (content: string, title?: string) => {
+    const response = await api.post('/knowledge/drafts', { content, title });
+    return response.data;
+};
+
+export const fetchKnowledgeDrafts = async () => {
+    const response = await api.get('/knowledge/drafts');
+    return response.data;
+};
+
+export const deleteKnowledgeDraft = async (id: string) => {
+    await api.delete(`/knowledge/drafts/${id}`);
+};
+
 export default api;
