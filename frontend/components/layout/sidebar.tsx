@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
     Home, DollarSign, Smartphone, Calendar, Users, Shield,
-    Share2, ClipboardList, Target, Settings, ChevronRight, ChevronLeft, Menu
+    Share2, ClipboardList, Target, Settings, ChevronRight, ChevronLeft, Menu, Brain, Activity
 } from 'lucide-react';
 import { useAuth } from '@/components/auth/auth-provider';
 import { cn } from '@/lib/utils'; // Assuming you have a cn utility for class merging
@@ -16,6 +16,8 @@ export function Sidebar() {
     const [isCollapsed, setIsCollapsed] = useState(false);
 
     const navItems = [
+        { href: '/knowledge', label: 'Cérebro (IA)', icon: Brain },
+        { href: '/intercurrences', label: 'Alertas (Sentinel)', icon: Activity },
         { href: '/', label: 'Dashboard', icon: Home },
         { href: '/agenda', label: 'Agenda', icon: Calendar },
         { href: '/patients', label: 'Pacientes', icon: Users },
