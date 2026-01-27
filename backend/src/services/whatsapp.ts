@@ -148,9 +148,9 @@ export async function initializeWhatsApp() {
       version,
       auth: {
         creds: state.creds,
-        keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'silent' })),
+        keys: makeCacheableSignalKeyStore(state.keys, (pino as any)({ level: 'silent' })),
       },
-      logger: pino({ level: 'silent' }),
+      logger: (pino as any)({ level: 'silent' }),
       browser: ['CALYX', 'Chrome', '1.0.0'],
       generateHighQualityLinkPreview: true,
     });

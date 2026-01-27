@@ -32,7 +32,7 @@ export async function downloadWhatsAppMedia(
     // Identifica tipo de mídia
     if (msg.imageMessage) {
       mediaType = 'imageMessage';
-      fileName = msg.imageMessage.mimetype?.split('/')[1] 
+      fileName = msg.imageMessage.mimetype?.split('/')[1]
         ? `image.${msg.imageMessage.mimetype.split('/')[1]}`
         : 'image.jpg';
       mimeType = msg.imageMessage.mimetype || 'image/jpeg';
@@ -51,7 +51,7 @@ export async function downloadWhatsAppMedia(
     }
 
     // Baixa a mídia usando Baileys
-    const logger = pino({ level: 'silent' });
+    const logger = (pino as any)({ level: 'silent' });
     const buffer = await downloadMediaMessage(
       message,
       'buffer',
@@ -110,7 +110,7 @@ export async function uploadMediaToFirebase(
 
     // Retorna URL pública do Firebase Storage
     const publicUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(filePath)}?alt=media&token=${Date.now()}`;
-    
+
     // Ou use a URL assinada (mais segura)
     return signedUrl;
   } catch (error) {
