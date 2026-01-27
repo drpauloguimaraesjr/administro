@@ -137,7 +137,7 @@ export default function IntercurrencesPage() {
                                 </CardHeader>
                                 <CardContent>
                                     <p className="text-slate-700 dark:text-slate-300 font-medium mb-2">
-                                        "{item.description}"
+                                        &quot;{item.description}&quot;
                                     </p>
                                     {item.aiAnalysis && (
                                         <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-md text-sm italic border border-slate-100 dark:border-slate-700">
@@ -181,7 +181,7 @@ export default function IntercurrencesPage() {
                         <div className="space-y-4 py-4">
                             <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border">
                                 <h4 className="text-sm font-semibold text-slate-500 uppercase mb-2">Relato do Paciente</h4>
-                                <p className="text-lg text-slate-800 dark:text-slate-200">"{selectedItem.description}"</p>
+                                <p className="text-lg text-slate-800 dark:text-slate-200">&quot;{selectedItem.description}&quot;</p>
                             </div>
 
                             {selectedItem.aiAnalysis && (

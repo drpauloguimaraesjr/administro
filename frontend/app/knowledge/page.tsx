@@ -160,7 +160,7 @@ export default function KnowledgePage() {
                                             <div>
                                                 <Label className="text-xs font-bold text-slate-400 uppercase">Princípio (Why)</Label>
                                                 <p className="bg-slate-50 dark:bg-slate-800 p-3 rounded-md text-sm italic border-l-2 border-slate-300">
-                                                    "{item.principle}"
+                                                    &quot;{item.principle}&quot;
                                                 </p>
                                             </div>
                                             <div>
