@@ -2,7 +2,10 @@ import { Router } from "express";
 import {
     requestKnowledgeGeneration,
     saveKnowledge,
-    getKnowledgeList
+    getKnowledgeList,
+    saveDraft,
+    getDrafts,
+    deleteDraft
 } from "../controllers/knowledgeController.js";
 
 const router = Router();
@@ -16,5 +19,10 @@ router.post("/", saveKnowledge);
 
 // Route to list all knowledge
 router.get("/", getKnowledgeList);
+
+// Drafts
+router.post("/drafts", saveDraft);
+router.get("/drafts", getDrafts);
+router.delete("/drafts/:id", deleteDraft);
 
 export default router;

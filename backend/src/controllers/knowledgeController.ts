@@ -167,3 +167,46 @@ export const getKnowledgeList = async (req: Request, res: Response) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+// Draft Management
+export const saveDraft = async (req: Request, res: Response) => {
+    try {
+        const { content, title } = req.body;
+        if (!content) return res.status(400).json({ error: "Content is required" });
+
+        const draftData = {
+            content,
+            title: title || new Date().toLocaleString('pt-BR'),
+            createdAt: new Date(),
+            status: 'draft'
+        };
+
+        const docRef = await db.collection("knowledge_drafts").add(draftData);
+        res.json({ id: docRef.id, ...draftData });
+    } catch (error: any) {
+        console.error("Error saving draft:", error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+export const getDrafts = async (req: Request, res: Response) => {
+    try {
+        const snapshot = await db.collection("knowledge_drafts").orderBy("createdAt", "desc").limit(20).get();
+        const drafts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        res.json(drafts);
+    } catch (error: any) {
+        console.error("Error fetching drafts:", error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+export const deleteDraft = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        await db.collection("knowledge_drafts").doc(id).delete();
+        res.json({ success: true });
+    } catch (error: any) {
+        console.error("Error deleting draft:", error);
+        res.status(500).json({ error: error.message });
+    }
+};
