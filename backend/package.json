@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "rm -rf build_output && npx tsc",
+    "build": "rm -rf build_output && npx -p typescript tsc",
     "start": "node build_output/index.js",
     "test": "jest --config jest.config.cjs"
   },
