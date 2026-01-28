@@ -37,16 +37,51 @@ const MultiKnowledgeResultSchema = z.object({
     results: z.array(SingleKnowledgeSchema)
 });
 
-export const requestKnowledgeGeneration = async (req: Request, res: Response) => {
-    try {
-        const { rawText } = req.body;
+// Constants for chunking
+const MAX_CHUNK_SIZE = 25000; // ~25k characters per chunk (safe limit for GPT-4)
+const CHUNK_OVERLAP = 500; // Overlap to avoid cutting mid-sentence
 
-        if (!rawText) {
-            return res.status(400).json({ error: "rawText is required" });
+// Helper function to split text into chunks
+function splitTextIntoChunks(text: string): string[] {
+    if (text.length <= MAX_CHUNK_SIZE) {
+        return [text];
+    }
+
+    const chunks: string[] = [];
+    let startIndex = 0;
+
+    while (startIndex < text.length) {
+        let endIndex = startIndex + MAX_CHUNK_SIZE;
+
+        // If not the last chunk, try to find a good break point (newline or period)
+        if (endIndex < text.length) {
+            // Look for a newline near the end
+            const newlineIndex = text.lastIndexOf('\n', endIndex);
+            if (newlineIndex > startIndex + MAX_CHUNK_SIZE * 0.7) {
+                endIndex = newlineIndex + 1;
+            } else {
+                // Look for a period
+                const periodIndex = text.lastIndexOf('. ', endIndex);
+                if (periodIndex > startIndex + MAX_CHUNK_SIZE * 0.7) {
+                    endIndex = periodIndex + 2;
+                }
+            }
         }
 
-        const systemPrompt = `Você é um Editor Médico Sênior da clínica Calyx.
-Sua missão é ler uma transcrição longa (que pode conter VÁRIOS assuntos diferentes) e extrair MÚLTIPLOS itens de conhecimento estruturado.
+        chunks.push(text.slice(startIndex, endIndex));
+        startIndex = endIndex - CHUNK_OVERLAP; // Small overlap for context continuity
+    }
+
+    console.log(`📦 Text split into ${chunks.length} chunks for processing`);
+    return chunks;
+}
+
+// Helper function to process a single chunk
+async function processChunk(rawText: string, chunkIndex: number, totalChunks: number): Promise<any[]> {
+    const systemPrompt = `Você é um Editor Médico Sênior da clínica Calyx.
+Sua missão é ler uma transcrição (que pode conter VÁRIOS assuntos diferentes) e extrair MÚLTIPLOS itens de conhecimento estruturado.
+
+${totalChunks > 1 ? `⚠️ ATENÇÃO: Este é o CHUNK ${chunkIndex + 1} de ${totalChunks} de uma transcrição maior. Processe apenas o conteúdo deste trecho.` : ''}
 
 ### OBJETIVO
 Identifique cada tópico distinto abordado no texto e crie um objeto para cada um.
@@ -70,31 +105,68 @@ SCHEMA DE CADA OBJETO (dentro da lista 'results'):
 ### INSTRUÇÕES:
 - Se o texto falar de "Enjoo" e depois de "Queda de Cabelo", CRIE DOIS OBJETOS SEPARADOS.
 - Não misture assuntos. Divida para conquistar.
-- Se for apenas um assunto, retorne uma lista com um único objeto.`;
+- Se for apenas um assunto, retorne uma lista com um único objeto.
+- Se não houver conteúdo médico relevante neste trecho, retorne { "results": [] }.`;
 
-        const completion = await openai.chat.completions.create({
-            model: "gpt-4o",
-            messages: [
-                { role: "system", content: systemPrompt },
-                { role: "user", content: rawText },
-            ],
-            response_format: { type: "json_object" },
-        });
+    console.log(`🧠 Processing chunk ${chunkIndex + 1}/${totalChunks} (${rawText.length} chars)...`);
 
-        const content = completion.choices[0].message.content;
-        if (!content) {
-            throw new Error("Empty response from OpenAI");
+    const completion = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: rawText },
+        ],
+        response_format: { type: "json_object" },
+    });
+
+    const content = completion.choices[0].message.content;
+    if (!content) {
+        console.warn(`⚠️ Empty response for chunk ${chunkIndex + 1}`);
+        return [];
+    }
+
+    const jsonContent = JSON.parse(content);
+
+    // Handle different response formats
+    if (jsonContent.results && Array.isArray(jsonContent.results)) {
+        console.log(`✅ Chunk ${chunkIndex + 1} returned ${jsonContent.results.length} items`);
+        return jsonContent.results;
+    } else if (jsonContent.topic) {
+        console.log(`✅ Chunk ${chunkIndex + 1} returned 1 item`);
+        return [jsonContent];
+    }
+
+    return [];
+}
+
+export const requestKnowledgeGeneration = async (req: Request, res: Response) => {
+    try {
+        const { rawText } = req.body;
+
+        if (!rawText) {
+            return res.status(400).json({ error: "rawText is required" });
         }
 
-        const jsonContent = JSON.parse(content);
+        console.log(`📝 Received text with ${rawText.length} characters`);
 
-        // Fallback: If AI returns a single object instead of { results: [] }
-        if (!jsonContent.results && jsonContent.topic) {
-            res.json({ results: [jsonContent] });
-            return;
+        // Split text into chunks if too large
+        const chunks = splitTextIntoChunks(rawText);
+        const allResults: any[] = [];
+
+        // Process each chunk (sequentially to avoid rate limits)
+        for (let i = 0; i < chunks.length; i++) {
+            try {
+                const chunkResults = await processChunk(chunks[i], i, chunks.length);
+                allResults.push(...chunkResults);
+            } catch (chunkError: any) {
+                console.error(`❌ Error processing chunk ${i + 1}:`, chunkError.message);
+                // Continue with other chunks even if one fails
+            }
         }
 
-        res.json(jsonContent);
+        console.log(`🎉 Total items extracted: ${allResults.length}`);
+
+        res.json({ results: allResults });
     } catch (error: any) {
         console.error("Error generating knowledge:", error);
         res.status(500).json({ error: error.message });
