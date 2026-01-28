@@ -1,5 +1,5 @@
 
-export type LeadStage = 'new' | 'contacted' | 'qualified' | 'scheduled' | 'converted' | 'lost';
+export type LeadStage = 'first_contact' | 'medical_appointment' | 'appointment_confirmation' | 'procedure_confirmation' | 'complications' | 'doubts' | 'dr_paulo';
 
 export type LeadSource =
     | 'whatsapp'

@@ -5,6 +5,7 @@ import { Client } from "@notionhq/client";
 // Initialize OpenAI client
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
+    baseURL: process.env.OPENAI_BASE_URL,
 });
 // Initialize Notion client
 const notion = new Client({
@@ -145,6 +146,48 @@ export const getKnowledgeList = async (req, res) => {
     }
     catch (error) {
         console.error("Error fetching knowledge:", error);
+        res.status(500).json({ error: error.message });
+    }
+};
+// Draft Management
+export const saveDraft = async (req, res) => {
+    try {
+        const { content, title } = req.body;
+        if (!content)
+            return res.status(400).json({ error: "Content is required" });
+        const draftData = {
+            content,
+            title: title || new Date().toLocaleString('pt-BR'),
+            createdAt: new Date(),
+            status: 'draft'
+        };
+        const docRef = await db.collection("knowledge_drafts").add(draftData);
+        res.json({ id: docRef.id, ...draftData });
+    }
+    catch (error) {
+        console.error("Error saving draft:", error);
+        res.status(500).json({ error: error.message });
+    }
+};
+export const getDrafts = async (req, res) => {
+    try {
+        const snapshot = await db.collection("knowledge_drafts").orderBy("createdAt", "desc").limit(20).get();
+        const drafts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        res.json(drafts);
+    }
+    catch (error) {
+        console.error("Error fetching drafts:", error);
+        res.status(500).json({ error: error.message });
+    }
+};
+export const deleteDraft = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await db.collection("knowledge_drafts").doc(id).delete();
+        res.json({ success: true });
+    }
+    catch (error) {
+        console.error("Error deleting draft:", error);
         res.status(500).json({ error: error.message });
     }
 };

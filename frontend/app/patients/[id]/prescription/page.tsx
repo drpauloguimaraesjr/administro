@@ -10,7 +10,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import api from '@/lib/api';
 
 import { PatientHeader } from '@/components/medical-record/patient-header';
-import { RichEditor, RichEditorRef } from '@/components/medical-record/rich-editor';
+import { LegacyEditor, LegacyEditorRef } from '@/components/ui/legacy-editor';
 import { PrintParameters, PrintParametersModal } from '@/components/prescription/PrintParametersModal';
 import { PrescriptionPreviewModal } from '@/components/prescription/PrescriptionPreviewModal';
 import { FormulasPanel } from '@/components/prescription/FormulasPanel';
@@ -21,7 +21,7 @@ export default function PrescriptionPage() {
     const params = useParams();
     const router = useRouter();
     const patientId = params.id as string;
-    const editorRef = useRef<RichEditorRef>(null);
+    const editorRef = useRef<LegacyEditorRef>(null);
 
     const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
     const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
@@ -103,11 +103,11 @@ export default function PrescriptionPage() {
                         <Input placeholder="Nome da Receita (ex: Antibióticos)" className="bg-white" />
                     </div>
                     <div className="flex-1 bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-                        <div className="p-2 border-b bg-gray-50 text-xs text-gray-500 font-medium">
+                        <div className="p-2 border-b bg-gray-50 text-xs text-gray-500 font-medium hidden">
                             Receituário Simples
                         </div>
                         <div className="h-full">
-                            <RichEditor
+                            <LegacyEditor
                                 ref={editorRef}
                                 placeholder="Digite a prescrição..."
                             />
