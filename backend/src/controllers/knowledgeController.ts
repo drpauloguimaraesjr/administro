@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import OpenAI from "openai";
-import { getFirestore } from "firebase-admin/firestore";
 import { z } from "zod";
 import { Client } from "@notionhq/client";
+import { db } from "../config/firebaseAdmin.js";
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -16,8 +16,6 @@ const notion = new Client({
 });
 
 const NOTION_DATABASE_ID = "2f342023207580049c5fe31e9b4c19be"; // Medical Brain ID
-
-const db = getFirestore();
 
 // Zod Schema for validation
 const SingleKnowledgeSchema = z.object({
