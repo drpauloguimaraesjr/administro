@@ -2,6 +2,7 @@
  * Ponto de entrada principal do backend
  */
 
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import whatsappRoutes from './routes/whatsapp.routes.js';

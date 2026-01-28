@@ -82,7 +82,7 @@ export const LeadsService = {
             }
 
             // Trigger: Quando move para 'contacted' (exemplo de boas vindas)
-            if (newStage === 'contacted' && oldStage === 'new' && leadData.phone) {
+            if (newStage === 'contacted' && oldStage === 'first_contact' && leadData.phone) {
                 // Poderia enviar outra mensagem aqui
             }
         }
