@@ -17,19 +17,25 @@ const notion = new Client({
 
 const NOTION_DATABASE_ID = "2f342023207580049c5fe31e9b4c19be"; // Medical Brain ID
 
-// Zod Schema for validation
+// Helper to convert array to string if needed
+const stringOrArray = z.union([
+    z.string(),
+    z.array(z.string()).transform(arr => arr.join('\n'))
+]);
+
+// Zod Schema for validation - flexible to handle AI variations
 const SingleKnowledgeSchema = z.object({
     topic: z.string(),
-    patientQuestion: z.string(),
-    sophiaResponse: z.string(),
-    clinicalContext: z.string(),
-    causeEffect: z.string(),
-    guidelines: z.string(),
-    keywords: z.string(),
-    category: z.string(),
-    principle: z.string(),
-    action: z.string(),
-    nuance: z.string(),
+    patientQuestion: z.string().optional().default(''),
+    sophiaResponse: z.string().optional().default(''),
+    clinicalContext: z.string().optional().default(''),
+    causeEffect: z.string().optional().default(''),
+    guidelines: stringOrArray.optional().default(''),
+    keywords: z.string().optional().default(''),
+    category: z.string().optional().default('Geral'),
+    principle: z.string().optional().default(''),
+    action: z.string().optional().default(''),
+    nuance: z.string().optional().default(''),
 });
 
 // Schema for the AI response (which might contain multiple items)

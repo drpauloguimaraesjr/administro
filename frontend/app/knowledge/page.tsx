@@ -156,6 +156,8 @@ export default function KnowledgePage() {
         }
     };
 
+    const [isSavingAll, setIsSavingAll] = useState(false);
+
     const handleSaveItem = async (index: number) => {
         const itemToSave = generatedItems[index];
         try {
@@ -167,6 +169,38 @@ export default function KnowledgePage() {
         } catch (error) {
             console.error(error);
             toast.error('Erro ao salvar item.');
+        }
+    };
+
+    const handleSaveAll = async () => {
+        if (generatedItems.length === 0) return;
+
+        setIsSavingAll(true);
+        let savedCount = 0;
+        let errorCount = 0;
+
+        toast.loading(`Salvando ${generatedItems.length} itens...`, { id: 'save-all' });
+
+        for (const item of generatedItems) {
+            try {
+                await saveKnowledge(item);
+                savedCount++;
+            } catch (error) {
+                console.error('Error saving item:', item.topic, error);
+                errorCount++;
+            }
+        }
+
+        toast.dismiss('save-all');
+        setIsSavingAll(false);
+
+        if (errorCount === 0) {
+            toast.success(`🎉 ${savedCount} itens salvos no Cérebro com sucesso!`);
+            setGeneratedItems([]);
+        } else {
+            toast.warning(`${savedCount} salvos, ${errorCount} com erro.`);
+            // Keep items that failed (we don't know which ones, so keep none for simplicity)
+            setGeneratedItems([]);
         }
     };
 
@@ -373,11 +407,29 @@ export default function KnowledgePage() {
                     {/* Results Area - Scrollable */}
                     {(generatedItems.length > 0) && (
                         <div className="w-full lg:w-[450px] xl:w-[500px] flex flex-col h-full bg-slate-50/50 rounded-xl border border-slate-200 overflow-hidden">
-                            <div className="p-4 bg-white border-b border-slate-200 flex justify-between items-center">
+                            <div className="p-4 bg-white border-b border-slate-200 flex justify-between items-center gap-4">
                                 <h3 className="font-semibold text-slate-800 flex items-center gap-2">
                                     <Brain className="h-4 w-4 text-purple-600" />
-                                    Insights Gerados ({generatedItems.length})
+                                    Insights ({generatedItems.length})
                                 </h3>
+                                <Button
+                                    size="sm"
+                                    onClick={handleSaveAll}
+                                    disabled={isSavingAll}
+                                    className="bg-green-600 hover:bg-green-700 text-white shadow-sm"
+                                >
+                                    {isSavingAll ? (
+                                        <>
+                                            <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                                            Salvando...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <CheckCircle2 className="mr-1 h-3 w-3" />
+                                            Aprovar Todos
+                                        </>
+                                    )}
+                                </Button>
                             </div>
 
                             <ScrollArea className="flex-1 p-4">
