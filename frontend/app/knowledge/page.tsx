@@ -40,10 +40,33 @@ export default function KnowledgePage() {
         }
     };
 
+    // Constants for chunking detection (must match backend)
+    const MAX_CHUNK_SIZE = 25000;
+
+    const getChunkInfo = (text: string) => {
+        if (text.length <= MAX_CHUNK_SIZE) {
+            return { chunks: 1, isLarge: false };
+        }
+        const chunks = Math.ceil(text.length / (MAX_CHUNK_SIZE - 500)); // Account for overlap
+        return { chunks, isLarge: true };
+    };
+
     const handleGenerate = async () => {
         if (!rawText.trim()) {
             toast.error('Por favor, insira um texto para processar.');
             return;
+        }
+
+        const { chunks, isLarge } = getChunkInfo(rawText);
+
+        // Show chunking info if text is large
+        if (isLarge) {
+            toast.info(
+                `📦 Texto grande detectado! (${rawText.length.toLocaleString()} caracteres)\n\n` +
+                `Será dividido em ${chunks} partes para processamento.\n` +
+                `⏱️ Tempo estimado: ${chunks * 30}-${chunks * 45} segundos`,
+                { duration: 8000 }
+            );
         }
 
         setIsGenerating(true);
@@ -52,15 +75,26 @@ export default function KnowledgePage() {
             try {
                 const title = rawText.substring(0, 30) + '...';
                 await saveKnowledgeDraft(rawText, title);
-                toast.success('Rascunho salvo automaticamente!');
+                toast.success('✅ Rascunho salvo automaticamente!');
                 loadDrafts(); // Refresh list
             } catch (draftError) {
                 console.error("Failed to save draft:", draftError);
                 toast.warning('Não foi possível salvar o rascunho, mas vamos tentar processar.');
             }
 
+            // Show processing toast for large texts
+            if (isLarge) {
+                toast.loading(`🧠 Processando ${chunks} partes... Aguarde, isso pode levar alguns minutos.`, {
+                    id: 'processing-chunks',
+                    duration: 300000 // 5 minutes max
+                });
+            }
+
             // 2. Generate Knowledge
             const data = await generateKnowledge(rawText);
+
+            // Dismiss loading toast
+            toast.dismiss('processing-chunks');
 
             // The backend returns { results: [...] } or { topic: ... }
             let items = [];
@@ -71,11 +105,16 @@ export default function KnowledgePage() {
             }
 
             setGeneratedItems(items);
-            toast.success(`${items.length} itens de conhecimento gerados!`);
-            // setRawText(''); // Keep text for context or if user wants to edit
+
+            if (items.length > 0) {
+                toast.success(`🎉 ${items.length} itens de conhecimento gerados com sucesso!`, { duration: 5000 });
+            } else {
+                toast.warning('Nenhum conhecimento médico relevante foi encontrado neste texto.');
+            }
         } catch (error) {
             console.error(error);
-            toast.error('Erro ao gerar conhecimento. Tente novamente.');
+            toast.dismiss('processing-chunks');
+            toast.error('❌ Erro ao gerar conhecimento. Tente novamente ou divida o texto manualmente.');
         } finally {
             setIsGenerating(false);
         }
