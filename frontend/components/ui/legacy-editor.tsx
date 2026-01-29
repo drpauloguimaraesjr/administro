@@ -1224,37 +1224,38 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                     {alignmentLines.map((line) => (
                         <div
                             key={line.id}
-                            className={`absolute cursor-pointer z-25 transition-colors ${hoveredAlignmentLine === line.id ? 'bg-red-500' : 'bg-purple-400'
-                                }`}
+                            className="absolute z-25 group"
                             style={{
-                                left: line.x,
+                                left: line.x - 6,
                                 top: margins.top,
                                 bottom: margins.bottom,
-                                width: hoveredAlignmentLine === line.id ? 3 : 2
+                                width: 12
                             }}
-                            onMouseEnter={() => setHoveredAlignmentLine(line.id)}
-                            onMouseLeave={() => setHoveredAlignmentLine(null)}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                // Check Ctrl/Cmd FIRST - align text if modifier key is pressed
-                                if (e.ctrlKey || e.metaKey) {
-                                    handleAlignmentLineClick(e, line.x);
-                                } else {
-                                    // Only delete if NOT holding modifier key
-                                    deleteAlignmentLine(line.id);
-                                }
-                            }}
-                            title="Ctrl/Cmd+Click = alinhar texto | Click = deletar linha"
                         >
-                            {/* Delete indicator */}
-                            {hoveredAlignmentLine === line.id && (
-                                <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded whitespace-nowrap">
-                                    Click = ✕ | Cmd+Click = Alinhar
-                                </div>
-                            )}
+                            {/* The actual line */}
+                            <div
+                                className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-purple-500 hover:bg-purple-600 cursor-pointer"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    alignSelectedTextToLine(line.x);
+                                }}
+                                title="Click para alinhar texto selecionado"
+                            />
+
+                            {/* Delete button - appears on hover */}
+                            <button
+                                className="absolute -top-6 left-1/2 -translate-x-1/2 bg-red-500 hover:bg-red-600 text-white text-[9px] w-5 h-5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    deleteAlignmentLine(line.id);
+                                }}
+                                title="Deletar linha"
+                            >
+                                ✕
+                            </button>
+
                             {/* Position indicator */}
-                            <div className={`absolute top-1 left-1/2 -translate-x-1/2 text-[8px] px-1 rounded whitespace-nowrap ${hoveredAlignmentLine === line.id ? 'bg-red-600 text-white' : 'bg-purple-500 text-white'
-                                }`}>
+                            <div className="absolute top-1 left-1/2 -translate-x-1/2 bg-purple-500 text-white text-[8px] px-1 rounded whitespace-nowrap pointer-events-none">
                                 {Math.round(line.x - margins.left)}px
                             </div>
                         </div>
