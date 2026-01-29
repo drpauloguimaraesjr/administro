@@ -214,6 +214,83 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                     <ToolbarBtn icon={<TableIcon className="w-4 h-4" />} onClick={handleTable} title="Inserir Tabela" />
                 </div>
 
+                {/* Indent/Outdent Group */}
+                <div className="flex gap-0.5 border-r pr-2 mr-2 border-gray-300">
+                    <ToolbarBtn icon={<Outdent className="w-4 h-4" />} onClick={() => execCmd('outdent')} title="Diminuir Recuo" />
+                    <ToolbarBtn icon={<Indent className="w-4 h-4" />} onClick={() => execCmd('indent')} title="Aumentar Recuo" />
+                </div>
+
+                {/* Prescription Formats */}
+                <div className="flex gap-0.5 border-r pr-2 mr-2 border-gray-300">
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 px-2 text-xs gap-1 text-purple-600 hover:bg-purple-50"
+                        onClick={() => {
+                            const html = `
+                                <p><strong>MEDICAMENTO 500mg</strong></p>
+                                <p style="padding-left: 40px;">Manipular 30 doses</p>
+                                <p style="padding-left: 40px;">Tomar 1 dose ao dia.</p>
+                                <p>&nbsp;</p>
+                            `;
+                            execCmd('insertHTML', html);
+                        }}
+                        title="Formato: Medicamento + Posologia Indentada"
+                    >
+                        📋 M+P
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 px-2 text-xs gap-1 text-orange-600 hover:bg-orange-50"
+                        onClick={() => {
+                            const html = `
+                                <table style="border-collapse: collapse; margin: 10px 0;">
+                                    <tr>
+                                        <td style="padding: 2px 10px 2px 0; border-right: 2px solid #666;">Medicamento 1</td>
+                                        <td rowspan="3" style="padding: 2px 0 2px 10px; vertical-align: middle;">Fazer EV em 30 min.</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 2px 10px 2px 0; border-right: 2px solid #666;">SF 0,9% 250ml</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 2px 10px 2px 0; border-right: 2px solid #666;">Componente 3</td>
+                                    </tr>
+                                </table>
+                                <p>&nbsp;</p>
+                            `;
+                            execCmd('insertHTML', html);
+                        }}
+                        title="Formato: Grupo com Barra Vertical"
+                    >
+                        📊 Grupo
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 px-2 text-xs gap-1 text-green-600 hover:bg-green-50"
+                        onClick={() => {
+                            const html = `
+                                <p><strong>USO ORAL</strong></p>
+                                <p>&nbsp;</p>
+                                <p>1. <strong>Medicamento</strong> _______________</p>
+                                <p style="padding-left: 20px;">Tomar 1 cp ao dia.</p>
+                                <p>&nbsp;</p>
+                                <p>2. <strong>Medicamento</strong> _______________</p>
+                                <p style="padding-left: 20px;">Tomar conforme orientação.</p>
+                                <p>&nbsp;</p>
+                            `;
+                            execCmd('insertHTML', html);
+                        }}
+                        title="Formato: Lista Numerada de Medicamentos"
+                    >
+                        📝 Lista
+                    </Button>
+                </div>
+
                 {/* Colors & Fonts */}
                 <div className="flex items-center gap-2 border-r pr-2 mr-2 border-gray-300">
                     <div className="flex items-center gap-1 group relative cursor-pointer" title="Cor da Fonte">
