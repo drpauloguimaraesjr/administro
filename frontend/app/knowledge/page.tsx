@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Brain, Wand2, Save, X, Plus, FileText, Trash2, Clock, History } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Brain, Wand2, Save, X, Plus, FileText, Trash2, Clock, History, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Progress } from '@/components/ui/progress';
 
 export default function KnowledgePage() {
     const [rawText, setRawText] = useState('');
@@ -21,6 +22,13 @@ export default function KnowledgePage() {
     const [generatedItems, setGeneratedItems] = useState<any[]>([]);
     const [drafts, setDrafts] = useState<any[]>([]);
     const [isLoadingDrafts, setIsLoadingDrafts] = useState(false);
+    const [processingStatus, setProcessingStatus] = useState<{
+        isLarge: boolean;
+        totalChunks: number;
+        currentChunk: number;
+        status: 'idle' | 'saving' | 'processing' | 'done' | 'error';
+        message: string;
+    }>({ isLarge: false, totalChunks: 0, currentChunk: 0, status: 'idle', message: '' });
 
     // Fetch drafts on load
     useEffect(() => {
@@ -59,62 +67,71 @@ export default function KnowledgePage() {
 
         const { chunks, isLarge } = getChunkInfo(rawText);
 
-        // Show chunking info if text is large
-        if (isLarge) {
-            toast.info(
-                `📦 Texto grande detectado! (${rawText.length.toLocaleString()} caracteres)\n\n` +
-                `Será dividido em ${chunks} partes para processamento.\n` +
-                `⏱️ Tempo estimado: ${chunks * 30}-${chunks * 45} segundos`,
-                { duration: 8000 }
-            );
-        }
+        // Reset and set initial status
+        setProcessingStatus({
+            isLarge,
+            totalChunks: chunks,
+            currentChunk: 0,
+            status: 'saving',
+            message: 'Salvando rascunho...'
+        });
 
         setIsGenerating(true);
+        setGeneratedItems([]); // Clear previous results
+
         try {
             // 1. Save Draft First (Auto-save)
             try {
                 const title = rawText.substring(0, 30) + '...';
                 await saveKnowledgeDraft(rawText, title);
-                toast.success('✅ Rascunho salvo automaticamente!');
-                loadDrafts(); // Refresh list
+                toast.success('✅ Rascunho salvo!');
+                loadDrafts();
             } catch (draftError) {
                 console.error("Failed to save draft:", draftError);
-                toast.warning('Não foi possível salvar o rascunho, mas vamos tentar processar.');
             }
 
-            // Show processing toast for large texts
-            if (isLarge) {
-                toast.loading(`🧠 Processando ${chunks} partes... Aguarde, isso pode levar alguns minutos.`, {
-                    id: 'processing-chunks',
-                    duration: 300000 // 5 minutes max
-                });
-            }
+            // Update status to processing
+            setProcessingStatus(prev => ({
+                ...prev,
+                status: 'processing',
+                message: isLarge
+                    ? `Processando ${chunks} partes... Isso pode levar alguns minutos.`
+                    : 'Processando texto com IA...'
+            }));
 
             // 2. Generate Knowledge
             const data = await generateKnowledge(rawText);
-
-            // Dismiss loading toast
-            toast.dismiss('processing-chunks');
 
             // The backend returns { results: [...] } or { topic: ... }
             let items = [];
             if (data.results && Array.isArray(data.results)) {
                 items = data.results;
             } else if (data.topic) {
-                items = [data]; // Fallback for single item
+                items = [data];
             }
 
             setGeneratedItems(items);
 
+            // Update to done status
+            setProcessingStatus(prev => ({
+                ...prev,
+                status: 'done',
+                message: items.length > 0
+                    ? `✅ ${items.length} itens gerados com sucesso!`
+                    : 'Nenhum conhecimento médico relevante encontrado.'
+            }));
+
             if (items.length > 0) {
-                toast.success(`🎉 ${items.length} itens de conhecimento gerados com sucesso!`, { duration: 5000 });
-            } else {
-                toast.warning('Nenhum conhecimento médico relevante foi encontrado neste texto.');
+                toast.success(`🎉 ${items.length} itens de conhecimento gerados!`, { duration: 5000 });
             }
         } catch (error) {
             console.error(error);
-            toast.dismiss('processing-chunks');
-            toast.error('❌ Erro ao gerar conhecimento. Tente novamente ou divida o texto manualmente.');
+            setProcessingStatus(prev => ({
+                ...prev,
+                status: 'error',
+                message: '❌ Erro ao processar. Tente novamente.'
+            }));
+            toast.error('Erro ao gerar conhecimento.');
         } finally {
             setIsGenerating(false);
         }
@@ -262,12 +279,75 @@ export default function KnowledgePage() {
                                     className="h-full resize-none border-0 focus-visible:ring-0 rounded-none p-6 text-lg leading-relaxed font-normal bg-slate-50/30"
                                     value={rawText}
                                     onChange={(e) => setRawText(e.target.value)}
+                                    disabled={isGenerating}
                                 />
                             </CardContent>
+
+                            {/* Processing Status Panel */}
+                            <AnimatePresence>
+                                {processingStatus.status !== 'idle' && (
+                                    <motion.div
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: 'auto' }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                        className="border-t border-slate-200 bg-gradient-to-r from-purple-50 to-indigo-50"
+                                    >
+                                        <div className="p-4 space-y-3">
+                                            {/* Status Header */}
+                                            <div className="flex items-center gap-3">
+                                                {processingStatus.status === 'saving' && (
+                                                    <Loader2 className="h-5 w-5 text-purple-600 animate-spin" />
+                                                )}
+                                                {processingStatus.status === 'processing' && (
+                                                    <Loader2 className="h-5 w-5 text-purple-600 animate-spin" />
+                                                )}
+                                                {processingStatus.status === 'done' && (
+                                                    <CheckCircle2 className="h-5 w-5 text-green-600" />
+                                                )}
+                                                {processingStatus.status === 'error' && (
+                                                    <AlertCircle className="h-5 w-5 text-red-600" />
+                                                )}
+                                                <span className={`font-medium ${processingStatus.status === 'done' ? 'text-green-700' :
+                                                    processingStatus.status === 'error' ? 'text-red-700' :
+                                                        'text-purple-700'
+                                                    }`}>
+                                                    {processingStatus.message}
+                                                </span>
+                                            </div>
+
+                                            {/* Chunk Info for Large Texts */}
+                                            {processingStatus.isLarge && processingStatus.status === 'processing' && (
+                                                <div className="space-y-2">
+                                                    <div className="flex justify-between text-xs text-slate-500">
+                                                        <span>📦 Texto dividido em {processingStatus.totalChunks} partes</span>
+                                                        <span>⏱️ ~{processingStatus.totalChunks * 30}s estimado</span>
+                                                    </div>
+                                                    <Progress value={undefined} className="h-2 animate-pulse" />
+                                                </div>
+                                            )}
+
+                                            {/* Done with count */}
+                                            {processingStatus.status === 'done' && generatedItems.length > 0 && (
+                                                <p className="text-sm text-slate-600">
+                                                    Revise os itens gerados à direita e clique em <strong>&quot;Aprovar &amp; Salvar&quot;</strong> para adicionar ao Cérebro.
+                                                </p>
+                                            )}
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
                             <CardFooter className="p-4 bg-slate-50 border-t items-center justify-between">
-                                <p className="text-xs text-slate-400 hidden sm:block">
-                                    {rawText.length} caracteres
-                                </p>
+                                <div className="hidden sm:flex items-center gap-4">
+                                    <p className="text-xs text-slate-400">
+                                        {rawText.length.toLocaleString()} caracteres
+                                    </p>
+                                    {rawText.length > MAX_CHUNK_SIZE && (
+                                        <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
+                                            📦 {getChunkInfo(rawText).chunks} partes
+                                        </span>
+                                    )}
+                                </div>
                                 <Button
                                     className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-indigo-600 shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 transition-all font-semibold"
                                     size="lg"
@@ -276,13 +356,13 @@ export default function KnowledgePage() {
                                 >
                                     {isGenerating ? (
                                         <>
-                                            <Wand2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Salvando & Processando...
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Processando...
                                         </>
                                     ) : (
                                         <>
-                                            <Save className="mr-2 h-4 w-4" />
-                                            Salvar & Processar Inteligência
+                                            <Brain className="mr-2 h-4 w-4" />
+                                            Processar com IA
                                         </>
                                     )}
                                 </Button>
@@ -358,6 +438,6 @@ export default function KnowledgePage() {
                     )}
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
