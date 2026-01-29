@@ -1236,18 +1236,20 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                             onMouseLeave={() => setHoveredAlignmentLine(null)}
                             onClick={(e) => {
                                 e.stopPropagation();
-                                if (hoveredAlignmentLine === line.id) {
-                                    deleteAlignmentLine(line.id);
-                                } else {
+                                // Check Ctrl/Cmd FIRST - align text if modifier key is pressed
+                                if (e.ctrlKey || e.metaKey) {
                                     handleAlignmentLineClick(e, line.x);
+                                } else {
+                                    // Only delete if NOT holding modifier key
+                                    deleteAlignmentLine(line.id);
                                 }
                             }}
-                            title={hoveredAlignmentLine === line.id ? 'Clique para deletar' : 'Ctrl/Cmd+Click para alinhar texto selecionado'}
+                            title="Ctrl/Cmd+Click = alinhar texto | Click = deletar linha"
                         >
                             {/* Delete indicator */}
                             {hoveredAlignmentLine === line.id && (
                                 <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded whitespace-nowrap">
-                                    ✕ Deletar
+                                    Click = ✕ | Cmd+Click = Alinhar
                                 </div>
                             )}
                             {/* Position indicator */}
