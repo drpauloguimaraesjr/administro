@@ -61,6 +61,7 @@ const HIGHLIGHTS = [
 
 export const RichEditor = forwardRef<RichEditorRef, RichEditorProps>(({ content = '', onChange, placeholder = 'Digite aqui...', editable = true }, ref) => {
     const editor = useEditor({
+        immediatelyRender: false,
         extensions: [
             StarterKit.configure({
                 bulletList: {
