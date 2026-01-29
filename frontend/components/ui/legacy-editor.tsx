@@ -70,9 +70,21 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
     const [currentBox, setCurrentBox] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
     const [selectedTextBox, setSelectedTextBox] = useState<string | null>(null);
     const [isDraggingTextBox, setIsDraggingTextBox] = useState<string | null>(null);
+    const [textBoxDragOffset, setTextBoxDragOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+
+    // Vertical Alignment Lines (Tab Stops) State
+    interface AlignmentLine {
+        id: string;
+        x: number; // Position from left of content area
+    }
+    const [alignmentLines, setAlignmentLines] = useState<AlignmentLine[]>([]);
+    const [isCreatingAlignmentLine, setIsCreatingAlignmentLine] = useState(false);
+    const [alignmentLinePreviewX, setAlignmentLinePreviewX] = useState<number | null>(null);
+    const [hoveredAlignmentLine, setHoveredAlignmentLine] = useState<string | null>(null);
 
     // Layout Toolbar State
     const [showLayoutToolbar, setShowLayoutToolbar] = useState(false);
+
 
     // Sync initial content
     useEffect(() => {
@@ -306,6 +318,22 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
         setDrawStart(null);
         setCurrentBox(null);
         setIsDrawingTextBox(false);
+
+        // Handle alignment line creation
+        if (isCreatingAlignmentLine && alignmentLinePreviewX !== null && paperRef.current) {
+            const newLine: AlignmentLine = {
+                id: `align-${Date.now()}`,
+                x: alignmentLinePreviewX
+            };
+            setAlignmentLines(prev => [...prev, newLine]);
+            setIsCreatingAlignmentLine(false);
+            setAlignmentLinePreviewX(null);
+        }
+
+        // Handle text box drag end
+        if (isDraggingTextBox) {
+            setIsDraggingTextBox(null);
+        }
     };
 
     const deleteTextBox = (id: string) => {
@@ -318,6 +346,116 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
             box.id === id ? { ...box, content } : box
         ));
     };
+
+    // --- Text Box Dragging ---
+    const handleTextBoxDragStart = (e: React.MouseEvent, boxId: string) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const box = textBoxes.find(b => b.id === boxId);
+        if (!box || !paperRef.current) return;
+
+        const paperRect = paperRef.current.getBoundingClientRect();
+        const mouseX = e.clientX - paperRect.left;
+        const mouseY = e.clientY - paperRect.top;
+
+        setIsDraggingTextBox(boxId);
+        setTextBoxDragOffset({ x: mouseX - box.x, y: mouseY - box.y });
+        setSelectedTextBox(boxId);
+    };
+
+    useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!isDraggingTextBox || !paperRef.current) return;
+
+            const paperRect = paperRef.current.getBoundingClientRect();
+            const mouseX = e.clientX - paperRect.left;
+            const mouseY = e.clientY - paperRect.top;
+
+            setTextBoxes(prev => prev.map(box => {
+                if (box.id === isDraggingTextBox) {
+                    return {
+                        ...box,
+                        x: Math.max(0, mouseX - textBoxDragOffset.x),
+                        y: Math.max(0, mouseY - textBoxDragOffset.y)
+                    };
+                }
+                return box;
+            }));
+        };
+
+        const handleMouseUp = () => {
+            setIsDraggingTextBox(null);
+        };
+
+        if (isDraggingTextBox) {
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+        }
+
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [isDraggingTextBox, textBoxDragOffset]);
+
+    // --- Alignment Lines ---
+    const deleteAlignmentLine = (id: string) => {
+        setAlignmentLines(prev => prev.filter(line => line.id !== id));
+    };
+
+    const handleAlignmentLineClick = (e: React.MouseEvent, lineX: number) => {
+        // If Ctrl/Cmd is pressed and there's selected text, align it
+        if (e.ctrlKey || e.metaKey) {
+            alignSelectedTextToLine(lineX);
+        }
+    };
+
+    const alignSelectedTextToLine = (lineX: number) => {
+        if (!editorRef.current) return;
+
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) return;
+
+        const range = selection.getRangeAt(0);
+        if (!range || range.collapsed) return;
+
+        // Calculate padding-left based on the alignment line position
+        const paddingLeft = Math.max(0, lineX - margins.left);
+
+        // Wrap selected content in a div with padding
+        const selectedContent = range.extractContents();
+        const wrapper = document.createElement('div');
+        wrapper.style.paddingLeft = `${paddingLeft}px`;
+        wrapper.appendChild(selectedContent);
+        range.insertNode(wrapper);
+
+        handleInput();
+    };
+
+    const handlePaperMouseMoveForAlignment = (e: React.MouseEvent) => {
+        if (!isCreatingAlignmentLine || !paperRef.current) return;
+
+        const paperRect = paperRef.current.getBoundingClientRect();
+        const mouseX = e.clientX - paperRect.left;
+
+        // Only allow lines within the content area
+        if (mouseX >= margins.left && mouseX <= (paperRect.width - margins.right)) {
+            setAlignmentLinePreviewX(mouseX);
+        }
+    };
+
+    const handlePaperClickForAlignment = (e: React.MouseEvent) => {
+        if (isCreatingAlignmentLine && alignmentLinePreviewX !== null) {
+            const newLine: AlignmentLine = {
+                id: `align-${Date.now()}`,
+                x: alignmentLinePreviewX
+            };
+            setAlignmentLines(prev => [...prev, newLine]);
+            setIsCreatingAlignmentLine(false);
+            setAlignmentLinePreviewX(null);
+        }
+    };
+
 
     if (!editable) {
         return (
@@ -743,9 +881,52 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                         </div>
                     )}
 
+                    <div className="w-px h-6 bg-slate-300 mx-2"></div>
+
+                    {/* Alignment Lines Tool (Purple) */}
+                    <div className="flex items-center gap-1 px-2 py-1 rounded bg-purple-50 border border-purple-200">
+                        <div className="w-0.5 h-4 bg-purple-500"></div>
+                        <span className="text-xs text-purple-700">Linha de Alinhamento</span>
+                        <Button
+                            type="button"
+                            variant={isCreatingAlignmentLine ? "default" : "ghost"}
+                            size="sm"
+                            className={`h-6 px-2 text-xs ${isCreatingAlignmentLine ? 'bg-purple-500 hover:bg-purple-600 text-white' : ''}`}
+                            onClick={() => {
+                                setIsCreatingAlignmentLine(!isCreatingAlignmentLine);
+                                setAlignmentLinePreviewX(null);
+                            }}
+                        >
+                            {isCreatingAlignmentLine ? '📍 Posicionando...' : '+ Criar'}
+                        </Button>
+                    </div>
+
+                    {alignmentLines.length > 0 && (
+                        <div className="flex items-center gap-1 px-2 py-1 rounded bg-purple-100 border border-purple-200">
+                            <span className="text-xs text-purple-600">{alignmentLines.length} linha(s)</span>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="h-5 px-1 text-xs text-red-500 hover:text-red-700"
+                                onClick={() => setAlignmentLines([])}
+                                title="Limpar todas as linhas"
+                            >
+                                ✕
+                            </Button>
+                        </div>
+                    )}
+
+                    {/* Help Messages */}
                     {isDrawingTextBox && (
                         <div className="ml-auto text-xs text-amber-600 bg-amber-100 px-2 py-1 rounded">
-                            💡 Clique e arraste na área FORA das margens para criar uma caixa de texto
+                            💡 Clique e arraste na margem para criar caixa de texto
+                        </div>
+                    )}
+
+                    {isCreatingAlignmentLine && (
+                        <div className="ml-auto text-xs text-purple-600 bg-purple-100 px-2 py-1 rounded">
+                            💡 Clique na área de texto para posicionar a linha • Ctrl/Cmd+Click para alinhar texto
                         </div>
                     )}
                 </div>
@@ -757,7 +938,7 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                 {/* Paper Simulation */}
                 <div
                     ref={paperRef}
-                    className={`bg-white shadow-lg relative transition-all duration-75 ease-linear ${isDrawingTextBox ? 'cursor-crosshair' : ''}`}
+                    className={`bg-white shadow-lg relative transition-all duration-75 ease-linear ${isDrawingTextBox ? 'cursor-crosshair' : ''} ${isCreatingAlignmentLine ? 'cursor-col-resize' : ''}`}
                     style={{
                         width: '210mm', // A4 width
                         minHeight: '297mm', // A4 height
@@ -767,8 +948,14 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                         paddingLeft: `${margins.left}px`,
                         position: 'relative'
                     }}
-                    onMouseDown={handlePaperMouseDown}
-                    onMouseMove={handlePaperMouseMove}
+                    onMouseDown={(e) => {
+                        handlePaperMouseDown(e);
+                        handlePaperClickForAlignment(e);
+                    }}
+                    onMouseMove={(e) => {
+                        handlePaperMouseMove(e);
+                        handlePaperMouseMoveForAlignment(e);
+                    }}
                     onMouseUp={handlePaperMouseUp}
                 >
                     {/* Content Area with Inner Margins */}
@@ -972,7 +1159,7 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                     {textBoxes.map((box) => (
                         <div
                             key={box.id}
-                            className={`absolute border-2 ${selectedTextBox === box.id ? 'border-amber-500 shadow-lg' : 'border-amber-300'} bg-white rounded cursor-move z-30 group`}
+                            className={`absolute border-2 ${selectedTextBox === box.id ? 'border-amber-500 shadow-lg' : 'border-amber-300'} ${isDraggingTextBox === box.id ? 'opacity-80' : ''} bg-white rounded z-30 group`}
                             style={{
                                 left: box.x,
                                 top: box.y,
@@ -986,11 +1173,16 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                                 setSelectedTextBox(box.id);
                             }}
                         >
-                            {/* Text Box Header */}
-                            <div className="absolute -top-6 left-0 right-0 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
-                                <div className="flex items-center gap-1 bg-amber-500 text-white text-[10px] px-2 py-0.5 rounded-t">
+                            {/* Drag Handle Header */}
+                            <div
+                                className="absolute -top-6 left-0 right-0 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                                <div
+                                    className="flex items-center gap-1 bg-amber-500 text-white text-[10px] px-2 py-0.5 rounded-t cursor-move hover:bg-amber-600"
+                                    onMouseDown={(e) => handleTextBoxDragStart(e, box.id)}
+                                >
                                     <GripVertical className="w-3 h-3" />
-                                    <span>Caixa de Texto</span>
+                                    <span>Arrastar</span>
                                 </div>
                                 <Button
                                     type="button"
@@ -1016,7 +1208,62 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                         </div>
                     ))}
 
-                    {/* Drawing Preview */}
+                    {/* --- Alignment Lines --- */}
+                    {alignmentLines.map((line) => (
+                        <div
+                            key={line.id}
+                            className={`absolute cursor-pointer z-25 transition-colors ${hoveredAlignmentLine === line.id ? 'bg-red-500' : 'bg-purple-400'
+                                }`}
+                            style={{
+                                left: line.x,
+                                top: margins.top,
+                                bottom: margins.bottom,
+                                width: hoveredAlignmentLine === line.id ? 3 : 2
+                            }}
+                            onMouseEnter={() => setHoveredAlignmentLine(line.id)}
+                            onMouseLeave={() => setHoveredAlignmentLine(null)}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                if (hoveredAlignmentLine === line.id) {
+                                    deleteAlignmentLine(line.id);
+                                } else {
+                                    handleAlignmentLineClick(e, line.x);
+                                }
+                            }}
+                            title={hoveredAlignmentLine === line.id ? 'Clique para deletar' : 'Ctrl/Cmd+Click para alinhar texto selecionado'}
+                        >
+                            {/* Delete indicator */}
+                            {hoveredAlignmentLine === line.id && (
+                                <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded whitespace-nowrap">
+                                    ✕ Deletar
+                                </div>
+                            )}
+                            {/* Position indicator */}
+                            <div className={`absolute top-1 left-1/2 -translate-x-1/2 text-[8px] px-1 rounded whitespace-nowrap ${hoveredAlignmentLine === line.id ? 'bg-red-600 text-white' : 'bg-purple-500 text-white'
+                                }`}>
+                                {Math.round(line.x - margins.left)}px
+                            </div>
+                        </div>
+                    ))}
+
+                    {/* Alignment Line Preview */}
+                    {isCreatingAlignmentLine && alignmentLinePreviewX !== null && (
+                        <div
+                            className="absolute bg-purple-400/50 pointer-events-none z-35 animate-pulse"
+                            style={{
+                                left: alignmentLinePreviewX,
+                                top: margins.top,
+                                bottom: margins.bottom,
+                                width: 2
+                            }}
+                        >
+                            <div className="absolute top-1 left-1/2 -translate-x-1/2 bg-purple-500 text-white text-[8px] px-1 rounded whitespace-nowrap">
+                                {Math.round(alignmentLinePreviewX - margins.left)}px
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Drawing Preview (Text Box) */}
                     {currentBox && (
                         <div
                             className="absolute border-2 border-dashed border-amber-500 bg-amber-50/50 pointer-events-none z-40"
