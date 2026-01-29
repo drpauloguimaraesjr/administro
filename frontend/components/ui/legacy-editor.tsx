@@ -6,7 +6,8 @@ import {
     AlignLeft, AlignCenter, AlignRight, AlignJustify,
     Indent, Outdent, Link as LinkIcon, Image as ImageIcon,
     Undo, Redo, Table as TableIcon, Type, Palette,
-    Maximize, Minimize, ChevronDown, FileText, Pill, Syringe, ListOrdered, LayoutTemplate
+    Maximize, Minimize, ChevronDown, FileText, Pill, Syringe, ListOrdered, LayoutTemplate,
+    Move, Square, Layers, Trash2, GripVertical, PanelLeft
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -36,6 +37,7 @@ export interface LegacyEditorRef {
 export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ content = '', placeholder, onChange, editable = true }, ref) => {
     const editorRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+    const paperRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Editor State
@@ -43,10 +45,34 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
     const [backColor, setBackColor] = useState('#ffffff');
     const [fontSize, setFontSize] = useState('3');
 
-    // Margin State (in pixels)
-    const [margins, setMargins] = useState({ top: 96, right: 96, bottom: 96, left: 96 }); // approx 2.54cm default
+    // Outer Margin State (blue - page margins)
+    const [margins, setMargins] = useState({ top: 96, right: 96, bottom: 96, left: 96 });
     const [showMargins, setShowMargins] = useState(true);
     const [isDragging, setIsDragging] = useState<null | 'top' | 'right' | 'bottom' | 'left'>(null);
+
+    // Inner Margin State (green - text area margins)
+    const [innerMargins, setInnerMargins] = useState({ top: 0, right: 0, bottom: 0, left: 0 });
+    const [showInnerMargins, setShowInnerMargins] = useState(false);
+    const [isDraggingInner, setIsDraggingInner] = useState<null | 'top' | 'right' | 'bottom' | 'left'>(null);
+
+    // Text Boxes State
+    interface TextBox {
+        id: string;
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+        content: string;
+    }
+    const [textBoxes, setTextBoxes] = useState<TextBox[]>([]);
+    const [isDrawingTextBox, setIsDrawingTextBox] = useState(false);
+    const [drawStart, setDrawStart] = useState<{ x: number; y: number } | null>(null);
+    const [currentBox, setCurrentBox] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
+    const [selectedTextBox, setSelectedTextBox] = useState<string | null>(null);
+    const [isDraggingTextBox, setIsDraggingTextBox] = useState<string | null>(null);
+
+    // Layout Toolbar State
+    const [showLayoutToolbar, setShowLayoutToolbar] = useState(false);
 
     // Sync initial content
     useEffect(() => {
@@ -180,6 +206,118 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
         };
     }, [isDragging]);
 
+    // --- Inner Margin Dragging Logic ---
+    const handleInnerMouseDown = (e: React.MouseEvent, side: 'top' | 'right' | 'bottom' | 'left') => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDraggingInner(side);
+    };
+
+    useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!isDraggingInner || !paperRef.current) return;
+
+            const paperRect = paperRef.current.getBoundingClientRect();
+            const mouseX = e.clientX - paperRect.left - margins.left;
+            const mouseY = e.clientY - paperRect.top - margins.top;
+
+            const contentWidth = paperRect.width - margins.left - margins.right;
+            const contentHeight = paperRect.height - margins.top - margins.bottom;
+
+            // Limits (min 0px, max half of content area)
+            if (isDraggingInner === 'left') {
+                const newLeft = Math.min(Math.max(mouseX, 0), contentWidth / 2);
+                setInnerMargins(prev => ({ ...prev, left: newLeft }));
+            }
+            if (isDraggingInner === 'right') {
+                const newRight = Math.min(Math.max(contentWidth - mouseX, 0), contentWidth / 2);
+                setInnerMargins(prev => ({ ...prev, right: newRight }));
+            }
+            if (isDraggingInner === 'top') {
+                const newTop = Math.min(Math.max(mouseY, 0), contentHeight / 2);
+                setInnerMargins(prev => ({ ...prev, top: newTop }));
+            }
+            if (isDraggingInner === 'bottom') {
+                const newBottom = Math.min(Math.max(contentHeight - mouseY, 0), contentHeight / 2);
+                setInnerMargins(prev => ({ ...prev, bottom: newBottom }));
+            }
+        };
+
+        const handleMouseUp = () => {
+            setIsDraggingInner(null);
+        };
+
+        if (isDraggingInner) {
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+        }
+
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [isDraggingInner, margins]);
+
+    // --- Text Box Drawing Logic ---
+    const handlePaperMouseDown = (e: React.MouseEvent) => {
+        if (!isDrawingTextBox || !paperRef.current) return;
+
+        const paperRect = paperRef.current.getBoundingClientRect();
+        const x = e.clientX - paperRect.left;
+        const y = e.clientY - paperRect.top;
+
+        // Check if clicking in margin area (not in content area)
+        const inMargin = x < margins.left || x > (paperRect.width - margins.right) ||
+            y < margins.top || y > (paperRect.height - margins.bottom);
+
+        if (inMargin) {
+            setDrawStart({ x, y });
+            setCurrentBox({ x, y, width: 0, height: 0 });
+        }
+    };
+
+    const handlePaperMouseMove = (e: React.MouseEvent) => {
+        if (!drawStart || !paperRef.current) return;
+
+        const paperRect = paperRef.current.getBoundingClientRect();
+        const currentX = e.clientX - paperRect.left;
+        const currentY = e.clientY - paperRect.top;
+
+        setCurrentBox({
+            x: Math.min(drawStart.x, currentX),
+            y: Math.min(drawStart.y, currentY),
+            width: Math.abs(currentX - drawStart.x),
+            height: Math.abs(currentY - drawStart.y)
+        });
+    };
+
+    const handlePaperMouseUp = () => {
+        if (currentBox && currentBox.width > 30 && currentBox.height > 20) {
+            const newTextBox: TextBox = {
+                id: `textbox-${Date.now()}`,
+                x: currentBox.x,
+                y: currentBox.y,
+                width: currentBox.width,
+                height: currentBox.height,
+                content: ''
+            };
+            setTextBoxes(prev => [...prev, newTextBox]);
+        }
+        setDrawStart(null);
+        setCurrentBox(null);
+        setIsDrawingTextBox(false);
+    };
+
+    const deleteTextBox = (id: string) => {
+        setTextBoxes(prev => prev.filter(box => box.id !== id));
+        setSelectedTextBox(null);
+    };
+
+    const updateTextBoxContent = (id: string, content: string) => {
+        setTextBoxes(prev => prev.map(box =>
+            box.id === id ? { ...box, content } : box
+        ));
+    };
 
     if (!editable) {
         return (
@@ -519,28 +657,107 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                     </select>
                 </div>
 
-                {/* Margins Toggle */}
+                {/* Layout Toggle */}
                 <div className="flex gap-0.5">
                     <Button
                         type="button"
-                        variant={showMargins ? "secondary" : "ghost"}
+                        variant={showLayoutToolbar ? "secondary" : "ghost"}
                         size="sm"
                         className="h-8 px-2 text-xs gap-1"
-                        onClick={() => setShowMargins(!showMargins)}
-                        title="Mostrar/Ocultar Margens"
+                        onClick={() => setShowLayoutToolbar(!showLayoutToolbar)}
+                        title="Abrir/Fechar Painel de Layout"
                     >
-                        {showMargins ? <Minimize className="w-3 h-3" /> : <Maximize className="w-3 h-3" />}
-                        Margens
+                        <PanelLeft className="w-3 h-3" />
+                        Layout
                     </Button>
                 </div>
             </div>
+
+            {/* Layout Toolbar Panel */}
+            {showLayoutToolbar && (
+                <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200 shrink-0">
+                    <span className="text-xs font-medium text-slate-500 uppercase tracking-wider mr-2">📐 Layout</span>
+
+                    {/* Page Margins (Blue) */}
+                    <div className="flex items-center gap-1 px-2 py-1 rounded bg-blue-50 border border-blue-200">
+                        <div className="w-3 h-3 bg-blue-400 rounded-sm"></div>
+                        <span className="text-xs text-blue-700">Margens da Página</span>
+                        <Button
+                            type="button"
+                            variant={showMargins ? "default" : "ghost"}
+                            size="sm"
+                            className={`h-6 px-2 text-xs ${showMargins ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
+                            onClick={() => setShowMargins(!showMargins)}
+                        >
+                            {showMargins ? 'ON' : 'OFF'}
+                        </Button>
+                    </div>
+
+                    {/* Inner Margins (Green) */}
+                    <div className="flex items-center gap-1 px-2 py-1 rounded bg-emerald-50 border border-emerald-200">
+                        <div className="w-3 h-3 bg-emerald-400 rounded-sm"></div>
+                        <span className="text-xs text-emerald-700">Margens de Texto</span>
+                        <Button
+                            type="button"
+                            variant={showInnerMargins ? "default" : "ghost"}
+                            size="sm"
+                            className={`h-6 px-2 text-xs ${showInnerMargins ? 'bg-emerald-500 hover:bg-emerald-600' : ''}`}
+                            onClick={() => setShowInnerMargins(!showInnerMargins)}
+                        >
+                            {showInnerMargins ? 'ON' : 'OFF'}
+                        </Button>
+                        {showInnerMargins && (
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 px-2 text-xs text-emerald-600"
+                                onClick={() => setInnerMargins({ top: 0, right: 0, bottom: 0, left: 0 })}
+                            >
+                                Reset
+                            </Button>
+                        )}
+                    </div>
+
+                    <div className="w-px h-6 bg-slate-300 mx-2"></div>
+
+                    {/* Text Box Tool */}
+                    <div className="flex items-center gap-1 px-2 py-1 rounded bg-amber-50 border border-amber-200">
+                        <Square className="w-3 h-3 text-amber-600" />
+                        <span className="text-xs text-amber-700">Caixa de Texto</span>
+                        <Button
+                            type="button"
+                            variant={isDrawingTextBox ? "default" : "ghost"}
+                            size="sm"
+                            className={`h-6 px-2 text-xs ${isDrawingTextBox ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}`}
+                            onClick={() => setIsDrawingTextBox(!isDrawingTextBox)}
+                        >
+                            {isDrawingTextBox ? '✏️ Desenhando...' : '+ Criar'}
+                        </Button>
+                    </div>
+
+                    {textBoxes.length > 0 && (
+                        <div className="flex items-center gap-1 px-2 py-1 rounded bg-slate-100 border border-slate-200">
+                            <Layers className="w-3 h-3 text-slate-600" />
+                            <span className="text-xs text-slate-600">{textBoxes.length} caixa(s)</span>
+                        </div>
+                    )}
+
+                    {isDrawingTextBox && (
+                        <div className="ml-auto text-xs text-amber-600 bg-amber-100 px-2 py-1 rounded">
+                            💡 Clique e arraste na área FORA das margens para criar uma caixa de texto
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* Editable Area Container with Guides */}
             <div className="flex-1 bg-slate-200 p-8 overflow-auto relative flex justify-center" ref={containerRef}>
 
                 {/* Paper Simulation */}
                 <div
-                    className="bg-white shadow-lg relative transition-all duration-75 ease-linear"
+                    ref={paperRef}
+                    className={`bg-white shadow-lg relative transition-all duration-75 ease-linear ${isDrawingTextBox ? 'cursor-crosshair' : ''}`}
                     style={{
                         width: '210mm', // A4 width
                         minHeight: '297mm', // A4 height
@@ -550,8 +767,11 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                         paddingLeft: `${margins.left}px`,
                         position: 'relative'
                     }}
+                    onMouseDown={handlePaperMouseDown}
+                    onMouseMove={handlePaperMouseMove}
+                    onMouseUp={handlePaperMouseUp}
                 >
-                    {/* Content */}
+                    {/* Content Area with Inner Margins */}
                     <div
                         ref={editorRef}
                         className="w-full h-full outline-none prose max-w-none text-slate-900"
@@ -559,10 +779,16 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                         onInput={handleInput}
                         suppressContentEditableWarning={true}
                         data-placeholder={placeholder}
-                        style={{ minHeight: '100px' }}
+                        style={{
+                            minHeight: '100px',
+                            paddingTop: `${innerMargins.top}px`,
+                            paddingRight: `${innerMargins.right}px`,
+                            paddingBottom: `${innerMargins.bottom}px`,
+                            paddingLeft: `${innerMargins.left}px`,
+                        }}
                     />
 
-                    {/* --- Margin Guides (Overlay) --- */}
+                    {/* --- Outer Margin Guides (Blue) --- */}
                     {showMargins && (
                         <>
                             {/* Left Guide Line */}
@@ -617,6 +843,190 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                             {/* Bottom Area Mask */}
                             <div className="absolute bottom-0 left-0 right-0 bg-gray-300/30 pointer-events-none" style={{ height: margins.bottom }}></div>
                         </>
+                    )}
+
+                    {/* --- Inner Margin Guides (Green) --- */}
+                    {showInnerMargins && (
+                        <>
+                            {/* Inner Left Guide */}
+                            {innerMargins.left > 0 && (
+                                <div
+                                    className="absolute border-l-2 border-dashed border-emerald-400 cursor-col-resize hover:border-emerald-600 hover:border-solid w-2 z-20 group"
+                                    style={{
+                                        left: margins.left + innerMargins.left,
+                                        top: margins.top,
+                                        bottom: margins.bottom
+                                    }}
+                                    onMouseDown={(e) => handleInnerMouseDown(e, 'left')}
+                                >
+                                    <div className="absolute top-1/2 -left-10 bg-emerald-500 text-white text-[9px] px-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
+                                        +{innerMargins.left}px
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Inner Right Guide */}
+                            {innerMargins.right > 0 && (
+                                <div
+                                    className="absolute border-r-2 border-dashed border-emerald-400 cursor-col-resize hover:border-emerald-600 hover:border-solid w-2 z-20 group"
+                                    style={{
+                                        right: margins.right + innerMargins.right,
+                                        top: margins.top,
+                                        bottom: margins.bottom
+                                    }}
+                                    onMouseDown={(e) => handleInnerMouseDown(e, 'right')}
+                                >
+                                    <div className="absolute top-1/2 -right-10 bg-emerald-500 text-white text-[9px] px-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
+                                        +{innerMargins.right}px
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Inner Top Guide */}
+                            {innerMargins.top > 0 && (
+                                <div
+                                    className="absolute border-t-2 border-dashed border-emerald-400 cursor-row-resize hover:border-emerald-600 hover:border-solid h-2 z-20 group"
+                                    style={{
+                                        top: margins.top + innerMargins.top,
+                                        left: margins.left,
+                                        right: margins.right
+                                    }}
+                                    onMouseDown={(e) => handleInnerMouseDown(e, 'top')}
+                                >
+                                    <div className="absolute left-1/2 -top-6 bg-emerald-500 text-white text-[9px] px-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
+                                        +{innerMargins.top}px
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Inner Bottom Guide */}
+                            {innerMargins.bottom > 0 && (
+                                <div
+                                    className="absolute border-b-2 border-dashed border-emerald-400 cursor-row-resize hover:border-emerald-600 hover:border-solid h-2 z-20 group"
+                                    style={{
+                                        bottom: margins.bottom + innerMargins.bottom,
+                                        left: margins.left,
+                                        right: margins.right
+                                    }}
+                                    onMouseDown={(e) => handleInnerMouseDown(e, 'bottom')}
+                                >
+                                    <div className="absolute left-1/2 -bottom-6 bg-emerald-500 text-white text-[9px] px-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
+                                        +{innerMargins.bottom}px
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Draggable handles when inner margins are 0 */}
+                            {innerMargins.left === 0 && (
+                                <div
+                                    className="absolute border-l-2 border-transparent hover:border-emerald-300 cursor-col-resize w-2 z-20"
+                                    style={{
+                                        left: margins.left,
+                                        top: margins.top,
+                                        bottom: margins.bottom
+                                    }}
+                                    onMouseDown={(e) => handleInnerMouseDown(e, 'left')}
+                                    title="Arraste para criar margem interna esquerda"
+                                />
+                            )}
+                            {innerMargins.right === 0 && (
+                                <div
+                                    className="absolute border-r-2 border-transparent hover:border-emerald-300 cursor-col-resize w-2 z-20"
+                                    style={{
+                                        right: margins.right,
+                                        top: margins.top,
+                                        bottom: margins.bottom
+                                    }}
+                                    onMouseDown={(e) => handleInnerMouseDown(e, 'right')}
+                                    title="Arraste para criar margem interna direita"
+                                />
+                            )}
+                            {innerMargins.top === 0 && (
+                                <div
+                                    className="absolute border-t-2 border-transparent hover:border-emerald-300 cursor-row-resize h-2 z-20"
+                                    style={{
+                                        top: margins.top,
+                                        left: margins.left,
+                                        right: margins.right
+                                    }}
+                                    onMouseDown={(e) => handleInnerMouseDown(e, 'top')}
+                                    title="Arraste para criar margem interna superior"
+                                />
+                            )}
+                            {innerMargins.bottom === 0 && (
+                                <div
+                                    className="absolute border-b-2 border-transparent hover:border-emerald-300 cursor-row-resize h-2 z-20"
+                                    style={{
+                                        bottom: margins.bottom,
+                                        left: margins.left,
+                                        right: margins.right
+                                    }}
+                                    onMouseDown={(e) => handleInnerMouseDown(e, 'bottom')}
+                                    title="Arraste para criar margem interna inferior"
+                                />
+                            )}
+                        </>
+                    )}
+
+                    {/* --- Text Boxes --- */}
+                    {textBoxes.map((box) => (
+                        <div
+                            key={box.id}
+                            className={`absolute border-2 ${selectedTextBox === box.id ? 'border-amber-500 shadow-lg' : 'border-amber-300'} bg-white rounded cursor-move z-30 group`}
+                            style={{
+                                left: box.x,
+                                top: box.y,
+                                width: box.width,
+                                height: box.height,
+                                minWidth: 50,
+                                minHeight: 30
+                            }}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedTextBox(box.id);
+                            }}
+                        >
+                            {/* Text Box Header */}
+                            <div className="absolute -top-6 left-0 right-0 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="flex items-center gap-1 bg-amber-500 text-white text-[10px] px-2 py-0.5 rounded-t">
+                                    <GripVertical className="w-3 h-3" />
+                                    <span>Caixa de Texto</span>
+                                </div>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-5 w-5 p-0 bg-red-500 hover:bg-red-600 text-white rounded"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        deleteTextBox(box.id);
+                                    }}
+                                >
+                                    <Trash2 className="w-3 h-3" />
+                                </Button>
+                            </div>
+                            {/* Editable Content */}
+                            <div
+                                className="w-full h-full p-2 outline-none text-sm overflow-auto"
+                                contentEditable
+                                suppressContentEditableWarning
+                                onBlur={(e) => updateTextBoxContent(box.id, e.currentTarget.innerHTML)}
+                                dangerouslySetInnerHTML={{ __html: box.content }}
+                            />
+                        </div>
+                    ))}
+
+                    {/* Drawing Preview */}
+                    {currentBox && (
+                        <div
+                            className="absolute border-2 border-dashed border-amber-500 bg-amber-50/50 pointer-events-none z-40"
+                            style={{
+                                left: currentBox.x,
+                                top: currentBox.y,
+                                width: currentBox.width,
+                                height: currentBox.height
+                            }}
+                        />
                     )}
                 </div>
             </div>
