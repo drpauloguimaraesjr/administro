@@ -134,6 +134,16 @@ export const fetchKnowledge = async () => {
     return response.data;
 };
 
+// Knowledge Library (saved items with search/filter)
+export const fetchKnowledgeLibrary = async (params?: { search?: string; category?: string; limit?: number }) => {
+    const response = await api.get('/knowledge/library', { params });
+    return response.data;
+};
+
+export const deleteKnowledgeItem = async (id: string) => {
+    await api.delete(`/knowledge/${id}`);
+};
+
 // Knowledge Drafts
 export const saveKnowledgeDraft = async (content: string, title?: string) => {
     const response = await api.post('/knowledge/drafts', { content, title });
@@ -147,6 +157,112 @@ export const fetchKnowledgeDrafts = async () => {
 
 export const deleteKnowledgeDraft = async (id: string) => {
     await api.delete(`/knowledge/drafts/${id}`);
+};
+
+// Documents (Receitas, Atestados, Prontuários)
+export interface MedicamentoData {
+    nome: string;
+    posologia: string;
+}
+
+export interface ReceitaData {
+    medico_nome: string;
+    medico_crm: string;
+    medico_especialidade: string;
+    clinica_nome: string;
+    clinica_endereco: string;
+    clinica_telefone: string;
+    paciente_nome: string;
+    paciente_cpf?: string;
+    medicamentos: MedicamentoData[];
+    data: string;
+    cidade: string;
+}
+
+export interface AtestadoData {
+    medico_nome: string;
+    medico_crm: string;
+    medico_especialidade: string;
+    clinica_nome: string;
+    clinica_endereco: string;
+    clinica_telefone: string;
+    paciente_nome: string;
+    paciente_cpf?: string;
+    cid?: string;
+    dias_afastamento: number;
+    data_inicio?: string;
+    motivo?: string;
+    data: string;
+    cidade: string;
+}
+
+export interface EvolucaoData {
+    medico_nome: string;
+    medico_crm: string;
+    medico_especialidade: string;
+    clinica_nome: string;
+    clinica_endereco: string;
+    clinica_telefone: string;
+    paciente_nome: string;
+    paciente_cpf: string;
+    paciente_nascimento?: string;
+    paciente_idade?: string;
+    data_atendimento: string;
+    hora_atendimento: string;
+    tipo_atendimento?: string;
+    queixa_principal?: string;
+    historia_doenca_atual?: string;
+    antecedentes?: string;
+    exame_fisico?: string;
+    hipotese_diagnostica?: string;
+    conduta?: string;
+    retorno?: string;
+    observacoes?: string;
+}
+
+export type DocumentType = 'receita' | 'atestado' | 'evolucao';
+
+export const createDocument = async (type: DocumentType, data: ReceitaData | AtestadoData | EvolucaoData, addToQueue = true) => {
+    const response = await api.post('/documents', { type, data, addToQueue });
+    return response.data;
+};
+
+export const getDocument = async (id: string) => {
+    const response = await api.get(`/documents/${id}`);
+    return response.data;
+};
+
+export const getDocuments = async (params?: { status?: string; type?: DocumentType; patientName?: string }) => {
+    const response = await api.get('/documents', { params });
+    return response.data;
+};
+
+export const deleteDocument = async (id: string) => {
+    await api.delete(`/documents/${id}`);
+};
+
+export const getSignatureQueue = async () => {
+    const response = await api.get('/documents/queue/pending');
+    return response.data;
+};
+
+export const signDocumentsBatch = async (documentIds: string[], birdIdCode: string) => {
+    const response = await api.post('/documents/queue/sign-batch', { documentIds, birdIdCode });
+    return response.data;
+};
+
+export const removeFromSignatureQueue = async (id: string) => {
+    await api.delete(`/documents/queue/${id}`);
+};
+
+export const sendDocument = async (id: string, via: 'whatsapp' | 'email', recipient: string) => {
+    const response = await api.post(`/documents/${id}/send`, { via, recipient });
+    return response.data;
+};
+
+export const downloadDocument = async (id: string) => {
+    const response = await api.get(`/documents/${id}/download`, { responseType: 'blob' });
+    return response.data;
 };
 
 export default api;

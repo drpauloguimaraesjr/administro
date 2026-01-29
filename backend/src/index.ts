@@ -19,6 +19,7 @@ import { usersRouter } from './routes/users.js';
 import { whatsappQueuesRouter } from './routes/whatsapp-queues.js';
 import intercurrencesRoutes from './routes/intercurrencesRoutes.js';
 import knowledgeRoutes from './routes/knowledgeRoutes.js';
+import documentRoutes from './routes/documentRoutes.js';
 
 const app = express();
 
@@ -68,6 +69,7 @@ app.use('/api/whatsapp/queues', whatsappQueuesRouter);
 app.use('/api/medx', medxRoutes);
 app.use('/api/intercurrences', intercurrencesRoutes);
 app.use('/api/knowledge', knowledgeRoutes);
+app.use('/api/documents', documentRoutes);
 
 // Inicia servidor
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
@@ -85,6 +87,7 @@ app.listen(PORT, async () => {
   console.log(`   - /api/users`);
   console.log(`   - /api/intercurrences`);
   console.log(`   - /api/knowledge`);
+  console.log(`   - /api/documents (📄 Receitas, Atestados, Prontuários)`);
 
   // Inicializa WhatsApp se configurado
   if (process.env.WHATSAPP_AUTO_START === 'true') {

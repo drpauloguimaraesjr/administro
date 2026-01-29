@@ -5,7 +5,9 @@ import {
     getKnowledgeList,
     saveDraft,
     getDrafts,
-    deleteDraft
+    deleteDraft,
+    getKnowledgeBase,
+    deleteKnowledge
 } from "../controllers/knowledgeController.js";
 
 const router = Router();
@@ -17,8 +19,14 @@ router.post("/generate", requestKnowledgeGeneration);
 // Route to save the final approved knowledge to database
 router.post("/", saveKnowledge);
 
-// Route to list all knowledge
+// Route to list all knowledge (legacy)
 router.get("/", getKnowledgeList);
+
+// Route to get knowledge base with search/filter (new)
+router.get("/library", getKnowledgeBase);
+
+// Route to delete a knowledge item
+router.delete("/:id", deleteKnowledge);
 
 // Drafts
 router.post("/drafts", saveDraft);
