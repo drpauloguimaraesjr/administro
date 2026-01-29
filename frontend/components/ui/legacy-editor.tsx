@@ -795,145 +795,157 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                     </select>
                 </div>
 
-                {/* Layout Toggle */}
-                <div className="flex gap-0.5">
-                    <Button
-                        type="button"
-                        variant={showLayoutToolbar ? "secondary" : "ghost"}
-                        size="sm"
-                        className="h-8 px-2 text-xs gap-1"
-                        onClick={() => setShowLayoutToolbar(!showLayoutToolbar)}
-                        title="Abrir/Fechar Painel de Layout"
-                    >
-                        <PanelLeft className="w-3 h-3" />
-                        Layout
-                    </Button>
-                </div>
+                {/* Layout Dropdown */}
+                <DropdownMenu open={showLayoutToolbar} onOpenChange={setShowLayoutToolbar}>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            type="button"
+                            variant={showLayoutToolbar ? "secondary" : "ghost"}
+                            size="sm"
+                            className="h-8 px-2 text-xs gap-1"
+                        >
+                            <PanelLeft className="w-3 h-3" />
+                            Layout
+                            <ChevronDown className="w-3 h-3" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-64 p-2">
+                        <DropdownMenuLabel className="text-xs text-slate-500 uppercase tracking-wider">
+                            📐 Ferramentas de Layout
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+
+                        {/* Page Margins (Blue) */}
+                        <div className="flex items-center justify-between gap-2 px-2 py-2 rounded bg-blue-50 border border-blue-100 mb-2">
+                            <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 bg-blue-400 rounded-sm"></div>
+                                <span className="text-xs text-blue-700 font-medium">Margens da Página</span>
+                            </div>
+                            <Button
+                                type="button"
+                                variant={showMargins ? "default" : "outline"}
+                                size="sm"
+                                className={`h-6 px-3 text-xs ${showMargins ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
+                                onClick={() => setShowMargins(!showMargins)}
+                            >
+                                {showMargins ? 'ON' : 'OFF'}
+                            </Button>
+                        </div>
+
+                        {/* Inner Margins (Green) */}
+                        <div className="flex flex-col gap-1 px-2 py-2 rounded bg-emerald-50 border border-emerald-100 mb-2">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 bg-emerald-400 rounded-sm"></div>
+                                    <span className="text-xs text-emerald-700 font-medium">Margens de Texto</span>
+                                </div>
+                                <div className="flex gap-1">
+                                    <Button
+                                        type="button"
+                                        variant={showInnerMargins ? "default" : "outline"}
+                                        size="sm"
+                                        className={`h-6 px-3 text-xs ${showInnerMargins ? 'bg-emerald-500 hover:bg-emerald-600' : ''}`}
+                                        onClick={() => setShowInnerMargins(!showInnerMargins)}
+                                    >
+                                        {showInnerMargins ? 'ON' : 'OFF'}
+                                    </Button>
+                                    {showInnerMargins && (
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-6 px-2 text-xs text-emerald-600"
+                                            onClick={() => setInnerMargins({ top: 0, right: 0, bottom: 0, left: 0 })}
+                                        >
+                                            Reset
+                                        </Button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <DropdownMenuSeparator />
+
+                        {/* Text Box Tool */}
+                        <div className="flex flex-col gap-1 px-2 py-2 rounded bg-amber-50 border border-amber-100 mb-2">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Square className="w-3 h-3 text-amber-600" />
+                                    <span className="text-xs text-amber-700 font-medium">Caixa de Texto</span>
+                                    {textBoxes.length > 0 && (
+                                        <span className="text-[10px] bg-amber-200 text-amber-700 px-1.5 rounded-full">{textBoxes.length}</span>
+                                    )}
+                                </div>
+                                <Button
+                                    type="button"
+                                    variant={isDrawingTextBox ? "default" : "outline"}
+                                    size="sm"
+                                    className={`h-6 px-3 text-xs ${isDrawingTextBox ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}`}
+                                    onClick={() => {
+                                        setIsDrawingTextBox(!isDrawingTextBox);
+                                        setShowLayoutToolbar(false);
+                                    }}
+                                >
+                                    {isDrawingTextBox ? '✏️ Ativo' : '+ Criar'}
+                                </Button>
+                            </div>
+                            {isDrawingTextBox && (
+                                <p className="text-[10px] text-amber-600 mt-1">
+                                    💡 Clique e arraste na margem
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Alignment Lines Tool */}
+                        <div className="flex flex-col gap-1 px-2 py-2 rounded bg-purple-50 border border-purple-100">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-0.5 h-4 bg-purple-500"></div>
+                                    <span className="text-xs text-purple-700 font-medium">Linha de Alinhamento</span>
+                                    {alignmentLines.length > 0 && (
+                                        <span className="text-[10px] bg-purple-200 text-purple-700 px-1.5 rounded-full">{alignmentLines.length}</span>
+                                    )}
+                                </div>
+                                <div className="flex gap-1">
+                                    <Button
+                                        type="button"
+                                        variant={isCreatingAlignmentLine ? "default" : "outline"}
+                                        size="sm"
+                                        className={`h-6 px-3 text-xs ${isCreatingAlignmentLine ? 'bg-purple-500 hover:bg-purple-600 text-white' : ''}`}
+                                        onClick={() => {
+                                            setIsCreatingAlignmentLine(!isCreatingAlignmentLine);
+                                            setAlignmentLinePreviewX(null);
+                                            setShowLayoutToolbar(false);
+                                        }}
+                                    >
+                                        {isCreatingAlignmentLine ? '📍 Ativo' : '+ Criar'}
+                                    </Button>
+                                    {alignmentLines.length > 0 && (
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-6 px-1 text-xs text-red-500 hover:text-red-700"
+                                            onClick={() => setAlignmentLines([])}
+                                            title="Limpar todas"
+                                        >
+                                            ✕
+                                        </Button>
+                                    )}
+                                </div>
+                            </div>
+                            {isCreatingAlignmentLine && (
+                                <p className="text-[10px] text-purple-600 mt-1">
+                                    💡 Clique na área de texto • Ctrl+Click para alinhar
+                                </p>
+                            )}
+                        </div>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
 
-            {/* Layout Toolbar Panel */}
-            {showLayoutToolbar && (
-                <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200 shrink-0">
-                    <span className="text-xs font-medium text-slate-500 uppercase tracking-wider mr-2">📐 Layout</span>
-
-                    {/* Page Margins (Blue) */}
-                    <div className="flex items-center gap-1 px-2 py-1 rounded bg-blue-50 border border-blue-200">
-                        <div className="w-3 h-3 bg-blue-400 rounded-sm"></div>
-                        <span className="text-xs text-blue-700">Margens da Página</span>
-                        <Button
-                            type="button"
-                            variant={showMargins ? "default" : "ghost"}
-                            size="sm"
-                            className={`h-6 px-2 text-xs ${showMargins ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
-                            onClick={() => setShowMargins(!showMargins)}
-                        >
-                            {showMargins ? 'ON' : 'OFF'}
-                        </Button>
-                    </div>
-
-                    {/* Inner Margins (Green) */}
-                    <div className="flex items-center gap-1 px-2 py-1 rounded bg-emerald-50 border border-emerald-200">
-                        <div className="w-3 h-3 bg-emerald-400 rounded-sm"></div>
-                        <span className="text-xs text-emerald-700">Margens de Texto</span>
-                        <Button
-                            type="button"
-                            variant={showInnerMargins ? "default" : "ghost"}
-                            size="sm"
-                            className={`h-6 px-2 text-xs ${showInnerMargins ? 'bg-emerald-500 hover:bg-emerald-600' : ''}`}
-                            onClick={() => setShowInnerMargins(!showInnerMargins)}
-                        >
-                            {showInnerMargins ? 'ON' : 'OFF'}
-                        </Button>
-                        {showInnerMargins && (
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                className="h-6 px-2 text-xs text-emerald-600"
-                                onClick={() => setInnerMargins({ top: 0, right: 0, bottom: 0, left: 0 })}
-                            >
-                                Reset
-                            </Button>
-                        )}
-                    </div>
-
-                    <div className="w-px h-6 bg-slate-300 mx-2"></div>
-
-                    {/* Text Box Tool */}
-                    <div className="flex items-center gap-1 px-2 py-1 rounded bg-amber-50 border border-amber-200">
-                        <Square className="w-3 h-3 text-amber-600" />
-                        <span className="text-xs text-amber-700">Caixa de Texto</span>
-                        <Button
-                            type="button"
-                            variant={isDrawingTextBox ? "default" : "ghost"}
-                            size="sm"
-                            className={`h-6 px-2 text-xs ${isDrawingTextBox ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}`}
-                            onClick={() => setIsDrawingTextBox(!isDrawingTextBox)}
-                        >
-                            {isDrawingTextBox ? '✏️ Desenhando...' : '+ Criar'}
-                        </Button>
-                    </div>
-
-                    {textBoxes.length > 0 && (
-                        <div className="flex items-center gap-1 px-2 py-1 rounded bg-slate-100 border border-slate-200">
-                            <Layers className="w-3 h-3 text-slate-600" />
-                            <span className="text-xs text-slate-600">{textBoxes.length} caixa(s)</span>
-                        </div>
-                    )}
-
-                    <div className="w-px h-6 bg-slate-300 mx-2"></div>
-
-                    {/* Alignment Lines Tool (Purple) */}
-                    <div className="flex items-center gap-1 px-2 py-1 rounded bg-purple-50 border border-purple-200">
-                        <div className="w-0.5 h-4 bg-purple-500"></div>
-                        <span className="text-xs text-purple-700">Linha de Alinhamento</span>
-                        <Button
-                            type="button"
-                            variant={isCreatingAlignmentLine ? "default" : "ghost"}
-                            size="sm"
-                            className={`h-6 px-2 text-xs ${isCreatingAlignmentLine ? 'bg-purple-500 hover:bg-purple-600 text-white' : ''}`}
-                            onClick={() => {
-                                setIsCreatingAlignmentLine(!isCreatingAlignmentLine);
-                                setAlignmentLinePreviewX(null);
-                            }}
-                        >
-                            {isCreatingAlignmentLine ? '📍 Posicionando...' : '+ Criar'}
-                        </Button>
-                    </div>
-
-                    {alignmentLines.length > 0 && (
-                        <div className="flex items-center gap-1 px-2 py-1 rounded bg-purple-100 border border-purple-200">
-                            <span className="text-xs text-purple-600">{alignmentLines.length} linha(s)</span>
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                className="h-5 px-1 text-xs text-red-500 hover:text-red-700"
-                                onClick={() => setAlignmentLines([])}
-                                title="Limpar todas as linhas"
-                            >
-                                ✕
-                            </Button>
-                        </div>
-                    )}
-
-                    {/* Help Messages */}
-                    {isDrawingTextBox && (
-                        <div className="ml-auto text-xs text-amber-600 bg-amber-100 px-2 py-1 rounded">
-                            💡 Clique e arraste na margem para criar caixa de texto
-                        </div>
-                    )}
-
-                    {isCreatingAlignmentLine && (
-                        <div className="ml-auto text-xs text-purple-600 bg-purple-100 px-2 py-1 rounded">
-                            💡 Clique na área de texto para posicionar a linha • Ctrl/Cmd+Click para alinhar texto
-                        </div>
-                    )}
-                </div>
-            )}
-
             {/* Editable Area Container with Guides */}
-            <div className="flex-1 bg-slate-200 p-8 overflow-auto relative flex justify-center" ref={containerRef}>
+            <div className="flex-1 bg-slate-300 p-2 overflow-auto relative flex justify-center" ref={containerRef}>
 
                 {/* Paper Simulation */}
                 <div
