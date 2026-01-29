@@ -6,9 +6,20 @@ import {
     AlignLeft, AlignCenter, AlignRight, AlignJustify,
     Indent, Outdent, Link as LinkIcon, Image as ImageIcon,
     Undo, Redo, Table as TableIcon, Type, Palette,
-    Maximize, Minimize
+    Maximize, Minimize, ChevronDown, FileText, Pill, Syringe, ListOrdered, LayoutTemplate
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface LegacyEditorProps {
     content?: string;
@@ -220,76 +231,254 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                     <ToolbarBtn icon={<Indent className="w-4 h-4" />} onClick={() => execCmd('indent')} title="Aumentar Recuo" />
                 </div>
 
-                {/* Prescription Formats */}
-                <div className="flex gap-0.5 border-r pr-2 mr-2 border-gray-300">
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 px-2 text-xs gap-1 text-purple-600 hover:bg-purple-50"
-                        onClick={() => {
-                            const html = `
-                                <p><strong>MEDICAMENTO 500mg</strong></p>
-                                <p style="padding-left: 40px;">Manipular 30 doses</p>
-                                <p style="padding-left: 40px;">Tomar 1 dose ao dia.</p>
-                                <p>&nbsp;</p>
-                            `;
-                            execCmd('insertHTML', html);
-                        }}
-                        title="Formato: Medicamento + Posologia Indentada"
-                    >
-                        📋 M+P
-                    </Button>
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 px-2 text-xs gap-1 text-orange-600 hover:bg-orange-50"
-                        onClick={() => {
-                            const html = `
-                                <table style="border-collapse: collapse; margin: 10px 0;">
-                                    <tr>
-                                        <td style="padding: 2px 10px 2px 0; border-right: 2px solid #666;">Medicamento 1</td>
-                                        <td rowspan="3" style="padding: 2px 0 2px 10px; vertical-align: middle;">Fazer EV em 30 min.</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 2px 10px 2px 0; border-right: 2px solid #666;">SF 0,9% 250ml</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 2px 10px 2px 0; border-right: 2px solid #666;">Componente 3</td>
-                                    </tr>
-                                </table>
-                                <p>&nbsp;</p>
-                            `;
-                            execCmd('insertHTML', html);
-                        }}
-                        title="Formato: Grupo com Barra Vertical"
-                    >
-                        📊 Grupo
-                    </Button>
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 px-2 text-xs gap-1 text-green-600 hover:bg-green-50"
-                        onClick={() => {
-                            const html = `
-                                <p><strong>USO ORAL</strong></p>
-                                <p>&nbsp;</p>
-                                <p>1. <strong>Medicamento</strong> _______________</p>
-                                <p style="padding-left: 20px;">Tomar 1 cp ao dia.</p>
-                                <p>&nbsp;</p>
-                                <p>2. <strong>Medicamento</strong> _______________</p>
-                                <p style="padding-left: 20px;">Tomar conforme orientação.</p>
-                                <p>&nbsp;</p>
-                            `;
-                            execCmd('insertHTML', html);
-                        }}
-                        title="Formato: Lista Numerada de Medicamentos"
-                    >
-                        📝 Lista
-                    </Button>
-                </div>
+                {/* Templates Dropdown - Elegante */}
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="h-8 px-3 gap-2 bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-200 text-purple-700 hover:from-purple-100 hover:to-indigo-100 hover:border-purple-300 font-medium shadow-sm"
+                        >
+                            <LayoutTemplate className="w-4 h-4" />
+                            Templates
+                            <ChevronDown className="w-3 h-3 opacity-60" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-72 p-2" align="start">
+                        <DropdownMenuLabel className="text-xs text-gray-500 uppercase tracking-wider">
+                            Formatos de Prescrição
+                        </DropdownMenuLabel>
+
+                        {/* Medicamentos */}
+                        <DropdownMenuSub>
+                            <DropdownMenuSubTrigger className="gap-2">
+                                <Pill className="w-4 h-4 text-purple-500" />
+                                <span>Medicamentos</span>
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuSubContent className="w-64">
+                                <DropdownMenuItem
+                                    onClick={() => execCmd('insertHTML', `
+                                        <p><strong>MEDICAMENTO 500mg</strong></p>
+                                        <p style="padding-left: 40px;">Manipular 30 doses</p>
+                                        <p style="padding-left: 40px;">Tomar 1 dose ao dia.</p>
+                                        <p>&nbsp;</p>
+                                    `)}
+                                    className="gap-2 cursor-pointer"
+                                >
+                                    <span className="text-lg">💊</span>
+                                    <div>
+                                        <p className="font-medium">Medicamento + Posologia</p>
+                                        <p className="text-xs text-gray-500">Nome em negrito, posologia indentada</p>
+                                    </div>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => execCmd('insertHTML', `
+                                        <p><strong>MEDICAMENTO</strong> _____ mg/ml</p>
+                                        <p style="padding-left: 40px;">Quantidade: _____ unidades</p>
+                                        <p style="padding-left: 40px;">Posologia: _____</p>
+                                        <p style="padding-left: 40px;">Via: _____ | Frequência: _____</p>
+                                        <p>&nbsp;</p>
+                                    `)}
+                                    className="gap-2 cursor-pointer"
+                                >
+                                    <span className="text-lg">📋</span>
+                                    <div>
+                                        <p className="font-medium">Formato Completo</p>
+                                        <p className="text-xs text-gray-500">Com campos para preencher</p>
+                                    </div>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => execCmd('insertHTML', `
+                                        <p><strong>MANIPULADO</strong></p>
+                                        <p style="padding-left: 40px;">Fórmula: _____</p>
+                                        <p style="padding-left: 40px;">Manipular: _____ cápsulas</p>
+                                        <p style="padding-left: 40px;">Tomar 1 cápsula _____</p>
+                                        <p>&nbsp;</p>
+                                    `)}
+                                    className="gap-2 cursor-pointer"
+                                >
+                                    <span className="text-lg">⚗️</span>
+                                    <div>
+                                        <p className="font-medium">Manipulados</p>
+                                        <p className="text-xs text-gray-500">Para farmácia de manipulação</p>
+                                    </div>
+                                </DropdownMenuItem>
+                            </DropdownMenuSubContent>
+                        </DropdownMenuSub>
+
+                        {/* Grupos (Barra Vertical) */}
+                        <DropdownMenuSub>
+                            <DropdownMenuSubTrigger className="gap-2">
+                                <Syringe className="w-4 h-4 text-orange-500" />
+                                <span>Grupos EV / IM</span>
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuSubContent className="w-64">
+                                <DropdownMenuItem
+                                    onClick={() => execCmd('insertHTML', `
+                                        <table style="border-collapse: collapse; margin: 10px 0;">
+                                            <tr>
+                                                <td style="padding: 2px 10px 2px 0; border-right: 2px solid #666;">Medicamento 1</td>
+                                                <td rowspan="2" style="padding: 2px 0 2px 10px; vertical-align: middle;">Fazer EV em 30 min.</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 2px 10px 2px 0; border-right: 2px solid #666;">SF 0,9% 250ml</td>
+                                            </tr>
+                                        </table>
+                                        <p>&nbsp;</p>
+                                    `)}
+                                    className="gap-2 cursor-pointer"
+                                >
+                                    <span className="text-lg">2️⃣</span>
+                                    <div>
+                                        <p className="font-medium">2 Componentes</p>
+                                        <p className="text-xs text-gray-500">Medicamento + Diluente</p>
+                                    </div>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => execCmd('insertHTML', `
+                                        <table style="border-collapse: collapse; margin: 10px 0;">
+                                            <tr>
+                                                <td style="padding: 2px 10px 2px 0; border-right: 2px solid #666;">Componente 1</td>
+                                                <td rowspan="3" style="padding: 2px 0 2px 10px; vertical-align: middle;">Fazer EV em 30 min.</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 2px 10px 2px 0; border-right: 2px solid #666;">Componente 2</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 2px 10px 2px 0; border-right: 2px solid #666;">SF 0,9% 250ml</td>
+                                            </tr>
+                                        </table>
+                                        <p>&nbsp;</p>
+                                    `)}
+                                    className="gap-2 cursor-pointer"
+                                >
+                                    <span className="text-lg">3️⃣</span>
+                                    <div>
+                                        <p className="font-medium">3 Componentes</p>
+                                        <p className="text-xs text-gray-500">Vitaminas + Diluente</p>
+                                    </div>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => execCmd('insertHTML', `
+                                        <table style="border-collapse: collapse; margin: 10px 0;">
+                                            <tr>
+                                                <td style="padding: 2px 10px 2px 0; border-right: 2px solid #666;">Complexo B S/ B1</td>
+                                                <td rowspan="4" style="padding: 2px 0 2px 10px; vertical-align: middle;">Fazer EV lento em 30 min.</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 2px 10px 2px 0; border-right: 2px solid #666;">Metilfolato</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 2px 10px 2px 0; border-right: 2px solid #666;">Metilcobalamina</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 2px 10px 2px 0; border-right: 2px solid #666;">SF 0,9% 250ml</td>
+                                            </tr>
+                                        </table>
+                                        <p>&nbsp;</p>
+                                    `)}
+                                    className="gap-2 cursor-pointer"
+                                >
+                                    <span className="text-lg">4️⃣</span>
+                                    <div>
+                                        <p className="font-medium">4 Componentes</p>
+                                        <p className="text-xs text-gray-500">Vitaminas complexo completo</p>
+                                    </div>
+                                </DropdownMenuItem>
+                            </DropdownMenuSubContent>
+                        </DropdownMenuSub>
+
+                        {/* Listas */}
+                        <DropdownMenuSub>
+                            <DropdownMenuSubTrigger className="gap-2">
+                                <ListOrdered className="w-4 h-4 text-green-500" />
+                                <span>Listas Numeradas</span>
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuSubContent className="w-64">
+                                <DropdownMenuItem
+                                    onClick={() => execCmd('insertHTML', `
+                                        <p><strong>USO ORAL</strong></p>
+                                        <p>&nbsp;</p>
+                                        <p>1. <strong>Medicamento</strong> _______________</p>
+                                        <p style="padding-left: 20px;">Tomar 1 cp ao dia.</p>
+                                        <p>&nbsp;</p>
+                                        <p>2. <strong>Medicamento</strong> _______________</p>
+                                        <p style="padding-left: 20px;">Tomar conforme orientação.</p>
+                                        <p>&nbsp;</p>
+                                    `)}
+                                    className="gap-2 cursor-pointer"
+                                >
+                                    <span className="text-lg">📝</span>
+                                    <div>
+                                        <p className="font-medium">Lista Uso Oral</p>
+                                        <p className="text-xs text-gray-500">2 medicamentos numerados</p>
+                                    </div>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => execCmd('insertHTML', `
+                                        <p><strong>USO INJETÁVEL</strong></p>
+                                        <p>&nbsp;</p>
+                                        <p>1. _______________</p>
+                                        <p style="padding-left: 20px;">Aplicar IM _____</p>
+                                        <p>&nbsp;</p>
+                                        <p>2. _______________</p>
+                                        <p style="padding-left: 20px;">Aplicar EV _____</p>
+                                        <p>&nbsp;</p>
+                                    `)}
+                                    className="gap-2 cursor-pointer"
+                                >
+                                    <span className="text-lg">💉</span>
+                                    <div>
+                                        <p className="font-medium">Lista Uso Injetável</p>
+                                        <p className="text-xs text-gray-500">2 medicamentos IM/EV</p>
+                                    </div>
+                                </DropdownMenuItem>
+                            </DropdownMenuSubContent>
+                        </DropdownMenuSub>
+
+                        <DropdownMenuSeparator />
+
+                        {/* Cabeçalhos */}
+                        <DropdownMenuSub>
+                            <DropdownMenuSubTrigger className="gap-2">
+                                <FileText className="w-4 h-4 text-blue-500" />
+                                <span>Cabeçalhos de Via</span>
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuSubContent className="w-56">
+                                <DropdownMenuItem onClick={() => execCmd('insertHTML', '<p><strong>USO ORAL</strong></p><p>&nbsp;</p>')} className="cursor-pointer">
+                                    💊 USO ORAL
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => execCmd('insertHTML', '<p><strong>USO INJETÁVEL</strong></p><p>&nbsp;</p>')} className="cursor-pointer">
+                                    💉 USO INJETÁVEL
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => execCmd('insertHTML', '<p><strong>USO TÓPICO</strong></p><p>&nbsp;</p>')} className="cursor-pointer">
+                                    🧴 USO TÓPICO
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => execCmd('insertHTML', '<p><strong>USO NASAL</strong></p><p>&nbsp;</p>')} className="cursor-pointer">
+                                    👃 USO NASAL
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => execCmd('insertHTML', '<p><strong>USO OFTÁLMICO</strong></p><p>&nbsp;</p>')} className="cursor-pointer">
+                                    👁️ USO OFTÁLMICO
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => execCmd('insertHTML', '<p><strong>USO SUBLINGUAL</strong></p><p>&nbsp;</p>')} className="cursor-pointer">
+                                    👅 USO SUBLINGUAL
+                                </DropdownMenuItem>
+                            </DropdownMenuSubContent>
+                        </DropdownMenuSub>
+
+                        <DropdownMenuSeparator />
+
+                        {/* Separadores */}
+                        <DropdownMenuItem
+                            onClick={() => execCmd('insertHTML', '<p>────────────────────────────────</p>')}
+                            className="gap-2 cursor-pointer"
+                        >
+                            <span className="text-lg">➖</span>
+                            <span>Linha Separadora</span>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
 
                 {/* Colors & Fonts */}
                 <div className="flex items-center gap-2 border-r pr-2 mr-2 border-gray-300">
