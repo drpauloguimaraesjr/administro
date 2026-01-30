@@ -32,6 +32,7 @@ interface LegacyEditorProps {
 export interface LegacyEditorRef {
     insertContent: (content: string) => void;
     getHTML: () => string;
+    setContent: (content: string) => void;
 }
 
 export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ content = '', placeholder, onChange, editable = true }, ref) => {
@@ -110,6 +111,12 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
         },
         getHTML: () => {
             return editorRef.current?.innerHTML || '';
+        },
+        setContent: (html: string) => {
+            if (editorRef.current) {
+                editorRef.current.innerHTML = html;
+                handleInput();
+            }
         }
     }));
 
