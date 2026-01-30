@@ -331,8 +331,8 @@ export default function DocumentsPage() {
                     <button
                         onClick={() => setActiveTab('new')}
                         className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'new'
-                                ? 'border-purple-600 text-purple-600'
-                                : 'border-transparent text-slate-500 hover:text-slate-700'
+                            ? 'border-purple-600 text-purple-600'
+                            : 'border-transparent text-slate-500 hover:text-slate-700'
                             }`}
                     >
                         <Plus className="inline-block h-4 w-4 mr-2" />Novo Documento
@@ -340,8 +340,8 @@ export default function DocumentsPage() {
                     <button
                         onClick={() => setActiveTab('history')}
                         className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'history'
-                                ? 'border-purple-600 text-purple-600'
-                                : 'border-transparent text-slate-500 hover:text-slate-700'
+                            ? 'border-purple-600 text-purple-600'
+                            : 'border-transparent text-slate-500 hover:text-slate-700'
                             }`}
                     >
                         <Clock className="inline-block h-4 w-4 mr-2" />Histórico
@@ -371,8 +371,8 @@ export default function DocumentsPage() {
                                             key={type}
                                             onClick={() => setDocumentType(type)}
                                             className={`p-3 rounded-lg border-2 transition-all flex flex-col items-center gap-2 ${documentType === type
-                                                    ? 'border-purple-500 bg-purple-50 text-purple-700'
-                                                    : 'border-slate-200 hover:border-slate-300'
+                                                ? 'border-purple-500 bg-purple-50 text-purple-700'
+                                                : 'border-slate-200 hover:border-slate-300'
                                                 }`}
                                         >
                                             <Icon className="h-6 w-6" />
@@ -617,7 +617,7 @@ export default function DocumentsPage() {
                         <div className="text-center py-12">
                             <FileText className="h-12 w-12 mx-auto text-slate-300 mb-4" />
                             <h3 className="text-lg font-medium text-slate-600">Nenhum documento encontrado</h3>
-                            <p className="text-slate-400 mt-1">Crie seu primeiro documento na aba "Novo Documento"</p>
+                            <p className="text-slate-400 mt-1">Crie seu primeiro documento na aba &quot;Novo Documento&quot;</p>
                         </div>
                     ) : (
                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -711,8 +711,8 @@ export default function DocumentsPage() {
                                             }
                                         }}
                                         className={`p-3 rounded-lg border cursor-pointer transition-all ${isSelected
-                                                ? 'border-purple-500 bg-purple-50'
-                                                : 'border-slate-200 hover:border-slate-300'
+                                            ? 'border-purple-500 bg-purple-50'
+                                            : 'border-slate-200 hover:border-slate-300'
                                             }`}
                                     >
                                         <div className="flex items-center gap-3">

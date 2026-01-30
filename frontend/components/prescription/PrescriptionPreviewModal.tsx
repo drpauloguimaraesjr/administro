@@ -44,22 +44,23 @@ export function PrescriptionPreviewModal({
     const [qrCodeUrl, setQrCodeUrl] = useState('');
     const printRef = useRef<HTMLDivElement>(null);
 
-    if (!params) return null;
-
     const documentId = `${Date.now().toString(36).toUpperCase()}`;
     const validationUrl = `${DOCTOR_CONFIG.validationUrl}?i=${documentId}`;
     const currentDate = new Date();
 
     // Generate QR Code
     useEffect(() => {
-        if (params.qrCode) {
+        if (params?.qrCode) {
             QRCode.toDataURL(validationUrl, {
                 width: 100,
                 margin: 1,
                 color: { dark: '#000000', light: '#ffffff' }
             }).then(setQrCodeUrl).catch(console.error);
         }
-    }, [params.qrCode, validationUrl]);
+    }, [params?.qrCode, validationUrl]);
+
+    // Early return after hooks
+    if (!params) return null;
 
     const formatDateBR = (dateStr: string) => {
         if (!dateStr) return '';

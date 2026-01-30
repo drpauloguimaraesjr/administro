@@ -83,7 +83,7 @@ export default function WhatsAppPage() {
     useEffect(() => {
         // Determina URL do backend baseada no ambiente
         // NEXT_PUBLIC_BACKEND_URL deve estar configurada no .env.local
-        const url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        const url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
         setBackendUrl(url);
     }, []);
 

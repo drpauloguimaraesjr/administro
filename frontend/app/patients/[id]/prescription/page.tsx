@@ -598,7 +598,7 @@ export default function PrescriptionPage() {
                                                 {templates.length === 0 ? (
                                                     <p className="text-center text-gray-500 py-8">
                                                         Nenhum template salvo.<br />
-                                                        <span className="text-sm">Clique em "Salvar Atual" para criar um.</span>
+                                                        <span className="text-sm">Clique em &quot;Salvar Atual&quot; para criar um.</span>
                                                     </p>
                                                 ) : (
                                                     regularTemplates.map((template) => (
