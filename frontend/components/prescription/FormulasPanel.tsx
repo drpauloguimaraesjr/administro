@@ -133,7 +133,7 @@ export function FormulasPanel({ onSelectFormula }: FormulasPanelProps) {
                     <div className="space-y-1">
                         <div className="px-2 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center justify-between">
                             <span>Resultados</span>
-                            <span className="text-gray-300 text-[9px]">Clique na seta para inserir</span>
+                            <span className="text-gray-300 text-[9px]">Clique no + para inserir</span>
                         </div>
                         {filteredFormulas.map((formula) => (
                             <FormulaCard
