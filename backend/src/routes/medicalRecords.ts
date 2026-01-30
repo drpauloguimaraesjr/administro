@@ -405,4 +405,131 @@ router.delete('/:patientId/documents/:id', async (req: Request, res: Response) =
     }
 });
 
+// ============ PRESCRIPTION TEMPLATES (Favorites) ============
+
+// GET /api/medical-records/templates - Get all templates (global, not patient-specific)
+router.get('/templates', async (req: Request, res: Response) => {
+    try {
+        const db = getFirestore();
+        const snapshot = await db.collection('prescription_templates')
+            .orderBy('usageCount', 'desc')
+            .get();
+
+        const templates = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        res.json(templates);
+    } catch (error: any) {
+        console.error('Erro ao buscar templates:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// POST /api/medical-records/templates - Create a new template
+router.post('/templates', async (req: Request, res: Response) => {
+    try {
+        const db = getFirestore();
+        const now = new Date().toISOString();
+
+        const template = {
+            name: req.body.name,
+            content: req.body.content,
+            type: req.body.type || 'simples',
+            category: req.body.category || 'geral',
+            tags: req.body.tags || [],
+            isFavorite: req.body.isFavorite || false,
+            usageCount: 0,
+            createdAt: now,
+            updatedAt: now,
+        };
+
+        const docRef = await db.collection('prescription_templates').add(template);
+
+        res.status(201).json({ id: docRef.id, ...template });
+    } catch (error: any) {
+        console.error('Erro ao criar template:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// PUT /api/medical-records/templates/:id - Update a template
+router.put('/templates/:id', async (req: Request, res: Response) => {
+    try {
+        const db = getFirestore();
+        const docRef = db.collection('prescription_templates').doc(req.params.id);
+
+        const updates = {
+            ...req.body,
+            updatedAt: new Date().toISOString(),
+        };
+
+        await docRef.update(updates);
+        res.json({ id: req.params.id, ...updates });
+    } catch (error: any) {
+        console.error('Erro ao atualizar template:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// PUT /api/medical-records/templates/:id/use - Increment usage count
+router.put('/templates/:id/use', async (req: Request, res: Response) => {
+    try {
+        const db = getFirestore();
+        const docRef = db.collection('prescription_templates').doc(req.params.id);
+
+        const doc = await docRef.get();
+        if (!doc.exists) {
+            return res.status(404).json({ error: 'Template não encontrado' });
+        }
+
+        const currentCount = doc.data()?.usageCount || 0;
+        await docRef.update({
+            usageCount: currentCount + 1,
+            lastUsedAt: new Date().toISOString()
+        });
+
+        res.json({ success: true, usageCount: currentCount + 1 });
+    } catch (error: any) {
+        console.error('Erro ao incrementar uso:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// PUT /api/medical-records/templates/:id/favorite - Toggle favorite status
+router.put('/templates/:id/favorite', async (req: Request, res: Response) => {
+    try {
+        const db = getFirestore();
+        const docRef = db.collection('prescription_templates').doc(req.params.id);
+
+        const doc = await docRef.get();
+        if (!doc.exists) {
+            return res.status(404).json({ error: 'Template não encontrado' });
+        }
+
+        const isFavorite = !doc.data()?.isFavorite;
+        await docRef.update({ isFavorite });
+
+        res.json({ success: true, isFavorite });
+    } catch (error: any) {
+        console.error('Erro ao favoritar template:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// DELETE /api/medical-records/templates/:id - Delete a template
+router.delete('/templates/:id', async (req: Request, res: Response) => {
+    try {
+        const db = getFirestore();
+        await db.collection('prescription_templates').doc(req.params.id).delete();
+
+        res.json({ success: true });
+    } catch (error: any) {
+        console.error('Erro ao remover template:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 export default router;
+

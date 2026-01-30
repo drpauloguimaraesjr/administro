@@ -5,7 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
     Search, ArrowLeft, Printer, Copy, Plus, ArrowRightCircle, FileWarning,
-    Save, Clock, History, Star, ZoomIn, ZoomOut, Moon, Sun, Sparkles, Loader2
+    Save, Clock, History, Star, ZoomIn, ZoomOut, Moon, Sun, Sparkles, Loader2,
+    BookMarked, StarOff, Trash2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +14,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import api from '@/lib/api';
 
 import { PatientHeader } from '@/components/medical-record/patient-header';
@@ -28,6 +31,19 @@ interface Prescription {
     title: string;
     content: string;
     type: 'simples' | 'controlada';
+    createdAt: string;
+    updatedAt: string;
+}
+
+interface PrescriptionTemplate {
+    id: string;
+    name: string;
+    content: string;
+    type: 'simples' | 'controlada';
+    category: string;
+    tags: string[];
+    isFavorite: boolean;
+    usageCount: number;
     createdAt: string;
     updatedAt: string;
 }
@@ -57,6 +73,10 @@ export default function PrescriptionPage() {
     const [charCount, setCharCount] = useState(0);
     const [wordCount, setWordCount] = useState(0);
     const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+    const [isTemplatesOpen, setIsTemplatesOpen] = useState(false);
+    const [isSaveTemplateOpen, setIsSaveTemplateOpen] = useState(false);
+    const [templateName, setTemplateName] = useState('');
+    const [templateCategory, setTemplateCategory] = useState('geral');
 
     // Fetch patient data
     const { data: patient } = useQuery({
@@ -73,6 +93,49 @@ export default function PrescriptionPage() {
         queryFn: async () => {
             const res = await api.get(`/medical-records/${patientId}/prescriptions`);
             return res.data;
+        },
+    });
+
+    // Fetch templates
+    const { data: templates = [], refetch: refetchTemplates } = useQuery<PrescriptionTemplate[]>({
+        queryKey: ['prescription-templates'],
+        queryFn: async () => {
+            const res = await api.get('/medical-records/templates');
+            return res.data;
+        },
+    });
+
+    // Save template mutation
+    const saveTemplateMutation = useMutation({
+        mutationFn: async (data: { name: string; content: string; type: string; category: string }) => {
+            return api.post('/medical-records/templates', data);
+        },
+        onSuccess: () => {
+            toast.success('Template salvo com sucesso!');
+            refetchTemplates();
+            setIsSaveTemplateOpen(false);
+            setTemplateName('');
+        },
+    });
+
+    // Toggle favorite mutation
+    const toggleFavoriteMutation = useMutation({
+        mutationFn: async (templateId: string) => {
+            return api.put(`/medical-records/templates/${templateId}/favorite`);
+        },
+        onSuccess: () => {
+            refetchTemplates();
+        },
+    });
+
+    // Delete template mutation
+    const deleteTemplateMutation = useMutation({
+        mutationFn: async (templateId: string) => {
+            return api.delete(`/medical-records/templates/${templateId}`);
+        },
+        onSuccess: () => {
+            toast.success('Template removido!');
+            refetchTemplates();
         },
     });
 
@@ -249,6 +312,52 @@ export default function PrescriptionPage() {
         }
     };
 
+    // Template handlers
+    const handleLoadTemplate = async (template: PrescriptionTemplate) => {
+        if (editorRef.current) {
+            editorRef.current.setContent(template.content);
+            setPrescriptionTitle(template.name);
+            setPrescriptionType(template.type);
+
+            // Increment usage count
+            try {
+                await api.put(`/medical-records/templates/${template.id}/use`);
+                refetchTemplates();
+            } catch (error) {
+                console.error('Erro ao registrar uso:', error);
+            }
+
+            setIsTemplatesOpen(false);
+            toast.success(`Template "${template.name}" carregado!`);
+        }
+    };
+
+    const handleSaveAsTemplate = async () => {
+        if (!editorRef.current) return;
+
+        const content = editorRef.current.getHTML();
+        if (!content || content.length < 10) {
+            toast.error('Digite algo antes de salvar como template');
+            return;
+        }
+
+        if (!templateName.trim()) {
+            toast.error('Digite um nome para o template');
+            return;
+        }
+
+        await saveTemplateMutation.mutateAsync({
+            name: templateName.trim(),
+            content,
+            type: prescriptionType,
+            category: templateCategory,
+        });
+    };
+
+    // Separate templates into favorites and regular
+    const favoriteTemplates = templates.filter(t => t.isFavorite);
+    const regularTemplates = templates.filter(t => !t.isFavorite);
+
     if (!patient) return null;
 
     return (
@@ -350,6 +459,192 @@ export default function PrescriptionPage() {
                                                 </div>
                                             ))
                                         )}
+                                    </div>
+                                </ScrollArea>
+                            </SheetContent>
+                        </Sheet>
+
+                        {/* Templates Sheet */}
+                        <Sheet open={isTemplatesOpen} onOpenChange={setIsTemplatesOpen}>
+                            <SheetTrigger asChild>
+                                <Button variant="outline" size="sm" className={isDarkMode ? 'border-slate-700 text-slate-300' : ''}>
+                                    <BookMarked className="w-4 h-4 mr-1" /> Templates
+                                    {templates.length > 0 && (
+                                        <Badge variant="secondary" className="ml-1 h-5 px-1.5">
+                                            {templates.length}
+                                        </Badge>
+                                    )}
+                                </Button>
+                            </SheetTrigger>
+                            <SheetContent className="w-[450px]">
+                                <SheetHeader>
+                                    <SheetTitle className="flex items-center justify-between">
+                                        <span>Templates de Receita</span>
+                                        <Dialog open={isSaveTemplateOpen} onOpenChange={setIsSaveTemplateOpen}>
+                                            <DialogTrigger asChild>
+                                                <Button size="sm" variant="outline">
+                                                    <Plus className="w-4 h-4 mr-1" /> Salvar Atual
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent>
+                                                <DialogHeader>
+                                                    <DialogTitle>Salvar como Template</DialogTitle>
+                                                </DialogHeader>
+                                                <div className="space-y-4 py-4">
+                                                    <div className="space-y-2">
+                                                        <Label>Nome do Template</Label>
+                                                        <Input
+                                                            placeholder="Ex: Vitamina B12 Injetável"
+                                                            value={templateName}
+                                                            onChange={(e) => setTemplateName(e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label>Categoria</Label>
+                                                        <select
+                                                            className="w-full border rounded-md px-3 py-2"
+                                                            value={templateCategory}
+                                                            onChange={(e) => setTemplateCategory(e.target.value)}
+                                                        >
+                                                            <option value="geral">Geral</option>
+                                                            <option value="vitaminas">Vitaminas</option>
+                                                            <option value="antibioticos">Antibióticos</option>
+                                                            <option value="analgesicos">Analgésicos</option>
+                                                            <option value="hormonios">Hormônios</option>
+                                                            <option value="outros">Outros</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <DialogFooter>
+                                                    <Button variant="outline" onClick={() => setIsSaveTemplateOpen(false)}>
+                                                        Cancelar
+                                                    </Button>
+                                                    <Button
+                                                        onClick={handleSaveAsTemplate}
+                                                        disabled={saveTemplateMutation.isPending}
+                                                    >
+                                                        {saveTemplateMutation.isPending ? (
+                                                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                                        ) : (
+                                                            <Save className="w-4 h-4 mr-2" />
+                                                        )}
+                                                        Salvar Template
+                                                    </Button>
+                                                </DialogFooter>
+                                            </DialogContent>
+                                        </Dialog>
+                                    </SheetTitle>
+                                </SheetHeader>
+                                <ScrollArea className="h-[calc(100vh-120px)] mt-4">
+                                    <div className="space-y-4 pr-4">
+                                        {/* Favorites Section */}
+                                        {favoriteTemplates.length > 0 && (
+                                            <div>
+                                                <h3 className="text-sm font-medium text-amber-600 mb-2 flex items-center">
+                                                    <Star className="w-4 h-4 mr-1 fill-amber-500" /> Favoritos
+                                                </h3>
+                                                <div className="space-y-2">
+                                                    {favoriteTemplates.map((template) => (
+                                                        <div
+                                                            key={template.id}
+                                                            className="p-3 border rounded-lg hover:bg-amber-50 transition-colors border-amber-200 bg-amber-50/50"
+                                                        >
+                                                            <div className="flex items-start justify-between">
+                                                                <div
+                                                                    className="flex-1 cursor-pointer"
+                                                                    onClick={() => handleLoadTemplate(template)}
+                                                                >
+                                                                    <p className="font-medium text-sm">{template.name}</p>
+                                                                    <div className="flex items-center gap-2 mt-1">
+                                                                        <Badge variant="outline" className="text-xs">
+                                                                            {template.category}
+                                                                        </Badge>
+                                                                        <span className="text-xs text-gray-500">
+                                                                            {template.usageCount}x usado
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="flex items-center gap-1">
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        className="h-7 w-7 p-0"
+                                                                        onClick={() => toggleFavoriteMutation.mutate(template.id)}
+                                                                    >
+                                                                        <Star className="w-4 h-4 fill-amber-500 text-amber-500" />
+                                                                    </Button>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        className="h-7 w-7 p-0 text-red-500 hover:text-red-600"
+                                                                        onClick={() => deleteTemplateMutation.mutate(template.id)}
+                                                                    >
+                                                                        <Trash2 className="w-4 h-4" />
+                                                                    </Button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Regular Templates */}
+                                        <div>
+                                            {favoriteTemplates.length > 0 && (
+                                                <h3 className="text-sm font-medium text-gray-500 mb-2">Todos</h3>
+                                            )}
+                                            <div className="space-y-2">
+                                                {templates.length === 0 ? (
+                                                    <p className="text-center text-gray-500 py-8">
+                                                        Nenhum template salvo.<br />
+                                                        <span className="text-sm">Clique em "Salvar Atual" para criar um.</span>
+                                                    </p>
+                                                ) : (
+                                                    regularTemplates.map((template) => (
+                                                        <div
+                                                            key={template.id}
+                                                            className="p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                                                        >
+                                                            <div className="flex items-start justify-between">
+                                                                <div
+                                                                    className="flex-1 cursor-pointer"
+                                                                    onClick={() => handleLoadTemplate(template)}
+                                                                >
+                                                                    <p className="font-medium text-sm">{template.name}</p>
+                                                                    <div className="flex items-center gap-2 mt-1">
+                                                                        <Badge variant="outline" className="text-xs">
+                                                                            {template.category}
+                                                                        </Badge>
+                                                                        <span className="text-xs text-gray-500">
+                                                                            {template.usageCount}x usado
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="flex items-center gap-1">
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        className="h-7 w-7 p-0"
+                                                                        onClick={() => toggleFavoriteMutation.mutate(template.id)}
+                                                                    >
+                                                                        <StarOff className="w-4 h-4 text-gray-400" />
+                                                                    </Button>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        className="h-7 w-7 p-0 text-red-500 hover:text-red-600"
+                                                                        onClick={() => deleteTemplateMutation.mutate(template.id)}
+                                                                    >
+                                                                        <Trash2 className="w-4 h-4" />
+                                                                    </Button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
                                 </ScrollArea>
                             </SheetContent>
