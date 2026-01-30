@@ -126,6 +126,54 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
         handleInput();
     };
 
+    // Keyboard shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (!editorRef.current?.contains(document.activeElement)) return;
+
+            const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+            const modifier = isMac ? e.metaKey : e.ctrlKey;
+
+            if (!modifier) return;
+
+            switch (e.key.toLowerCase()) {
+                case 'b':
+                    e.preventDefault();
+                    execCmd('bold');
+                    break;
+                case 'i':
+                    e.preventDefault();
+                    execCmd('italic');
+                    break;
+                case 'u':
+                    e.preventDefault();
+                    execCmd('underline');
+                    break;
+                case 'x':
+                    if (e.shiftKey) {
+                        e.preventDefault();
+                        execCmd('strikeThrough');
+                    }
+                    break;
+                case 'z':
+                    e.preventDefault();
+                    if (e.shiftKey) {
+                        execCmd('redo');
+                    } else {
+                        execCmd('undo');
+                    }
+                    break;
+                case 'y':
+                    e.preventDefault();
+                    execCmd('redo');
+                    break;
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, []);
+
     const handleLink = () => {
         const url = prompt('Enter a URL:', 'http://');
         if (url) execCmd('createLink', url);
