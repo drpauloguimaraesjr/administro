@@ -789,7 +789,16 @@ export default function PrescriptionPage() {
                     onClose={() => setIsPreviewModalOpen(false)}
                     content={editorContent}
                     params={printParams}
-                    patientName={patient.name}
+                    patient={{
+                        name: patient.name,
+                        cpf: patient.cpf,
+                        rg: patient.rg,
+                        gender: patient.gender === 'M' ? 'Masculino' : 'Feminino',
+                        phone: patient.phone,
+                        birthDate: patient.birthDate,
+                        address: patient.address ? `${patient.address}, ${patient.city || ''} - ${patient.state || ''}` : '',
+                        email: patient.email,
+                    }}
                     type={prescriptionType}
                 />
             )}
