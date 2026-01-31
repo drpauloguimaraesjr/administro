@@ -143,6 +143,12 @@ router.get('/stats', async (req: Request, res: Response) => {
                 const lastVisit = new Date(p.lastVisit || p.lastAppointment || p.createdAt || '2000-01-01');
                 return lastVisit < ninetyDaysAgo;
             }).length,
+            // Grade distribution
+            gradeAAA: patients.filter((p: any) => p.grade === 'AAA' || (p.score || 0) >= 80).length,
+            gradeAA: patients.filter((p: any) => p.grade === 'AA' || ((p.score || 0) >= 60 && (p.score || 0) < 80)).length,
+            gradeA: patients.filter((p: any) => p.grade === 'A' || ((p.score || 0) >= 40 && (p.score || 0) < 60)).length,
+            gradeB: patients.filter((p: any) => p.grade === 'B' || ((p.score || 0) >= 20 && (p.score || 0) < 40)).length,
+            gradeC: patients.filter((p: any) => p.grade === 'C' || (p.score || 0) < 20).length,
         };
 
         res.json(stats);
@@ -339,6 +345,132 @@ router.put('/:id/tags', async (req: Request, res: Response) => {
     }
 });
 
+// PUT /api/patients/:id/score - Atualizar score do paciente
+router.put('/:id/score', async (req: Request, res: Response) => {
+    try {
+        const db = getFirestore();
+        const { score, grade } = req.body;
+
+        // Validate score range
+        const validScore = Math.max(0, Math.min(100, score || 0));
+
+        // Calculate grade from score if not provided
+        let calculatedGrade = grade;
+        if (!calculatedGrade) {
+            if (validScore >= 80) calculatedGrade = 'AAA';
+            else if (validScore >= 60) calculatedGrade = 'AA';
+            else if (validScore >= 40) calculatedGrade = 'A';
+            else if (validScore >= 20) calculatedGrade = 'B';
+            else calculatedGrade = 'C';
+        }
+
+        await db.collection('patients')
+            .doc(req.params.id)
+            .update({
+                score: validScore,
+                grade: calculatedGrade,
+                scoreUpdatedAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            });
+
+        res.json({ success: true, score: validScore, grade: calculatedGrade });
+    } catch (error: any) {
+        console.error('Erro ao atualizar score:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// POST /api/patients/:id/calculate-score - Calcular score automaticamente
+router.post('/:id/calculate-score', async (req: Request, res: Response) => {
+    try {
+        const db = getFirestore();
+        const patientId = req.params.id;
+
+        // Get patient data
+        const patientDoc = await db.collection('patients').doc(patientId).get();
+        if (!patientDoc.exists) {
+            return res.status(404).json({ error: 'Paciente não encontrado' });
+        }
+
+        const patient = patientDoc.data() as any;
+        const now = new Date();
+        let score = 0;
+
+        // 1. Frequência de consultas (appointments count)
+        const appointmentsCount = patient.appointmentsCount || 0;
+        score += Math.min(appointmentsCount * 10, 40);
+
+        // 2. Tempo como paciente (loyalty)
+        if (patient.createdAt) {
+            const createdDate = new Date(patient.createdAt);
+            const yearsAsPatient = (now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24 * 365);
+            score += Math.min(Math.floor(yearsAsPatient) * 5, 20);
+        }
+
+        // 3. Indicações
+        const referralsCount = patient.referralsCount || 0;
+        score += Math.min(referralsCount * 15, 30);
+
+        // 4. Pagamento em dia
+        if (!patient.hasPaymentDelay) {
+            score += 10;
+        }
+
+        // 5. Engajamento WhatsApp
+        if (patient.whatsappEngaged) {
+            score += 5;
+        }
+
+        // 6. Procedimentos
+        const proceduresCount = patient.proceduresCount || 0;
+        score += Math.min(proceduresCount * 5, 20);
+
+        // 7. Inatividade (penalidade)
+        if (patient.lastVisit) {
+            const lastVisitDate = new Date(patient.lastVisit);
+            const daysSinceVisit = (now.getTime() - lastVisitDate.getTime()) / (1000 * 60 * 60 * 24);
+            const inactivePeriods = Math.floor(daysSinceVisit / 90);
+            score -= inactivePeriods * 10;
+        }
+
+        // Ensure score is between 0 and 100
+        score = Math.max(0, Math.min(100, Math.round(score)));
+
+        // Calculate grade
+        let grade: string;
+        if (score >= 80) grade = 'AAA';
+        else if (score >= 60) grade = 'AA';
+        else if (score >= 40) grade = 'A';
+        else if (score >= 20) grade = 'B';
+        else grade = 'C';
+
+        // Update patient
+        await db.collection('patients').doc(patientId).update({
+            score,
+            grade,
+            scoreUpdatedAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        });
+
+        res.json({
+            success: true,
+            score,
+            grade,
+            breakdown: {
+                appointments: Math.min(appointmentsCount * 10, 40),
+                loyalty: patient.createdAt ? Math.min(Math.floor((now.getTime() - new Date(patient.createdAt).getTime()) / (1000 * 60 * 60 * 24 * 365)) * 5, 20) : 0,
+                referrals: Math.min(referralsCount * 15, 30),
+                payment: !patient.hasPaymentDelay ? 10 : 0,
+                whatsapp: patient.whatsappEngaged ? 5 : 0,
+                procedures: Math.min(proceduresCount * 5, 20),
+            }
+        });
+    } catch (error: any) {
+        console.error('Erro ao calcular score:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // POST /api/patients - Criar paciente
 router.post('/', async (req: Request, res: Response) => {
     try {
@@ -349,6 +481,8 @@ router.post('/', async (req: Request, res: Response) => {
             ...req.body,
             tags: req.body.tags || ['Novo'],
             status: 'active',
+            score: 30, // Score inicial para novos pacientes
+            grade: 'B', // Grade inicial
             createdAt: now,
             updatedAt: now
         };

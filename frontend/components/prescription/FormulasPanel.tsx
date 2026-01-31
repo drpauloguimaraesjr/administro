@@ -181,6 +181,18 @@ function FormulaCard({ formula, onSelect }: { formula: PrescriptionFormula; onSe
                     <div className="group relative bg-white border border-gray-200 rounded-lg p-3 hover:border-purple-300 hover:shadow-md transition-all cursor-default">
 
                         <div className="flex justify-between items-start gap-3">
+                            <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-8 w-8 text-gray-300 hover:text-purple-600 hover:bg-purple-50 rounded-full shrink-0 -ml-1 -mt-1"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onSelect();
+                                }}
+                            >
+                                <Plus className="w-5 h-5" />
+                            </Button>
+
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-1.5 mb-1">
                                     <div className={`p-1 rounded-md ${formula.category === 'Hormônios' ? 'bg-orange-100 text-orange-600' : 'bg-blue-50 text-blue-600'}`}>
@@ -203,18 +215,6 @@ function FormulaCard({ formula, onSelect }: { formula: PrescriptionFormula; onSe
                                     </div>
                                 </div>
                             </div>
-
-                            <Button
-                                size="icon"
-                                variant="ghost"
-                                className="h-8 w-8 text-gray-300 hover:text-purple-600 hover:bg-purple-50 rounded-full shrink-0 -mr-1 -mt-1"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    onSelect();
-                                }}
-                            >
-                                <Plus className="w-5 h-5" />
-                            </Button>
                         </div>
                     </div>
                 </TooltipTrigger>
