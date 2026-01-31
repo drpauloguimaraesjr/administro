@@ -186,7 +186,7 @@ export default function PatientsPage() {
                         />
                     </div>
 
-                    {/* Patients Grid */}
+                    {/* Patients List - Layout Vertical */}
                     {isLoading ? (
                         <div className="text-center py-12 text-muted-foreground">
                             Carregando pacientes...
@@ -205,23 +205,113 @@ export default function PatientsPage() {
                             </Button>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {patients.map((patient: any) => (
-                                <motion.div
-                                    key={patient.id}
-                                    initial={{ opacity: 0, scale: 0.95 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-5 border border-slate-200 dark:border-slate-700 hover:border-teal-500 transition-all"
-                                >
-                                    <div className="flex justify-between items-start mb-3">
-                                        <Link href={`/patients/${patient.id}`} className="hover:underline">
-                                            <h3 className="font-semibold text-lg">{patient.name}</h3>
-                                        </Link>
-                                        <div className="flex gap-1">
+                        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+                            {/* Header da lista */}
+                            <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                <div className="col-span-4">Paciente</div>
+                                <div className="col-span-5 text-center">Relacionamento</div>
+                                <div className="col-span-2 text-center">Score</div>
+                                <div className="col-span-1 text-right">Ações</div>
+                            </div>
+
+                            {/* Lista de pacientes */}
+                            <div className="divide-y divide-slate-100 dark:divide-slate-700">
+                                {patients.map((patient: any) => (
+                                    <motion.div
+                                        key={patient.id}
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors items-center"
+                                    >
+                                        {/* Coluna 1: Dados do Paciente */}
+                                        <div className="col-span-4">
+                                            <Link href={`/patients/${patient.id}`} className="group">
+                                                <h3 className="font-semibold text-slate-900 dark:text-white group-hover:text-teal-600 transition-colors">
+                                                    {patient.name}
+                                                </h3>
+                                            </Link>
+                                            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-sm text-slate-500">
+                                                <span>CPF: {patient.cpf || '-'}</span>
+                                                <span>{calculateAge(patient.birthDate)}</span>
+                                            </div>
+                                            <div className="flex gap-3 mt-2 text-xs text-slate-400">
+                                                {patient.phone && (
+                                                    <span className="flex items-center gap-1">
+                                                        <Phone className="w-3 h-3" />
+                                                        {patient.phone}
+                                                    </span>
+                                                )}
+                                                {patient.email && (
+                                                    <span className="flex items-center gap-1">
+                                                        <Mail className="w-3 h-3" />
+                                                        {patient.email}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Coluna 2: Informações de Relacionamento */}
+                                        <div className="col-span-5">
+                                            <div className="grid grid-cols-3 gap-4 text-center">
+                                                {/* Desde */}
+                                                <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-2">
+                                                    <p className="text-[10px] uppercase text-slate-400 font-medium">Desde</p>
+                                                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                                                        {patient.createdAt
+                                                            ? new Date(patient.createdAt).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })
+                                                            : '-'
+                                                        }
+                                                    </p>
+                                                </div>
+
+                                                {/* Indicado por */}
+                                                <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-2">
+                                                    <p className="text-[10px] uppercase text-slate-400 font-medium">Indicado por</p>
+                                                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 truncate" title={patient.referredBy || '-'}>
+                                                        {patient.referredBy || '-'}
+                                                    </p>
+                                                </div>
+
+                                                {/* Indicações feitas */}
+                                                <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-2">
+                                                    <p className="text-[10px] uppercase text-slate-400 font-medium">Indicou</p>
+                                                    <p className="text-sm font-semibold text-teal-600">
+                                                        {patient.referralsCount || 0} pessoas
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Coluna 3: Score */}
+                                        <div className="col-span-2 text-center">
+                                            {patient.grade ? (
+                                                <div className="inline-flex flex-col items-center">
+                                                    <span className={`
+                                                        text-lg font-bold px-3 py-1 rounded-full
+                                                        ${patient.grade === 'AAA' ? 'bg-amber-100 text-amber-700' : ''}
+                                                        ${patient.grade === 'AA' ? 'bg-yellow-100 text-yellow-700' : ''}
+                                                        ${patient.grade === 'A' ? 'bg-slate-100 text-slate-600' : ''}
+                                                        ${patient.grade === 'B' ? 'bg-blue-100 text-blue-700' : ''}
+                                                        ${patient.grade === 'C' ? 'bg-red-100 text-red-700' : ''}
+                                                    `}>
+                                                        {patient.grade}
+                                                    </span>
+                                                    <span className="text-[10px] text-slate-400 mt-1">
+                                                        {patient.score || 0} pts
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <span className="text-xs text-slate-400">-</span>
+                                            )}
+                                        </div>
+
+                                        {/* Coluna 4: Ações */}
+                                        <div className="col-span-1 flex justify-end gap-1">
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => handleEdit(patient)}
+                                                className="h-8 w-8 p-0"
                                             >
                                                 <Edit className="w-4 h-4" />
                                             </Button>
@@ -229,39 +319,21 @@ export default function PatientsPage() {
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => handleDelete(patient)}
-                                                className="text-red-500 hover:text-red-700"
+                                                className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>
                                         </div>
-                                    </div>
+                                    </motion.div>
+                                ))}
+                            </div>
 
-                                    <div className="space-y-2 text-sm text-muted-foreground">
-                                        <p>CPF: {patient.cpf || '-'}</p>
-                                        <p>Idade: {calculateAge(patient.birthDate)}</p>
-                                        {patient.phone && (
-                                            <p className="flex items-center gap-2">
-                                                <Phone className="w-3 h-3" />
-                                                {patient.phone}
-                                            </p>
-                                        )}
-                                        {patient.email && (
-                                            <p className="flex items-center gap-2">
-                                                <Mail className="w-3 h-3" />
-                                                {patient.email}
-                                            </p>
-                                        )}
-                                    </div>
-
-                                    <div className="mt-4 pt-3 border-t">
-                                        <Link href={`/patients/${patient.id}`}>
-                                            <Button variant="outline" size="sm" className="w-full">
-                                                Ver Detalhes
-                                            </Button>
-                                        </Link>
-                                    </div>
-                                </motion.div>
-                            ))}
+                            {/* Footer com contagem */}
+                            <div className="px-6 py-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700">
+                                <p className="text-sm text-slate-500">
+                                    Total: <span className="font-semibold text-slate-700">{patients.length}</span> pacientes
+                                </p>
+                            </div>
                         </div>
                     )}
                 </motion.div>
