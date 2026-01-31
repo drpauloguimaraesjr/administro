@@ -234,7 +234,7 @@ export default function PatientsPage() {
                                                 <span>CPF: {patient.cpf || '-'}</span>
                                                 <span>{calculateAge(patient.birthDate)}</span>
                                             </div>
-                                            <div className="flex gap-3 mt-2 text-xs text-slate-400">
+                                            <div className="flex flex-wrap gap-3 mt-2 text-xs text-slate-400">
                                                 {patient.phone && (
                                                     <span className="flex items-center gap-1">
                                                         <Phone className="w-3 h-3" />
@@ -245,6 +245,11 @@ export default function PatientsPage() {
                                                     <span className="flex items-center gap-1">
                                                         <Mail className="w-3 h-3" />
                                                         {patient.email}
+                                                    </span>
+                                                )}
+                                                {patient.city && (
+                                                    <span className="flex items-center gap-1">
+                                                        📍 {patient.city}
                                                     </span>
                                                 )}
                                             </div>
