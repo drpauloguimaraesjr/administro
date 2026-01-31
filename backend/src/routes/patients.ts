@@ -396,42 +396,66 @@ router.post('/:id/calculate-score', async (req: Request, res: Response) => {
         const now = new Date();
         let score = 0;
 
-        // 1. Frequência de consultas (appointments count)
-        const appointmentsCount = patient.appointmentsCount || 0;
-        score += Math.min(appointmentsCount * 10, 40);
+        // ============================================
+        // SCORE BASEADO EM VALOR DE NEGÓCIO
+        // ============================================
 
-        // 2. Tempo como paciente (loyalty)
+        // 1. TOTAL GASTO NA CLÍNICA (até 35 pontos) - PRINCIPAL
+        const totalSpent = patient.totalSpent || 0;
+        const spendingTiers = [
+            { min: 50000, points: 35 },
+            { min: 30000, points: 30 },
+            { min: 20000, points: 25 },
+            { min: 10000, points: 20 },
+            { min: 5000, points: 15 },
+            { min: 2000, points: 10 },
+            { min: 1000, points: 5 },
+        ];
+        let spendingPoints = 0;
+        for (const tier of spendingTiers) {
+            if (totalSpent >= tier.min) {
+                spendingPoints = tier.points;
+                break;
+            }
+        }
+        score += spendingPoints;
+
+        // 2. TICKET MÉDIO (até 15 pontos)
+        const averageTicket = patient.averageTicket || 0;
+        const ticketTiers = [
+            { min: 5000, points: 15 },
+            { min: 3000, points: 12 },
+            { min: 2000, points: 10 },
+            { min: 1000, points: 7 },
+            { min: 500, points: 5 },
+        ];
+        let ticketPoints = 0;
+        for (const tier of ticketTiers) {
+            if (averageTicket >= tier.min) {
+                ticketPoints = tier.points;
+                break;
+            }
+        }
+        score += ticketPoints;
+
+        // 3. MEMBROS DA FAMÍLIA NA CLÍNICA (até 20 pontos)
+        const familyMembersCount = patient.familyMembersCount || 0;
+        const familyPoints = Math.min(familyMembersCount * 5, 20);
+        score += familyPoints;
+
+        // 4. INDICAÇÕES (até 15 pontos)
+        const referralsCount = patient.referralsCount || 0;
+        const referralPoints = Math.min(referralsCount * 3, 15);
+        score += referralPoints;
+
+        // 5. TEMPO COMO PACIENTE (até 15 pontos)
+        let loyaltyPoints = 0;
         if (patient.createdAt) {
             const createdDate = new Date(patient.createdAt);
             const yearsAsPatient = (now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24 * 365);
-            score += Math.min(Math.floor(yearsAsPatient) * 5, 20);
+            loyaltyPoints = Math.min(Math.floor(yearsAsPatient) * 3, 15);
         }
-
-        // 3. Indicações
-        const referralsCount = patient.referralsCount || 0;
-        score += Math.min(referralsCount * 15, 30);
-
-        // 4. Pagamento em dia
-        if (!patient.hasPaymentDelay) {
-            score += 10;
-        }
-
-        // 5. Engajamento WhatsApp
-        if (patient.whatsappEngaged) {
-            score += 5;
-        }
-
-        // 6. Procedimentos
-        const proceduresCount = patient.proceduresCount || 0;
-        score += Math.min(proceduresCount * 5, 20);
-
-        // 7. Inatividade (penalidade)
-        if (patient.lastVisit) {
-            const lastVisitDate = new Date(patient.lastVisit);
-            const daysSinceVisit = (now.getTime() - lastVisitDate.getTime()) / (1000 * 60 * 60 * 24);
-            const inactivePeriods = Math.floor(daysSinceVisit / 90);
-            score -= inactivePeriods * 10;
-        }
+        score += loyaltyPoints;
 
         // Ensure score is between 0 and 100
         score = Math.max(0, Math.min(100, Math.round(score)));
@@ -457,12 +481,11 @@ router.post('/:id/calculate-score', async (req: Request, res: Response) => {
             score,
             grade,
             breakdown: {
-                appointments: Math.min(appointmentsCount * 10, 40),
-                loyalty: patient.createdAt ? Math.min(Math.floor((now.getTime() - new Date(patient.createdAt).getTime()) / (1000 * 60 * 60 * 24 * 365)) * 5, 20) : 0,
-                referrals: Math.min(referralsCount * 15, 30),
-                payment: !patient.hasPaymentDelay ? 10 : 0,
-                whatsapp: patient.whatsappEngaged ? 5 : 0,
-                procedures: Math.min(proceduresCount * 5, 20),
+                totalSpent: { value: totalSpent, points: spendingPoints, maxPoints: 35 },
+                averageTicket: { value: averageTicket, points: ticketPoints, maxPoints: 15 },
+                familyMembers: { count: familyMembersCount, points: familyPoints, maxPoints: 20 },
+                referrals: { count: referralsCount, points: referralPoints, maxPoints: 15 },
+                loyalty: { years: loyaltyPoints / 3, points: loyaltyPoints, maxPoints: 15 },
             }
         });
     } catch (error: any) {

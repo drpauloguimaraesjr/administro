@@ -1,5 +1,6 @@
 // lib/patient-scoring.ts
 // Sistema de classificação de pacientes por score (AAA, AA, A, B, C)
+// FOCO: Valor de negócio (gasto, ticket médio, família, indicações, tempo)
 
 export type PatientGrade = 'AAA' | 'AA' | 'A' | 'B' | 'C';
 
@@ -14,52 +15,72 @@ export interface PatientScoreResult {
 }
 
 export interface PatientScoreInput {
-    // Dados do paciente
-    createdAt?: string;
-    lastVisit?: string;
+    // Dados financeiros (PRINCIPAL)
+    totalSpent?: number; // Total gasto na clínica (R$)
+    averageTicket?: number; // Ticket médio por consulta/procedimento
+
+    // Família e relacionamento
+    familyMembersCount?: number; // Quantidade de familiares na clínica
+    referralsCount?: number; // Quantidade de indicações feitas
+
+    // Tempo e fidelidade
+    createdAt?: string; // Data de cadastro
+    lastVisit?: string; // Última visita
+
+    // Extras
     appointmentsCount?: number;
-    referralsCount?: number;
-    hasPaymentDelay?: boolean;
-    whatsappEngaged?: boolean;
     proceduresCount?: number;
     tags?: string[];
-    totalSpent?: number;
 }
 
-// Configuração de pontos
+// Configuração de pontos baseada em VALOR DE NEGÓCIO
 const SCORE_CONFIG = {
-    // Frequência de consultas nos últimos 12 meses
-    appointmentPoints: 10, // +10 pts por consulta
-    maxAppointmentPoints: 40, // máximo de 40 pts
+    // 1. TOTAL GASTO NA CLÍNICA (até 35 pontos) - PRINCIPAL
+    spending: {
+        tiers: [
+            { min: 50000, points: 35 },  // R$ 50k+ = 35 pts
+            { min: 30000, points: 30 },  // R$ 30k+ = 30 pts
+            { min: 20000, points: 25 },  // R$ 20k+ = 25 pts
+            { min: 10000, points: 20 },  // R$ 10k+ = 20 pts
+            { min: 5000, points: 15 },   // R$ 5k+  = 15 pts
+            { min: 2000, points: 10 },   // R$ 2k+  = 10 pts
+            { min: 1000, points: 5 },    // R$ 1k+  = 5 pts
+            { min: 0, points: 0 },
+        ],
+    },
 
-    // Tempo como paciente
-    yearlyLoyaltyPoints: 5, // +5 pts por ano
-    maxLoyaltyPoints: 20, // máximo de 20 pts
+    // 2. TICKET MÉDIO (até 15 pontos)
+    averageTicket: {
+        tiers: [
+            { min: 5000, points: 15 },  // R$ 5k+ = 15 pts
+            { min: 3000, points: 12 },  // R$ 3k+ = 12 pts
+            { min: 2000, points: 10 },  // R$ 2k+ = 10 pts
+            { min: 1000, points: 7 },   // R$ 1k+ = 7 pts
+            { min: 500, points: 5 },    // R$ 500+ = 5 pts
+            { min: 0, points: 0 },
+        ],
+    },
 
-    // Indicações
-    referralPoints: 15, // +15 pts por indicação
-    maxReferralPoints: 30, // máximo de 30 pts
+    // 3. MEMBROS DA FAMÍLIA NA CLÍNICA (até 20 pontos)
+    familyMembers: {
+        pointsPerMember: 5,  // +5 pts por familiar
+        maxPoints: 20,        // máximo 20 pts (4 familiares)
+    },
 
-    // Pagamento em dia
-    paymentOnTimePoints: 10, // +10 pts
+    // 4. INDICAÇÕES (até 15 pontos)
+    referrals: {
+        pointsPerReferral: 3, // +3 pts por indicação
+        maxPoints: 15,        // máximo 15 pts (5 indicações)
+    },
 
-    // Engajamento WhatsApp
-    whatsappEngagementPoints: 5, // +5 pts
-
-    // Procedimentos realizados
-    procedurePoints: 5, // +5 pts por procedimento
-    maxProcedurePoints: 20, // máximo de 20 pts
-
-    // Inatividade (penalidade)
-    inactivityPenalty: -10, // -10 pts a cada 90 dias sem consulta
-
-    // Valor gasto
-    spendingTiers: [
-        { min: 10000, points: 15 },
-        { min: 5000, points: 10 },
-        { min: 2000, points: 5 },
-    ],
+    // 5. TEMPO COMO PACIENTE (até 15 pontos)
+    loyalty: {
+        pointsPerYear: 3,    // +3 pts por ano
+        maxPoints: 15,       // máximo 15 pts (5 anos)
+    },
 };
+
+// Total máximo possível: 35 + 15 + 20 + 15 + 15 = 100 pontos
 
 // Classificação por faixas
 const GRADE_CONFIG: Record<PatientGrade, { min: number; max: number; label: string; emoji: string; color: string; bgColor: string; borderColor: string }> = {
@@ -71,71 +92,15 @@ const GRADE_CONFIG: Record<PatientGrade, { min: number; max: number; label: stri
 };
 
 /**
- * Calcula o score de um paciente baseado em múltiplos fatores
+ * Calcula o score de um paciente baseado em VALOR DE NEGÓCIO
  */
 export function calculatePatientScore(input: PatientScoreInput): PatientScoreResult {
     let score = 0;
     const now = new Date();
 
-    // 1. Frequência de consultas
-    if (input.appointmentsCount) {
-        const appointmentPts = Math.min(
-            input.appointmentsCount * SCORE_CONFIG.appointmentPoints,
-            SCORE_CONFIG.maxAppointmentPoints
-        );
-        score += appointmentPts;
-    }
-
-    // 2. Tempo como paciente (lealdade)
-    if (input.createdAt) {
-        const createdDate = new Date(input.createdAt);
-        const yearsAsPatient = (now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24 * 365);
-        const loyaltyPts = Math.min(
-            Math.floor(yearsAsPatient) * SCORE_CONFIG.yearlyLoyaltyPoints,
-            SCORE_CONFIG.maxLoyaltyPoints
-        );
-        score += loyaltyPts;
-    }
-
-    // 3. Indicações
-    if (input.referralsCount) {
-        const referralPts = Math.min(
-            input.referralsCount * SCORE_CONFIG.referralPoints,
-            SCORE_CONFIG.maxReferralPoints
-        );
-        score += referralPts;
-    }
-
-    // 4. Pagamento em dia
-    if (!input.hasPaymentDelay) {
-        score += SCORE_CONFIG.paymentOnTimePoints;
-    }
-
-    // 5. Engajamento WhatsApp
-    if (input.whatsappEngaged) {
-        score += SCORE_CONFIG.whatsappEngagementPoints;
-    }
-
-    // 6. Procedimentos realizados
-    if (input.proceduresCount) {
-        const procedurePts = Math.min(
-            input.proceduresCount * SCORE_CONFIG.procedurePoints,
-            SCORE_CONFIG.maxProcedurePoints
-        );
-        score += procedurePts;
-    }
-
-    // 7. Inatividade (penalidade)
-    if (input.lastVisit) {
-        const lastVisitDate = new Date(input.lastVisit);
-        const daysSinceVisit = (now.getTime() - lastVisitDate.getTime()) / (1000 * 60 * 60 * 24);
-        const inactivePeriods = Math.floor(daysSinceVisit / 90);
-        score += inactivePeriods * SCORE_CONFIG.inactivityPenalty;
-    }
-
-    // 8. Valor gasto
-    if (input.totalSpent) {
-        for (const tier of SCORE_CONFIG.spendingTiers) {
+    // 1. TOTAL GASTO NA CLÍNICA (peso 35% - principal critério)
+    if (input.totalSpent !== undefined) {
+        for (const tier of SCORE_CONFIG.spending.tiers) {
             if (input.totalSpent >= tier.min) {
                 score += tier.points;
                 break;
@@ -143,20 +108,54 @@ export function calculatePatientScore(input: PatientScoreInput): PatientScoreRes
         }
     }
 
-    // 9. Bônus por tags especiais
-    if (input.tags?.includes('Indicação')) {
-        score += 5;
+    // 2. TICKET MÉDIO (peso 15%)
+    if (input.averageTicket !== undefined) {
+        for (const tier of SCORE_CONFIG.averageTicket.tiers) {
+            if (input.averageTicket >= tier.min) {
+                score += tier.points;
+                break;
+            }
+        }
+    }
+
+    // 3. MEMBROS DA FAMÍLIA NA CLÍNICA (peso 20%)
+    if (input.familyMembersCount) {
+        const familyPts = Math.min(
+            input.familyMembersCount * SCORE_CONFIG.familyMembers.pointsPerMember,
+            SCORE_CONFIG.familyMembers.maxPoints
+        );
+        score += familyPts;
+    }
+
+    // 4. INDICAÇÕES (peso 15%)
+    if (input.referralsCount) {
+        const referralPts = Math.min(
+            input.referralsCount * SCORE_CONFIG.referrals.pointsPerReferral,
+            SCORE_CONFIG.referrals.maxPoints
+        );
+        score += referralPts;
+    }
+
+    // 5. TEMPO COMO PACIENTE (peso 15%)
+    if (input.createdAt) {
+        const createdDate = new Date(input.createdAt);
+        const yearsAsPatient = (now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24 * 365);
+        const loyaltyPts = Math.min(
+            Math.floor(yearsAsPatient) * SCORE_CONFIG.loyalty.pointsPerYear,
+            SCORE_CONFIG.loyalty.maxPoints
+        );
+        score += loyaltyPts;
     }
 
     // Garantir que o score fique entre 0 e 100
-    score = Math.max(0, Math.min(100, score));
+    score = Math.max(0, Math.min(100, Math.round(score)));
 
     // Determinar o grade
     const grade = getGradeFromScore(score);
     const gradeConfig = GRADE_CONFIG[grade];
 
     return {
-        score: Math.round(score),
+        score,
         grade,
         label: gradeConfig.label,
         emoji: gradeConfig.emoji,
@@ -187,9 +186,59 @@ export function getGradeInfo(grade: PatientGrade) {
 /**
  * Lista todos os grades disponíveis
  */
-export function getAllGrades(): Array<PatientGrade & { config: typeof GRADE_CONFIG[PatientGrade] }> {
+export function getAllGrades() {
     return Object.entries(GRADE_CONFIG).map(([grade, config]) => ({
         grade: grade as PatientGrade,
         ...config,
-    })) as any;
+    }));
+}
+
+/**
+ * Calcula breakdown detalhado do score
+ */
+export function getScoreBreakdown(input: PatientScoreInput) {
+    const now = new Date();
+
+    let spendingPoints = 0;
+    if (input.totalSpent !== undefined) {
+        for (const tier of SCORE_CONFIG.spending.tiers) {
+            if (input.totalSpent >= tier.min) {
+                spendingPoints = tier.points;
+                break;
+            }
+        }
+    }
+
+    let ticketPoints = 0;
+    if (input.averageTicket !== undefined) {
+        for (const tier of SCORE_CONFIG.averageTicket.tiers) {
+            if (input.averageTicket >= tier.min) {
+                ticketPoints = tier.points;
+                break;
+            }
+        }
+    }
+
+    const familyPoints = input.familyMembersCount
+        ? Math.min(input.familyMembersCount * SCORE_CONFIG.familyMembers.pointsPerMember, SCORE_CONFIG.familyMembers.maxPoints)
+        : 0;
+
+    const referralPoints = input.referralsCount
+        ? Math.min(input.referralsCount * SCORE_CONFIG.referrals.pointsPerReferral, SCORE_CONFIG.referrals.maxPoints)
+        : 0;
+
+    let loyaltyPoints = 0;
+    if (input.createdAt) {
+        const createdDate = new Date(input.createdAt);
+        const yearsAsPatient = (now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24 * 365);
+        loyaltyPoints = Math.min(Math.floor(yearsAsPatient) * SCORE_CONFIG.loyalty.pointsPerYear, SCORE_CONFIG.loyalty.maxPoints);
+    }
+
+    return {
+        totalSpent: { points: spendingPoints, maxPoints: 35, value: input.totalSpent || 0 },
+        averageTicket: { points: ticketPoints, maxPoints: 15, value: input.averageTicket || 0 },
+        familyMembers: { points: familyPoints, maxPoints: 20, count: input.familyMembersCount || 0 },
+        referrals: { points: referralPoints, maxPoints: 15, count: input.referralsCount || 0 },
+        loyalty: { points: loyaltyPoints, maxPoints: 15, years: input.createdAt ? Math.floor((now.getTime() - new Date(input.createdAt).getTime()) / (1000 * 60 * 60 * 24 * 365)) : 0 },
+    };
 }
