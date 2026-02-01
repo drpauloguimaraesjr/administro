@@ -81,4 +81,17 @@ router.patch('/:id/stage', async (req, res) => {
     }
 });
 
+// PATCH /api/leads/:id/assign - Atribuir lead a membro da equipe
+router.patch('/:id/assign', async (req, res) => {
+    try {
+        const { assignedTo } = req.body;
+        // assignedTo pode ser null (remover atribuição) ou string (ID do membro)
+        await LeadsService.assignTo(req.params.id, assignedTo);
+        res.status(200).json({ success: true });
+    } catch (error) {
+        console.error('Error assigning lead:', error);
+        res.status(500).json({ error: 'Failed to assign lead' });
+    }
+});
+
 export default router;

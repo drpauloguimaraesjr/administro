@@ -29,7 +29,7 @@ const COLUMNS: { id: LeadStage; title: string; color: string; emoji: string }[] 
 ];
 
 export function KanbanBoard() {
-    const { leads, moveLead, isLoading } = useLeads();
+    const { leads, moveLead, assignLead, isLoading } = useLeads();
     const [activeId, setActiveId] = useState<string | null>(null);
 
     const sensors = useSensors(
@@ -81,6 +81,11 @@ export function KanbanBoard() {
         setActiveId(null);
     };
 
+    // Handler para atribuir lead a membro da equipe
+    const handleAssign = (leadId: string, memberId: string | null) => {
+        assignLead({ id: leadId, assignedTo: memberId });
+    };
+
     const activeLead = activeId ? leads.find(l => l.id === activeId) : null;
 
     if (isLoading) {
@@ -106,13 +111,14 @@ export function KanbanBoard() {
                         <KanbanColumnComponent
                             key={col.id}
                             column={{ ...col, leads: columnLeads }}
+                            onAssign={handleAssign}
                         />
                     );
                 })}
             </div>
 
             <DragOverlay>
-                {activeLead ? <LeadCard lead={activeLead} /> : null}
+                {activeLead ? <LeadCard lead={activeLead} onAssign={handleAssign} /> : null}
             </DragOverlay>
         </DndContext>
     );

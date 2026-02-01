@@ -35,6 +35,11 @@ export const leadsService = {
         await api.patch(`/leads/${id}/stage`, { stage });
     },
 
+    // Atribuir lead a um membro da equipe
+    assignTo: async (id: string, assignedTo: string | null): Promise<void> => {
+        await api.patch(`/leads/${id}/assign`, { assignedTo });
+    },
+
     // Deletar lead
     delete: async (id: string): Promise<void> => {
         await api.delete(`/leads/${id}`);

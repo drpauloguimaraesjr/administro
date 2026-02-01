@@ -59,12 +59,45 @@ export function useLeads() {
         },
     });
 
+    // Mutation: Atribuir Lead a um membro da equipe
+    const assignLeadMutation = useMutation({
+        mutationFn: ({ id, assignedTo }: { id: string; assignedTo: string | null }) =>
+            leadsService.assignTo(id, assignedTo),
+        onMutate: async ({ id, assignedTo }) => {
+            await queryClient.cancelQueries({ queryKey: ['leads'] });
+
+            const previousLeads = queryClient.getQueryData<Lead[]>(['leads']);
+
+            if (previousLeads) {
+                queryClient.setQueryData<Lead[]>(['leads'], (old) =>
+                    old?.map(lead => lead.id === id ? {
+                        ...lead,
+                        assignedTo: assignedTo || undefined,
+                        assignedAt: assignedTo ? new Date().toISOString() : undefined
+                    } : lead) || []
+                );
+            }
+
+            return { previousLeads };
+        },
+        onError: (err, variables, context) => {
+            if (context?.previousLeads) {
+                queryClient.setQueryData(['leads'], context.previousLeads);
+            }
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: ['leads'] });
+        },
+    });
+
     return {
         leads,
         isLoading,
         error,
         createLead: createLeadMutation.mutateAsync,
         moveLead: moveLeadMutation.mutate,
-        isMoving: moveLeadMutation.isLoading
+        assignLead: assignLeadMutation.mutate,
+        isMoving: moveLeadMutation.isPending,
+        isAssigning: assignLeadMutation.isPending,
     };
 }

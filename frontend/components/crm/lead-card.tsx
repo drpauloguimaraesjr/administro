@@ -18,10 +18,12 @@ import Link from 'next/link';
 import { Lead } from '@/types/crm';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { cn } from '@/lib/utils'; // Assuming shadcn utils exist, usually in lib/utils
+import { cn } from '@/lib/utils';
+import { AssigneeDropdown, AssigneeBadge } from './assignee-dropdown';
 
 interface LeadCardProps {
     lead: Lead;
+    onAssign?: (leadId: string, memberId: string | null) => void;
 }
 
 const urgencyColors = {
@@ -41,7 +43,7 @@ const sourceIcons = {
     other: <span className="text-[10px]">...</span>,
 };
 
-export function LeadCard({ lead }: LeadCardProps) {
+export function LeadCard({ lead, onAssign }: LeadCardProps) {
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
         id: lead.id,
         data: { lead },
@@ -50,6 +52,13 @@ export function LeadCard({ lead }: LeadCardProps) {
     const style = transform ? {
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
     } : undefined;
+
+    const handleAssign = (memberId: string | null) => {
+        if (onAssign) {
+            onAssign(lead.id, memberId);
+        }
+    };
+
 
     return (
         <Card
@@ -110,18 +119,30 @@ export function LeadCard({ lead }: LeadCardProps) {
                 )}
             </CardContent>
 
-            <CardFooter className="p-2 pt-0 flex justify-between border-t mt-2 pt-2 gap-1">
-                <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-green-600 hover:bg-green-50">
-                    <MessageCircle className="w-4 h-4" />
-                </Button>
-                <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-blue-600 hover:bg-blue-50">
-                    <Phone className="w-4 h-4" />
-                </Button>
-                <Link href={`/crm/leads/${lead.id}`}>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-purple-600 hover:bg-purple-50 ml-auto">
-                        <Eye className="w-4 h-4" />
+            <CardFooter className="p-2 pt-0 flex justify-between items-center border-t mt-2 pt-2 gap-1">
+                {/* Dropdown de Atribuição */}
+                <div onPointerDown={(e) => e.stopPropagation()}>
+                    <AssigneeDropdown
+                        value={lead.assignedTo}
+                        onChange={handleAssign}
+                        compact
+                    />
+                </div>
+
+                {/* Ações */}
+                <div className="flex items-center gap-0.5 ml-auto">
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-green-600 hover:bg-green-50">
+                        <MessageCircle className="w-4 h-4" />
                     </Button>
-                </Link>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-blue-600 hover:bg-blue-50">
+                        <Phone className="w-4 h-4" />
+                    </Button>
+                    <Link href={`/crm/leads/${lead.id}`}>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-purple-600 hover:bg-purple-50">
+                            <Eye className="w-4 h-4" />
+                        </Button>
+                    </Link>
+                </div>
             </CardFooter>
         </Card>
     );

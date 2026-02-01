@@ -10,9 +10,10 @@ import { Button } from '@/components/ui/button';
 
 interface KanbanColumnProps {
     column: IKanbanColumn;
+    onAssign?: (leadId: string, memberId: string | null) => void;
 }
 
-export function KanbanColumn({ column }: KanbanColumnProps) {
+export function KanbanColumn({ column, onAssign }: KanbanColumnProps) {
     const { setNodeRef, isOver } = useDroppable({
         id: column.id,
     });
@@ -53,7 +54,7 @@ export function KanbanColumn({ column }: KanbanColumnProps) {
                 )}
             >
                 {column.leads.map((lead) => (
-                    <LeadCard key={lead.id} lead={lead} />
+                    <LeadCard key={lead.id} lead={lead} onAssign={onAssign} />
                 ))}
 
                 {column.leads.length === 0 && (
