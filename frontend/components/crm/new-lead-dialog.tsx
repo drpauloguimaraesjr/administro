@@ -43,7 +43,7 @@ export function NewLeadDialog() {
         try {
             await createLead({
                 ...data,
-                stage: 'first_contact',
+                stage: 'lead_frio',
                 score: 50,
                 source: data.source as any
             });
