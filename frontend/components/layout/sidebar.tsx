@@ -25,8 +25,8 @@ export function Sidebar() {
         { href: '/questionarios', label: 'Questionários', icon: ClipboardList },
         { href: '/transactions', label: 'Financeiro', icon: DollarSign },
         { href: '/whatsapp', label: 'WhatsApp', icon: Smartphone },
-        { href: '/crm', label: 'CRM', icon: Target },
         { href: '/configuracoes', label: 'Configurações', icon: Settings },
+        { href: '/crm', label: 'CRM', icon: Target },
     ];
 
     return (
