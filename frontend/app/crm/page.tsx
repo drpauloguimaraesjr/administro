@@ -331,7 +331,7 @@ export default function CRMPage() {
                             </Card>
                         </div>
 
-                        {/* VIP Patients */}
+                        {/* TODO: Seção "Pacientes VIP" - Deixada por último para trabalhar depois
                         <Card>
                             <CardHeader className="pb-3">
                                 <CardTitle className="text-lg flex items-center gap-2">
@@ -361,6 +361,7 @@ export default function CRMPage() {
                                 )}
                             </CardContent>
                         </Card>
+                        */}
                     </motion.div>
                 )}
 
