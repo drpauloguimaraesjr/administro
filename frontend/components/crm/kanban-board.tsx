@@ -20,13 +20,12 @@ import { Lead, LeadStage } from '@/types/crm';
 import { useLeads } from '@/hooks/use-leads';
 
 const COLUMNS: { id: LeadStage; title: string; color: string; emoji: string }[] = [
-    { id: 'first_contact', title: 'Primeiro Contato', color: '#3B82F6', emoji: '👋' },
-    { id: 'medical_appointment', title: 'Consulta Médica', color: '#8B5CF6', emoji: '🩺' },
-    { id: 'appointment_confirmation', title: 'Confirmar Consulta', color: '#F59E0B', emoji: '📅' },
-    { id: 'procedure_confirmation', title: 'Confirmar Procedimento', color: '#10B981', emoji: '💉' },
-    { id: 'doubts', title: 'Dúvidas', color: '#6366F1', emoji: '🤔' },
-    { id: 'complications', title: 'Intercorrências', color: '#EF4444', emoji: '🚑' },
-    { id: 'dr_paulo', title: 'Dr. Paulo Guimarães', color: '#14B8A6', emoji: '👨‍⚕️' },
+    { id: 'lead_frio', title: 'Lead Frio', color: '#64748B', emoji: '🧊' },
+    { id: 'marcacao_consulta', title: 'Marcação de Consulta', color: '#3B82F6', emoji: '📋' },
+    { id: 'confirmacao_consulta', title: 'Confirmação Consulta', color: '#F59E0B', emoji: '📅' },
+    { id: 'confirmacao_procedimento', title: 'Confirmação Procedimento', color: '#10B981', emoji: '💉' },
+    { id: 'duvidas_intercorrencias', title: 'Dúvidas / Intercorrências', color: '#EF4444', emoji: '🆘' },
+    { id: 'dr_paulo', title: 'Dr. Paulo', color: '#14B8A6', emoji: '👨‍⚕️' },
 ];
 
 export function KanbanBoard() {

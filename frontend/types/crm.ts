@@ -1,5 +1,11 @@
 
-export type LeadStage = 'first_contact' | 'medical_appointment' | 'appointment_confirmation' | 'procedure_confirmation' | 'complications' | 'doubts' | 'dr_paulo';
+export type LeadStage =
+    | 'lead_frio'                  // Lead Frio - pessoas perguntando sobre serviços
+    | 'marcacao_consulta'          // Marcação de Consulta - agendando
+    | 'confirmacao_consulta'       // Confirmação de Consulta
+    | 'confirmacao_procedimento'   // Confirmação de Procedimento
+    | 'duvidas_intercorrencias'    // Dúvidas e Intercorrências
+    | 'dr_paulo';                  // Chamados para o Dr. Paulo
 
 export type LeadSource =
     | 'whatsapp'
