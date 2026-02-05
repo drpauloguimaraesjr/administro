@@ -1,472 +1,311 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import Link from 'next/link';
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
 import {
-  Package,
-  AlertTriangle,
-  TrendingDown,
-  Calendar,
-  Plus,
-  Search,
-  Filter,
-  ArrowUpRight,
-  ArrowDownRight,
-  Clock,
-  DollarSign,
-  Box,
-  AlertCircle,
-  CheckCircle2,
-  XCircle,
+  Package, AlertTriangle, TrendingUp, Plus, Search,
+  RefreshCw, Box, Pill, Droplet, ShieldAlert, Bell
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import Link from 'next/link';
 import api from '@/lib/api';
-import { StockSummary, StockListItem, StockAlert } from '@/types/inventory';
+
+interface InventorySummary {
+  totalItems: number;
+  totalValue: number;
+  lowStockCount: number;
+  outOfStockCount: number;
+  expiringCount: number;
+  expiredCount: number;
+  criticalAlerts: number;
+  warningAlerts: number;
+}
+
+interface InventoryItem {
+  id: string;
+  name: string;
+  category: string;
+  unit: string;
+  currentQuantity: number;
+  minStock: number;
+  costPrice?: number;
+  sellPrice?: number;
+}
 
 export default function EstoquePage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [search, setSearch] = useState('');
+  const queryClient = useQueryClient();
 
-  // Fetch summary
-  const { data: summary, isLoading: loadingSummary } = useQuery<StockSummary>({
+  const { data: summary, isLoading: loadingSummary } = useQuery({
     queryKey: ['inventory-summary'],
     queryFn: async () => {
-      const res = await api.get('/inventory/summary');
-      return res.data;
-    },
+      const response = await api.get('/inventory/summary');
+      return response.data as InventorySummary;
+    }
   });
 
-  // Fetch stock list
-  const { data: stockList = [], isLoading: loadingList } = useQuery<StockListItem[]>({
-    queryKey: ['inventory-list'],
+  const { data: items, isLoading: loadingItems } = useQuery({
+    queryKey: ['inventory-items'],
     queryFn: async () => {
-      const res = await api.get('/inventory/list');
-      return res.data;
+      const response = await api.get('/inventory');
+      return response.data as InventoryItem[];
+    }
+  });
+
+  const checkAlertsMutation = useMutation({
+    mutationFn: async () => {
+      const response = await api.post('/inventory/alerts/check');
+      return response.data;
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['inventory-summary'] });
+      queryClient.invalidateQueries({ queryKey: ['inventory-alerts'] });
+    }
   });
 
-  // Fetch alerts
-  const { data: alerts = [] } = useQuery<StockAlert[]>({
-    queryKey: ['inventory-alerts'],
-    queryFn: async () => {
-      const res = await api.get('/inventory/alerts');
-      return res.data;
-    },
-  });
+  const filteredItems = items?.filter(item =>
+    item.name.toLowerCase().includes(search.toLowerCase())
+  ) || [];
 
-  // Filter stock list
-  const filteredList = stockList.filter(item => {
-    const matchesSearch = item.productName.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(value);
-  };
-
-  const getStatusBadge = (status: StockListItem['status']) => {
-    switch (status) {
-      case 'ok':
-        return <Badge className="bg-green-100 text-green-700">Normal</Badge>;
-      case 'low':
-        return <Badge className="bg-yellow-100 text-yellow-700">Baixo</Badge>;
-      case 'critical':
-        return <Badge className="bg-red-100 text-red-700">Crítico</Badge>;
-      case 'out':
-        return <Badge className="bg-gray-100 text-gray-700">Esgotado</Badge>;
-      default:
-        return null;
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'medicamento': return <Pill className="w-4 h-4" />;
+      case 'material': return <Box className="w-4 h-4" />;
+      case 'cosmético': return <Droplet className="w-4 h-4" />;
+      default: return <Package className="w-4 h-4" />;
     }
   };
 
-  const getExpirationBadge = (days?: number) => {
-    if (days === undefined) return null;
-    if (days <= 0) {
-      return <Badge variant="destructive">Vencido</Badge>;
-    }
-    if (days <= 15) {
-      return <Badge className="bg-red-100 text-red-700">{days}d</Badge>;
-    }
-    if (days <= 30) {
-      return <Badge className="bg-yellow-100 text-yellow-700">{days}d</Badge>;
-    }
-    return <span className="text-gray-500 text-sm">{days}d</span>;
+  const getStockStatus = (item: InventoryItem) => {
+    if (item.currentQuantity <= 0) return { label: 'Esgotado', color: 'bg-red-500' };
+    if (item.currentQuantity <= item.minStock * 0.5) return { label: 'Crítico', color: 'bg-red-400' };
+    if (item.currentQuantity <= item.minStock) return { label: 'Baixo', color: 'bg-yellow-500' };
+    return { label: 'OK', color: 'bg-green-500' };
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-7xl">
-      <div className="space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+      <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold">Controle de Estoque</h1>
-            <p className="text-muted-foreground">
-              Gerencie produtos, lotes e movimentações
-            </p>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+              Estoque
+            </h1>
+            <p className="text-slate-400 mt-1">Gestão de produtos e insumos</p>
           </div>
-          <div className="flex gap-2 flex-wrap">
-            <Link href="/estoque/alertas">
-              <Button variant="outline">
-                <AlertTriangle className="w-4 h-4 mr-2" />
-                Alertas
-              </Button>
-            </Link>
-            <Link href="/estoque/consumo">
-              <Button variant="outline">
-                <TrendingDown className="w-4 h-4 mr-2" />
-                Consumo
-              </Button>
-            </Link>
-            <Link href="/estoque/produtos">
-              <Button variant="outline">
-                <Package className="w-4 h-4 mr-2" />
-                Produtos
-              </Button>
-            </Link>
-            <Link href="/estoque/lotes">
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                Entrada de Estoque
-              </Button>
-            </Link>
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={() => checkAlertsMutation.mutate()}
+              disabled={checkAlertsMutation.isPending}
+              className="border-slate-600 hover:bg-slate-700"
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${checkAlertsMutation.isPending ? 'animate-spin' : ''}`} />
+              Verificar Alertas
+            </Button>
+            <Button className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700">
+              <Plus className="w-4 h-4 mr-2" />
+              Novo Produto
+            </Button>
           </div>
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total em Estoque
-              </CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {loadingSummary ? '...' : formatCurrency(summary?.totalValue || 0)}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {summary?.totalProducts || 0} produtos • {summary?.totalBatches || 0} lotes
-              </p>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <Card className="bg-slate-800/50 border-slate-700 backdrop-blur">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-slate-400 text-sm">Total de Produtos</p>
+                    <p className="text-2xl font-bold text-white">{summary?.totalItems || 0}</p>
+                    <p className="text-slate-500 text-xs mt-1">
+                      Valor: R$ {(summary?.totalValue || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-full bg-cyan-500/20">
+                    <Package className="w-6 h-6 text-cyan-400" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Alertas Ativos
-              </CardTitle>
-              <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {loadingSummary ? '...' : (
-                  (summary?.alertsCount.critical || 0) + 
-                  (summary?.alertsCount.warning || 0)
-                )}
-              </div>
-              <div className="flex gap-2 mt-1">
-                {summary?.alertsCount.critical ? (
-                  <Badge variant="destructive" className="text-xs">
-                    {summary.alertsCount.critical} críticos
-                  </Badge>
-                ) : null}
-                {summary?.alertsCount.warning ? (
-                  <Badge className="bg-yellow-100 text-yellow-700 text-xs">
-                    {summary.alertsCount.warning} avisos
-                  </Badge>
-                ) : null}
-              </div>
-            </CardContent>
-          </Card>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <Card className="bg-slate-800/50 border-slate-700 backdrop-blur">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-slate-400 text-sm">Estoque Baixo</p>
+                    <p className="text-2xl font-bold text-yellow-400">{summary?.lowStockCount || 0}</p>
+                    <p className="text-slate-500 text-xs mt-1">
+                      Esgotados: {summary?.outOfStockCount || 0}
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-full bg-yellow-500/20">
+                    <AlertTriangle className="w-6 h-6 text-yellow-400" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Estoque Baixo
-              </CardTitle>
-              <TrendingDown className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">
-                {loadingSummary ? '...' : summary?.lowStockItems || 0}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {summary?.outOfStockItems || 0} esgotados
-              </p>
-            </CardContent>
-          </Card>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <Card className="bg-slate-800/50 border-slate-700 backdrop-blur">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-slate-400 text-sm">Vencendo (30 dias)</p>
+                    <p className="text-2xl font-bold text-orange-400">{summary?.expiringCount || 0}</p>
+                    <p className="text-slate-500 text-xs mt-1">
+                      Vencidos: {summary?.expiredCount || 0}
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-full bg-orange-500/20">
+                    <ShieldAlert className="w-6 h-6 text-orange-400" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Vencendo este Mês
-              </CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-orange-600">
-                {loadingSummary ? '...' : summary?.expiringThisMonth || 0}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                lotes com validade próxima
-              </p>
-            </CardContent>
-          </Card>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <Card className="bg-slate-800/50 border-slate-700 backdrop-blur">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-slate-400 text-sm">Alertas Ativos</p>
+                    <p className="text-2xl font-bold text-red-400">{summary?.criticalAlerts || 0}</p>
+                    <p className="text-slate-500 text-xs mt-1">
+                      Avisos: {summary?.warningAlerts || 0}
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-full bg-red-500/20">
+                    <Bell className="w-6 h-6 text-red-400" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
 
-        {/* Alerts Section */}
-        {alerts.length > 0 && (
-          <Card className="border-orange-200 bg-orange-50/50">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <AlertCircle className="w-5 h-5 text-orange-600" />
-                Alertas que Precisam de Atenção
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {alerts.slice(0, 5).map((alert) => (
-                  <div
-                    key={alert.id}
-                    className={`flex items-center justify-between p-3 rounded-lg ${
-                      alert.severity === 'critical'
-                        ? 'bg-red-100'
-                        : alert.severity === 'warning'
-                        ? 'bg-yellow-100'
-                        : 'bg-blue-100'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      {alert.severity === 'critical' ? (
-                        <XCircle className="w-5 h-5 text-red-600" />
-                      ) : alert.severity === 'warning' ? (
-                        <AlertTriangle className="w-5 h-5 text-yellow-600" />
-                      ) : (
-                        <AlertCircle className="w-5 h-5 text-blue-600" />
-                      )}
-                      <div>
-                        <p className="font-medium text-sm">{alert.title}</p>
-                        <p className="text-xs text-gray-600">{alert.message}</p>
-                      </div>
-                    </div>
-                    <Button variant="ghost" size="sm">
-                      Resolver
-                    </Button>
-                  </div>
-                ))}
-                {alerts.length > 5 && (
-                  <Link href="/estoque/alertas">
-                    <Button variant="ghost" className="w-full">
-                      Ver todos os {alerts.length} alertas
-                    </Button>
-                  </Link>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        {/* Navigation Tabs */}
+        <div className="flex gap-4 mb-6">
+          <Link href="/estoque/alertas">
+            <Button variant="outline" className="border-slate-600 hover:bg-slate-700">
+              <Bell className="w-4 h-4 mr-2" />
+              Alertas
+            </Button>
+          </Link>
+          <Link href="/estoque/consumo">
+            <Button variant="outline" className="border-slate-600 hover:bg-slate-700">
+              <TrendingUp className="w-4 h-4 mr-2" />
+              Análise de Consumo
+            </Button>
+          </Link>
+        </div>
 
-        {/* Stock List */}
-        <Card>
+        {/* Search */}
+        <div className="relative mb-6">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+          <Input
+            placeholder="Buscar produtos..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-10 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500"
+          />
+        </div>
+
+        {/* Items Table */}
+        <Card className="bg-slate-800/50 border-slate-700 backdrop-blur">
           <CardHeader>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <CardTitle>Lista de Estoque</CardTitle>
-              <div className="flex gap-2 w-full sm:w-auto">
-                <div className="relative flex-1 sm:w-64">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Input
-                    placeholder="Buscar produto..."
-                    className="pl-9"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-32">
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos</SelectItem>
-                    <SelectItem value="ok">Normal</SelectItem>
-                    <SelectItem value="low">Baixo</SelectItem>
-                    <SelectItem value="critical">Crítico</SelectItem>
-                    <SelectItem value="out">Esgotado</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+            <CardTitle className="text-white">Produtos em Estoque</CardTitle>
           </CardHeader>
           <CardContent>
-            {loadingList ? (
-              <div className="text-center py-8 text-gray-500">
-                Carregando...
+            {loadingItems ? (
+              <div className="flex items-center justify-center py-8">
+                <RefreshCw className="w-6 h-6 animate-spin text-cyan-400" />
               </div>
-            ) : filteredList.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                {stockList.length === 0 ? (
-                  <>
-                    <Package className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                    <p>Nenhum produto cadastrado</p>
-                    <Link href="/estoque/produtos">
-                      <Button variant="link">Cadastrar primeiro produto</Button>
-                    </Link>
-                  </>
-                ) : (
-                  <p>Nenhum produto encontrado com os filtros aplicados</p>
-                )}
+            ) : filteredItems.length === 0 ? (
+              <div className="text-center py-8 text-slate-400">
+                {items?.length === 0 ? 'Nenhum produto cadastrado' : 'Nenhum produto encontrado'}
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Produto</TableHead>
-                      <TableHead className="text-center">Quantidade</TableHead>
-                      <TableHead className="text-center">Mínimo</TableHead>
-                      <TableHead className="text-center">Status</TableHead>
-                      <TableHead className="text-center">Validade</TableHead>
-                      <TableHead className="text-right">Valor</TableHead>
-                      <TableHead className="text-center">Lotes</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredList.map((item) => (
-                      <TableRow key={item.productId} className="cursor-pointer hover:bg-gray-50">
-                        <TableCell>
-                          <Link href={`/estoque/produtos/${item.productId}`}>
-                            <div>
-                              <p className="font-medium">{item.productName}</p>
-                              <p className="text-xs text-gray-500">{item.category}</p>
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-slate-700">
+                      <th className="text-left py-3 px-4 text-slate-400 font-medium">Produto</th>
+                      <th className="text-left py-3 px-4 text-slate-400 font-medium">Categoria</th>
+                      <th className="text-right py-3 px-4 text-slate-400 font-medium">Quantidade</th>
+                      <th className="text-right py-3 px-4 text-slate-400 font-medium">Mínimo</th>
+                      <th className="text-right py-3 px-4 text-slate-400 font-medium">Custo</th>
+                      <th className="text-center py-3 px-4 text-slate-400 font-medium">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredItems.map((item) => {
+                      const status = getStockStatus(item);
+                      return (
+                        <motion.tr
+                          key={item.id}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="border-b border-slate-700/50 hover:bg-slate-700/30 transition-colors cursor-pointer"
+                        >
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 rounded-lg bg-slate-700/50">
+                                {getCategoryIcon(item.category)}
+                              </div>
+                              <span className="text-white font-medium">{item.name}</span>
                             </div>
-                          </Link>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <span className="font-medium">
-                            {item.totalQuantity} {item.unit}
-                          </span>
-                          {item.totalQuantity !== item.availableQuantity && (
-                            <span className="text-xs text-gray-500 block">
-                              ({item.availableQuantity} disp.)
-                            </span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-center text-gray-500">
-                          {item.minStock} {item.unit}
-                        </TableCell>
-                        <TableCell className="text-center">
-                          {getStatusBadge(item.status)}
-                        </TableCell>
-                        <TableCell className="text-center">
-                          {item.nearestExpiration ? (
-                            <div className="flex flex-col items-center">
-                              {getExpirationBadge(item.daysUntilExpiration)}
-                              <span className="text-xs text-gray-400">
-                                {new Date(item.nearestExpiration).toLocaleDateString('pt-BR')}
-                              </span>
-                            </div>
-                          ) : (
-                            <span className="text-gray-400">-</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          {formatCurrency(item.totalValue)}
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <Badge variant="outline">{item.batchCount}</Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                          </td>
+                          <td className="py-3 px-4 text-slate-400 capitalize">{item.category}</td>
+                          <td className="py-3 px-4 text-right text-white font-medium">
+                            {item.currentQuantity} {item.unit}
+                          </td>
+                          <td className="py-3 px-4 text-right text-slate-400">
+                            {item.minStock} {item.unit}
+                          </td>
+                          <td className="py-3 px-4 text-right text-slate-400">
+                            R$ {(item.costPrice || 0).toFixed(2)}
+                          </td>
+                          <td className="py-3 px-4 text-center">
+                            <Badge className={`${status.color} text-white`}>
+                              {status.label}
+                            </Badge>
+                          </td>
+                        </motion.tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             )}
           </CardContent>
         </Card>
-
-        {/* Quick Links */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Link href="/estoque/movimentacoes">
-            <Card className="hover:bg-gray-50 cursor-pointer transition-colors">
-              <CardContent className="flex items-center gap-3 py-4">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <ArrowUpRight className="w-5 h-5 text-blue-600" />
-                </div>
-                <div>
-                  <p className="font-medium">Movimentações</p>
-                  <p className="text-xs text-gray-500">Histórico completo</p>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link href="/estoque/lotes">
-            <Card className="hover:bg-gray-50 cursor-pointer transition-colors">
-              <CardContent className="flex items-center gap-3 py-4">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <Box className="w-5 h-5 text-green-600" />
-                </div>
-                <div>
-                  <p className="font-medium">Lotes</p>
-                  <p className="text-xs text-gray-500">Gerenciar lotes</p>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link href="/estoque/alertas">
-            <Card className="hover:bg-gray-50 cursor-pointer transition-colors">
-              <CardContent className="flex items-center gap-3 py-4">
-                <div className="p-2 bg-orange-100 rounded-lg">
-                  <AlertTriangle className="w-5 h-5 text-orange-600" />
-                </div>
-                <div>
-                  <p className="font-medium">Alertas</p>
-                  <p className="text-xs text-gray-500">
-                    {alerts.length > 0 ? `${alerts.length} ativos` : 'Nenhum ativo'}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link href="/estoque/produtos">
-            <Card className="hover:bg-gray-50 cursor-pointer transition-colors">
-              <CardContent className="flex items-center gap-3 py-4">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <Package className="w-5 h-5 text-purple-600" />
-                </div>
-                <div>
-                  <p className="font-medium">Produtos</p>
-                  <p className="text-xs text-gray-500">Cadastro</p>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-        </div>
       </div>
     </div>
   );

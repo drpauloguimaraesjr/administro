@@ -1,401 +1,249 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { 
-  TrendingUp, TrendingDown, Minus, Package, AlertTriangle, 
-  RefreshCw, ArrowUpRight, ArrowDownRight, Calendar, BarChart3 
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
+import {
+  TrendingUp, TrendingDown, Minus, ArrowLeft, RefreshCw,
+  Calendar, Package, AlertTriangle, BarChart3
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import Link from 'next/link';
+import api from '@/lib/api';
 
-interface ProductConsumption {
-  productId: string;
-  productName: string;
-  category: string;
+interface ConsumptionAnalysis {
+  itemId: string;
+  itemName: string;
+  period: number;
   totalConsumed: number;
   averageDaily: number;
-  consumptionTrend: 'increasing' | 'stable' | 'decreasing';
+  trend: 'increasing' | 'stable' | 'decreasing';
   trendPercentage: number;
   currentStock: number;
-  estimatedDaysUntilStockout: number | null;
-  status: 'ok' | 'warning' | 'critical';
+  estimatedDaysUntilStockout: number;
+  recommendedReorderDate: string | null;
+  consumptionHistory: Array<{ date: string; quantity: number }>;
 }
-
-interface ConsumptionSummary {
-  period: { start: string; end: string; days: number };
-  totalMovements: number;
-  totalConsumed: number;
-  totalValue: number;
-  topConsumed: Array<{ productName: string; quantity: number; value: number }>;
-  trends: {
-    increasing: number;
-    stable: number;
-    decreasing: number;
-  };
-  alerts: {
-    lowStockSoon: number;
-    highConsumption: number;
-  };
-}
-
-interface ProductDetail {
-  productId: string;
-  productName: string;
-  period: { start: string; end: string };
-  totalConsumed: number;
-  averageDaily: number;
-  consumptionByDay: Array<{ date: string; quantity: number }>;
-  consumptionTrend: 'increasing' | 'stable' | 'decreasing';
-  trendPercentage: number;
-  estimatedDaysUntilStockout: number | null;
-  currentStock: number;
-}
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export default function ConsumoPage() {
-  const [summary, setSummary] = useState<ConsumptionSummary | null>(null);
-  const [products, setProducts] = useState<ProductConsumption[]>([]);
-  const [selectedProduct, setSelectedProduct] = useState<ProductDetail | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [days, setDays] = useState(30);
+  const [period, setPeriod] = useState('30');
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const [summaryRes, productsRes] = await Promise.all([
-        fetch(`${API_URL}/api/inventory/consumption/summary?days=${days}`),
-        fetch(`${API_URL}/api/inventory/consumption/all?days=${days}`),
-      ]);
-      
-      const summaryData = await summaryRes.json();
-      const productsData = await productsRes.json();
-      
-      setSummary(summaryData);
-      setProducts(productsData);
-    } catch (error) {
-      console.error('Error fetching consumption data:', error);
-    } finally {
-      setLoading(false);
+  const { data: consumptions, isLoading } = useQuery({
+    queryKey: ['inventory-consumption', period],
+    queryFn: async () => {
+      const response = await api.get('/inventory/consumption/summary', { params: { period } });
+      return response.data as ConsumptionAnalysis[];
     }
-  };
-
-  const fetchProductDetail = async (productId: string) => {
-    try {
-      const res = await fetch(`${API_URL}/api/inventory/consumption/${productId}?days=${days}`);
-      const data = await res.json();
-      setSelectedProduct(data);
-    } catch (error) {
-      console.error('Error fetching product detail:', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, [days]);
+  });
 
   const getTrendIcon = (trend: string) => {
     switch (trend) {
-      case 'increasing': return <TrendingUp className="w-4 h-4 text-red-500" />;
-      case 'decreasing': return <TrendingDown className="w-4 h-4 text-green-500" />;
-      default: return <Minus className="w-4 h-4 text-gray-500" />;
+      case 'increasing': return <TrendingUp className="w-4 h-4 text-red-400" />;
+      case 'decreasing': return <TrendingDown className="w-4 h-4 text-green-400" />;
+      default: return <Minus className="w-4 h-4 text-slate-400" />;
     }
   };
 
   const getTrendColor = (trend: string) => {
     switch (trend) {
-      case 'increasing': return 'text-red-600 bg-red-50';
-      case 'decreasing': return 'text-green-600 bg-green-50';
-      default: return 'text-gray-600 bg-gray-50';
+      case 'increasing': return 'text-red-400';
+      case 'decreasing': return 'text-green-400';
+      default: return 'text-slate-400';
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'critical': 
-        return <span className="px-2 py-0.5 text-xs font-medium rounded bg-red-100 text-red-700">Crítico</span>;
-      case 'warning':
-        return <span className="px-2 py-0.5 text-xs font-medium rounded bg-yellow-100 text-yellow-700">Atenção</span>;
-      default:
-        return <span className="px-2 py-0.5 text-xs font-medium rounded bg-green-100 text-green-700">OK</span>;
-    }
+  const getStockoutBadge = (days: number) => {
+    if (days < 0) return <Badge className="bg-green-500">Sem consumo</Badge>;
+    if (days <= 7) return <Badge className="bg-red-500">Crítico ({days} dias)</Badge>;
+    if (days <= 14) return <Badge className="bg-orange-500">Alerta ({days} dias)</Badge>;
+    if (days <= 30) return <Badge className="bg-yellow-500">Atenção ({days} dias)</Badge>;
+    return <Badge className="bg-green-500">{days} dias</Badge>;
   };
 
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('pt-BR');
-  };
-
-  // Simple bar chart component
-  const SimpleBarChart = ({ data }: { data: Array<{ date: string; quantity: number }> }) => {
-    const maxQty = Math.max(...data.map(d => d.quantity), 1);
-    const last14Days = data.slice(-14);
-    
-    return (
-      <div className="flex items-end gap-1 h-24">
-        {last14Days.map((d, i) => (
-          <div key={i} className="flex-1 flex flex-col items-center">
-            <div
-              className="w-full bg-blue-500 rounded-t transition-all hover:bg-blue-600"
-              style={{ height: `${(d.quantity / maxQty) * 100}%`, minHeight: d.quantity > 0 ? '4px' : '0' }}
-              title={`${formatDate(d.date)}: ${d.quantity} un`}
-            />
-            {i % 2 === 0 && (
-              <span className="text-[8px] text-gray-400 mt-1">
-                {new Date(d.date).getDate()}
-              </span>
-            )}
-          </div>
-        ))}
-      </div>
-    );
+  // Estatísticas
+  const stats = {
+    totalConsumed: consumptions?.reduce((sum, c) => sum + c.totalConsumed, 0) || 0,
+    increasing: consumptions?.filter(c => c.trend === 'increasing').length || 0,
+    critical: consumptions?.filter(c => c.estimatedDaysUntilStockout > 0 && c.estimatedDaysUntilStockout <= 14).length || 0,
   };
 
   return (
-    <div className="p-6">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Análise de Consumo</h1>
-          <p className="text-gray-600">Tendências e previsões de uso de medicamentos</p>
-        </div>
-        <div className="flex items-center gap-4">
-          <select
-            value={days}
-            onChange={(e) => setDays(Number(e.target.value))}
-            className="px-3 py-2 border border-gray-300 rounded-lg"
-          >
-            <option value={7}>Últimos 7 dias</option>
-            <option value={14}>Últimos 14 dias</option>
-            <option value={30}>Últimos 30 dias</option>
-            <option value={60}>Últimos 60 dias</option>
-            <option value={90}>Últimos 90 dias</option>
-          </select>
-          <button
-            onClick={fetchData}
-            disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            Atualizar
-          </button>
-        </div>
-      </div>
-
-      {loading ? (
-        <div className="flex justify-center py-12">
-          <RefreshCw className="w-8 h-8 animate-spin text-gray-400" />
-        </div>
-      ) : (
-        <>
-          {/* Summary Cards */}
-          {summary && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-                <div className="flex items-center gap-2 text-gray-500 mb-2">
-                  <Package className="w-4 h-4" />
-                  <span className="text-sm">Total Consumido</span>
-                </div>
-                <div className="text-3xl font-bold text-gray-900">{summary.totalConsumed}</div>
-                <div className="text-sm text-gray-500">{summary.totalMovements} movimentações</div>
-              </div>
-
-              <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-                <div className="flex items-center gap-2 text-gray-500 mb-2">
-                  <TrendingUp className="w-4 h-4" />
-                  <span className="text-sm">Tendências</span>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex items-center gap-1">
-                    <ArrowUpRight className="w-4 h-4 text-red-500" />
-                    <span className="font-bold text-red-600">{summary.trends.increasing}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Minus className="w-4 h-4 text-gray-500" />
-                    <span className="font-bold text-gray-600">{summary.trends.stable}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <ArrowDownRight className="w-4 h-4 text-green-500" />
-                    <span className="font-bold text-green-600">{summary.trends.decreasing}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-                <div className="flex items-center gap-2 text-gray-500 mb-2">
-                  <AlertTriangle className="w-4 h-4" />
-                  <span className="text-sm">Alertas de Consumo</span>
-                </div>
-                <div className="text-3xl font-bold text-yellow-600">{summary.alerts.highConsumption}</div>
-                <div className="text-sm text-gray-500">produtos com alta demanda</div>
-              </div>
-
-              <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-                <div className="flex items-center gap-2 text-gray-500 mb-2">
-                  <Calendar className="w-4 h-4" />
-                  <span className="text-sm">Risco de Ruptura</span>
-                </div>
-                <div className="text-3xl font-bold text-red-600">{summary.alerts.lowStockSoon}</div>
-                <div className="text-sm text-gray-500">podem acabar em 14 dias</div>
-              </div>
-            </div>
-          )}
-
-          {/* Top Consumed */}
-          {summary && summary.topConsumed.length > 0 && (
-            <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm mb-6">
-              <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <BarChart3 className="w-4 h-4" />
-                Mais Consumidos ({days} dias)
-              </h3>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                {summary.topConsumed.map((item, idx) => (
-                  <div key={idx} className="text-center p-3 bg-gray-50 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">{item.quantity}</div>
-                    <div className="text-sm text-gray-600 truncate" title={item.productName}>
-                      {item.productName}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Product List */}
-          <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-gray-200">
-              <h3 className="font-semibold text-gray-900">Consumo por Produto</h3>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="text-left p-3 text-sm font-medium text-gray-600">Produto</th>
-                    <th className="text-left p-3 text-sm font-medium text-gray-600">Categoria</th>
-                    <th className="text-center p-3 text-sm font-medium text-gray-600">Consumido</th>
-                    <th className="text-center p-3 text-sm font-medium text-gray-600">Média/Dia</th>
-                    <th className="text-center p-3 text-sm font-medium text-gray-600">Tendência</th>
-                    <th className="text-center p-3 text-sm font-medium text-gray-600">Estoque Atual</th>
-                    <th className="text-center p-3 text-sm font-medium text-gray-600">Dias até Acabar</th>
-                    <th className="text-center p-3 text-sm font-medium text-gray-600">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {products.map((product) => (
-                    <tr 
-                      key={product.productId} 
-                      className="border-t border-gray-100 hover:bg-gray-50 cursor-pointer"
-                      onClick={() => fetchProductDetail(product.productId)}
-                    >
-                      <td className="p-3">
-                        <span className="font-medium text-gray-900">{product.productName}</span>
-                      </td>
-                      <td className="p-3 text-sm text-gray-600">{product.category}</td>
-                      <td className="p-3 text-center">
-                        <span className="font-semibold">{product.totalConsumed}</span>
-                      </td>
-                      <td className="p-3 text-center text-gray-600">{product.averageDaily}</td>
-                      <td className="p-3">
-                        <div className="flex items-center justify-center gap-1">
-                          <span className={`flex items-center gap-1 px-2 py-0.5 rounded ${getTrendColor(product.consumptionTrend)}`}>
-                            {getTrendIcon(product.consumptionTrend)}
-                            <span className="text-sm font-medium">
-                              {product.trendPercentage > 0 ? '+' : ''}{product.trendPercentage}%
-                            </span>
-                          </span>
-                        </div>
-                      </td>
-                      <td className="p-3 text-center">
-                        <span className={`font-semibold ${product.currentStock <= 5 ? 'text-red-600' : ''}`}>
-                          {product.currentStock}
-                        </span>
-                      </td>
-                      <td className="p-3 text-center">
-                        {product.estimatedDaysUntilStockout !== null ? (
-                          <span className={`font-semibold ${
-                            product.estimatedDaysUntilStockout <= 7 ? 'text-red-600' : 
-                            product.estimatedDaysUntilStockout <= 14 ? 'text-yellow-600' : 'text-green-600'
-                          }`}>
-                            {product.estimatedDaysUntilStockout} dias
-                          </span>
-                        ) : (
-                          <span className="text-gray-400">-</span>
-                        )}
-                      </td>
-                      <td className="p-3 text-center">
-                        {getStatusBadge(product.status)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <Link href="/estoque">
+              <Button variant="outline" size="icon" className="border-slate-600 hover:bg-slate-700">
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-emerald-500 bg-clip-text text-transparent">
+                Análise de Consumo
+              </h1>
+              <p className="text-slate-400 mt-1">Tendências e previsões de estoque</p>
             </div>
           </div>
+          <Select value={period} onValueChange={setPeriod}>
+            <SelectTrigger className="w-40 bg-slate-800 border-slate-700">
+              <SelectValue placeholder="Período" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7">Últimos 7 dias</SelectItem>
+              <SelectItem value="15">Últimos 15 dias</SelectItem>
+              <SelectItem value="30">Últimos 30 dias</SelectItem>
+              <SelectItem value="60">Últimos 60 dias</SelectItem>
+              <SelectItem value="90">Últimos 90 dias</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-          {/* Product Detail Modal */}
-          {selectedProduct && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-                <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-                  <h3 className="font-semibold text-lg text-gray-900">{selectedProduct.productName}</h3>
-                  <button 
-                    onClick={() => setSelectedProduct(null)}
-                    className="text-gray-400 hover:text-gray-600"
-                  >
-                    ✕
-                  </button>
-                </div>
-                <div className="p-4">
-                  {/* Stats */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                    <div className="text-center p-3 bg-gray-50 rounded-lg">
-                      <div className="text-2xl font-bold text-gray-900">{selectedProduct.totalConsumed}</div>
-                      <div className="text-xs text-gray-500">Total Consumido</div>
-                    </div>
-                    <div className="text-center p-3 bg-gray-50 rounded-lg">
-                      <div className="text-2xl font-bold text-gray-900">{selectedProduct.averageDaily}</div>
-                      <div className="text-xs text-gray-500">Média/Dia</div>
-                    </div>
-                    <div className="text-center p-3 bg-gray-50 rounded-lg">
-                      <div className="text-2xl font-bold text-gray-900">{selectedProduct.currentStock}</div>
-                      <div className="text-xs text-gray-500">Estoque Atual</div>
-                    </div>
-                    <div className="text-center p-3 bg-gray-50 rounded-lg">
-                      <div className={`text-2xl font-bold ${
-                        (selectedProduct.estimatedDaysUntilStockout || 999) <= 14 ? 'text-red-600' : 'text-green-600'
-                      }`}>
-                        {selectedProduct.estimatedDaysUntilStockout ?? '∞'}
-                      </div>
-                      <div className="text-xs text-gray-500">Dias até Acabar</div>
-                    </div>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-slate-400 text-sm">Total Consumido</p>
+                    <p className="text-2xl font-bold text-white">{stats.totalConsumed}</p>
+                    <p className="text-slate-500 text-xs">nos últimos {period} dias</p>
                   </div>
-
-                  {/* Trend */}
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className="text-gray-600">Tendência:</span>
-                    <span className={`flex items-center gap-1 px-2 py-1 rounded ${getTrendColor(selectedProduct.consumptionTrend)}`}>
-                      {getTrendIcon(selectedProduct.consumptionTrend)}
-                      <span className="font-medium">
-                        {selectedProduct.consumptionTrend === 'increasing' ? 'Aumentando' :
-                         selectedProduct.consumptionTrend === 'decreasing' ? 'Diminuindo' : 'Estável'}
-                        {' '}({selectedProduct.trendPercentage > 0 ? '+' : ''}{selectedProduct.trendPercentage}%)
-                      </span>
-                    </span>
-                  </div>
-
-                  {/* Chart */}
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h4 className="text-sm font-medium text-gray-600 mb-3">Consumo Diário (últimos 14 dias)</h4>
-                    <SimpleBarChart data={selectedProduct.consumptionByDay} />
-                  </div>
-
-                  {/* Period */}
-                  <div className="text-xs text-gray-400 mt-4 text-center">
-                    Período: {formatDate(selectedProduct.period.start)} - {formatDate(selectedProduct.period.end)}
+                  <div className="p-3 rounded-full bg-cyan-500/20">
+                    <BarChart3 className="w-6 h-6 text-cyan-400" />
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-slate-400 text-sm">Consumo Crescente</p>
+                    <p className="text-2xl font-bold text-red-400">{stats.increasing}</p>
+                    <p className="text-slate-500 text-xs">produtos com alta demanda</p>
+                  </div>
+                  <div className="p-3 rounded-full bg-red-500/20">
+                    <TrendingUp className="w-6 h-6 text-red-400" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-slate-400 text-sm">Risco de Falta</p>
+                    <p className="text-2xl font-bold text-orange-400">{stats.critical}</p>
+                    <p className="text-slate-500 text-xs">esgotam em até 14 dias</p>
+                  </div>
+                  <div className="p-3 rounded-full bg-orange-500/20">
+                    <AlertTriangle className="w-6 h-6 text-orange-400" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+
+        {/* Consumption List */}
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <RefreshCw className="w-8 h-8 animate-spin text-cyan-400" />
+          </div>
+        ) : consumptions?.length === 0 ? (
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <Package className="w-12 h-12 text-slate-500 mb-4" />
+              <p className="text-slate-400 text-lg">Nenhum dado de consumo</p>
+              <p className="text-slate-500 text-sm">Registre movimentações de saída para ver análises</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardHeader>
+              <CardTitle className="text-white">Produtos Mais Consumidos</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-slate-700">
+                      <th className="text-left py-3 px-4 text-slate-400 font-medium">Produto</th>
+                      <th className="text-right py-3 px-4 text-slate-400 font-medium">Consumido</th>
+                      <th className="text-right py-3 px-4 text-slate-400 font-medium">Média/Dia</th>
+                      <th className="text-center py-3 px-4 text-slate-400 font-medium">Tendência</th>
+                      <th className="text-right py-3 px-4 text-slate-400 font-medium">Estoque Atual</th>
+                      <th className="text-center py-3 px-4 text-slate-400 font-medium">Previsão Esgotamento</th>
+                      <th className="text-center py-3 px-4 text-slate-400 font-medium">Repor Até</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {consumptions?.map((item, index) => (
+                      <motion.tr
+                        key={item.itemId}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: index * 0.05 }}
+                        className="border-b border-slate-700/50 hover:bg-slate-700/30"
+                      >
+                        <td className="py-3 px-4">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-lg bg-slate-700/50">
+                              <Package className="w-4 h-4 text-slate-400" />
+                            </div>
+                            <span className="text-white font-medium">{item.itemName}</span>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 text-right text-white font-semibold">
+                          {item.totalConsumed}
+                        </td>
+                        <td className="py-3 px-4 text-right text-slate-300">
+                          {item.averageDaily.toFixed(1)}
+                        </td>
+                        <td className="py-3 px-4 text-center">
+                          <div className="flex items-center justify-center gap-2">
+                            {getTrendIcon(item.trend)}
+                            <span className={getTrendColor(item.trend)}>
+                              {item.trendPercentage > 0 ? '+' : ''}{item.trendPercentage}%
+                            </span>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 text-right text-white">
+                          {item.currentStock}
+                        </td>
+                        <td className="py-3 px-4 text-center">
+                          {getStockoutBadge(item.estimatedDaysUntilStockout)}
+                        </td>
+                        <td className="py-3 px-4 text-center text-slate-300">
+                          {item.recommendedReorderDate ? (
+                            <div className="flex items-center justify-center gap-2">
+                              <Calendar className="w-4 h-4 text-cyan-400" />
+                              {new Date(item.recommendedReorderDate).toLocaleDateString('pt-BR')}
+                            </div>
+                          ) : (
+                            <span className="text-slate-500">-</span>
+                          )}
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            </div>
-          )}
-        </>
-      )}
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }

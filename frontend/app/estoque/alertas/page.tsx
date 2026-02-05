@@ -1,118 +1,94 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { AlertTriangle, AlertCircle, Info, Check, Clock, RefreshCw, Package, Calendar } from 'lucide-react';
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
+import {
+  Bell, AlertTriangle, ShieldAlert, Package,
+  Check, Eye, ArrowLeft, RefreshCw, Calendar
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
+import api from '@/lib/api';
 
-interface StockAlert {
+interface InventoryAlert {
   id: string;
-  productId: string;
-  productName: string;
+  type: 'low_stock' | 'out_of_stock' | 'expiring_soon' | 'expired' | 'high_consumption';
+  severity: 'critical' | 'warning' | 'info';
+  itemId: string;
+  itemName: string;
   batchId?: string;
-  batchNumber?: string;
-  type: 'low_stock' | 'expiring_soon' | 'expired' | 'high_consumption' | 'stockout';
-  severity: 'info' | 'warning' | 'critical';
-  title: string;
   message: string;
-  details: {
-    currentQuantity?: number;
-    minQuantity?: number;
-    expirationDate?: string;
-    daysUntilExpiration?: number;
-    consumptionRate?: number;
-    previousConsumption?: number;
-    currentConsumption?: number;
-  };
-  suggestedActions?: string[];
+  details: Record<string, unknown>;
   status: 'active' | 'acknowledged' | 'resolved';
   createdAt: string;
+  acknowledgedAt?: string;
+  acknowledgedBy?: string;
+  resolvedAt?: string;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-
 export default function AlertasPage() {
-  const [alerts, setAlerts] = useState<StockAlert[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [checking, setChecking] = useState(false);
-  const [filter, setFilter] = useState<'all' | 'critical' | 'warning' | 'info'>('all');
+  const [filter, setFilter] = useState<'all' | 'active' | 'acknowledged'>('active');
+  const queryClient = useQueryClient();
 
-  const fetchAlerts = async () => {
-    try {
-      const res = await fetch(`${API_URL}/api/inventory/alerts`);
-      const data = await res.json();
-      setAlerts(data);
-    } catch (error) {
-      console.error('Error fetching alerts:', error);
-    } finally {
-      setLoading(false);
+  const { data: alerts, isLoading } = useQuery({
+    queryKey: ['inventory-alerts', filter],
+    queryFn: async () => {
+      const status = filter === 'all' ? undefined : filter;
+      const response = await api.get('/inventory/alerts/all', { params: { status } });
+      return response.data as InventoryAlert[];
     }
-  };
+  });
 
-  const checkAlerts = async () => {
-    setChecking(true);
-    try {
-      await fetch(`${API_URL}/api/inventory/alerts/check`, { method: 'POST' });
-      await fetchAlerts();
-    } catch (error) {
-      console.error('Error checking alerts:', error);
-    } finally {
-      setChecking(false);
+  const acknowledgeMutation = useMutation({
+    mutationFn: async (alertId: string) => {
+      const response = await api.post(`/inventory/alerts/${alertId}/acknowledge`, { userId: 'admin' });
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['inventory-alerts'] });
+      queryClient.invalidateQueries({ queryKey: ['inventory-summary'] });
     }
-  };
+  });
 
-  const acknowledgeAlert = async (id: string) => {
-    try {
-      await fetch(`${API_URL}/api/inventory/alerts/${id}/acknowledge`, { method: 'POST' });
-      await fetchAlerts();
-    } catch (error) {
-      console.error('Error acknowledging alert:', error);
+  const resolveMutation = useMutation({
+    mutationFn: async (alertId: string) => {
+      const response = await api.post(`/inventory/alerts/${alertId}/resolve`);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['inventory-alerts'] });
+      queryClient.invalidateQueries({ queryKey: ['inventory-summary'] });
     }
-  };
+  });
 
-  const resolveAlert = async (id: string) => {
-    try {
-      await fetch(`${API_URL}/api/inventory/alerts/${id}/resolve`, { method: 'POST' });
-      await fetchAlerts();
-    } catch (error) {
-      console.error('Error resolving alert:', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchAlerts();
-  }, []);
-
-  const filteredAlerts = alerts.filter(alert => 
-    filter === 'all' || alert.severity === filter
-  );
-
-  const getSeverityIcon = (severity: string) => {
-    switch (severity) {
-      case 'critical': return <AlertTriangle className="w-5 h-5 text-red-500" />;
-      case 'warning': return <AlertCircle className="w-5 h-5 text-yellow-500" />;
-      default: return <Info className="w-5 h-5 text-blue-500" />;
-    }
-  };
-
-  const getSeverityBg = (severity: string) => {
-    switch (severity) {
-      case 'critical': return 'bg-red-50 border-red-200';
-      case 'warning': return 'bg-yellow-50 border-yellow-200';
-      default: return 'bg-blue-50 border-blue-200';
-    }
-  };
-
-  const getTypeIcon = (type: string) => {
+  const getAlertIcon = (type: string) => {
     switch (type) {
-      case 'low_stock':
-      case 'stockout':
-        return <Package className="w-4 h-4" />;
-      case 'expiring_soon':
-      case 'expired':
-        return <Calendar className="w-4 h-4" />;
-      case 'high_consumption':
-        return <AlertTriangle className="w-4 h-4" />;
-      default:
-        return <Info className="w-4 h-4" />;
+      case 'low_stock': return <Package className="w-5 h-5" />;
+      case 'out_of_stock': return <AlertTriangle className="w-5 h-5" />;
+      case 'expiring_soon': return <Calendar className="w-5 h-5" />;
+      case 'expired': return <ShieldAlert className="w-5 h-5" />;
+      default: return <Bell className="w-5 h-5" />;
+    }
+  };
+
+  const getSeverityColor = (severity: string) => {
+    switch (severity) {
+      case 'critical': return 'bg-red-500/20 text-red-400 border-red-500/50';
+      case 'warning': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50';
+      case 'info': return 'bg-blue-500/20 text-blue-400 border-blue-500/50';
+      default: return 'bg-slate-500/20 text-slate-400 border-slate-500/50';
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'active': return <Badge className="bg-red-500">Ativo</Badge>;
+      case 'acknowledged': return <Badge className="bg-yellow-500">Visto</Badge>;
+      case 'resolved': return <Badge className="bg-green-500">Resolvido</Badge>;
+      default: return null;
     }
   };
 
@@ -122,189 +98,145 @@ export default function AlertasPage() {
       month: '2-digit',
       year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit',
+      minute: '2-digit'
     });
   };
 
-  const counts = {
-    critical: alerts.filter(a => a.severity === 'critical').length,
-    warning: alerts.filter(a => a.severity === 'warning').length,
-    info: alerts.filter(a => a.severity === 'info').length,
-  };
-
   return (
-    <div className="p-6">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Alertas de Estoque</h1>
-          <p className="text-gray-600">Monitore estoque baixo, validade e consumo</p>
-        </div>
-        <button
-          onClick={checkAlerts}
-          disabled={checking}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-        >
-          <RefreshCw className={`w-4 h-4 ${checking ? 'animate-spin' : ''}`} />
-          Verificar Alertas
-        </button>
-      </div>
-
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <button
-          onClick={() => setFilter('all')}
-          className={`p-4 rounded-lg border-2 transition ${
-            filter === 'all' ? 'border-gray-900 bg-gray-50' : 'border-gray-200 hover:border-gray-300'
-          }`}
-        >
-          <div className="text-3xl font-bold text-gray-900">{alerts.length}</div>
-          <div className="text-gray-600">Total de Alertas</div>
-        </button>
-        
-        <button
-          onClick={() => setFilter('critical')}
-          className={`p-4 rounded-lg border-2 transition ${
-            filter === 'critical' ? 'border-red-500 bg-red-50' : 'border-gray-200 hover:border-red-200'
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="w-6 h-6 text-red-500" />
-            <span className="text-3xl font-bold text-red-600">{counts.critical}</span>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <Link href="/estoque">
+              <Button variant="outline" size="icon" className="border-slate-600 hover:bg-slate-700">
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-red-400 to-orange-500 bg-clip-text text-transparent">
+                Alertas de Estoque
+              </h1>
+              <p className="text-slate-400 mt-1">Monitore problemas e tome ação</p>
+            </div>
           </div>
-          <div className="text-gray-600">Críticos</div>
-        </button>
-        
-        <button
-          onClick={() => setFilter('warning')}
-          className={`p-4 rounded-lg border-2 transition ${
-            filter === 'warning' ? 'border-yellow-500 bg-yellow-50' : 'border-gray-200 hover:border-yellow-200'
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            <AlertCircle className="w-6 h-6 text-yellow-500" />
-            <span className="text-3xl font-bold text-yellow-600">{counts.warning}</span>
-          </div>
-          <div className="text-gray-600">Atenção</div>
-        </button>
-        
-        <button
-          onClick={() => setFilter('info')}
-          className={`p-4 rounded-lg border-2 transition ${
-            filter === 'info' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-200'
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            <Info className="w-6 h-6 text-blue-500" />
-            <span className="text-3xl font-bold text-blue-600">{counts.info}</span>
-          </div>
-          <div className="text-gray-600">Informativos</div>
-        </button>
-      </div>
-
-      {/* Alert List */}
-      {loading ? (
-        <div className="flex justify-center py-12">
-          <RefreshCw className="w-8 h-8 animate-spin text-gray-400" />
         </div>
-      ) : filteredAlerts.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg">
-          <Check className="w-12 h-12 text-green-500 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900">Tudo em ordem!</h3>
-          <p className="text-gray-600">
-            {filter === 'all' 
-              ? 'Não há alertas ativos no momento'
-              : `Não há alertas ${filter === 'critical' ? 'críticos' : filter === 'warning' ? 'de atenção' : 'informativos'}`
-            }
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {filteredAlerts.map(alert => (
-            <div
-              key={alert.id}
-              className={`p-4 rounded-lg border ${getSeverityBg(alert.severity)}`}
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex items-start gap-3">
-                  {getSeverityIcon(alert.severity)}
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-gray-900">{alert.title}</h3>
-                      <span className="flex items-center gap-1 text-xs text-gray-500 bg-white px-2 py-0.5 rounded">
-                        {getTypeIcon(alert.type)}
-                        {alert.type.replace('_', ' ')}
-                      </span>
-                    </div>
-                    <p className="text-gray-700 mt-1">{alert.message}</p>
-                    
-                    {/* Details */}
-                    {alert.details && (
-                      <div className="mt-2 flex flex-wrap gap-3 text-sm text-gray-600">
-                        {alert.details.currentQuantity !== undefined && (
-                          <span>Atual: <strong>{alert.details.currentQuantity}</strong></span>
-                        )}
-                        {alert.details.minQuantity !== undefined && (
-                          <span>Mínimo: <strong>{alert.details.minQuantity}</strong></span>
-                        )}
-                        {alert.details.daysUntilExpiration !== undefined && (
-                          <span>Vence em: <strong>{alert.details.daysUntilExpiration} dias</strong></span>
-                        )}
-                        {alert.details.previousConsumption !== undefined && (
-                          <span>Consumo anterior: <strong>{alert.details.previousConsumption}</strong></span>
-                        )}
-                        {alert.details.currentConsumption !== undefined && (
-                          <span>Consumo atual: <strong>{alert.details.currentConsumption}</strong></span>
-                        )}
-                      </div>
-                    )}
 
-                    {/* Suggested Actions */}
-                    {alert.suggestedActions && alert.suggestedActions.length > 0 && (
-                      <div className="mt-3">
-                        <p className="text-xs font-medium text-gray-500 mb-1">Ações sugeridas:</p>
-                        <div className="flex flex-wrap gap-2">
-                          {alert.suggestedActions.map((action, idx) => (
-                            <span
-                              key={idx}
-                              className="text-xs bg-white px-2 py-1 rounded border border-gray-200"
-                            >
-                              {action}
-                            </span>
-                          ))}
+        {/* Filter Tabs */}
+        <div className="flex gap-2 mb-6">
+          <Button
+            variant={filter === 'active' ? 'default' : 'outline'}
+            onClick={() => setFilter('active')}
+            className={filter === 'active' ? 'bg-red-500 hover:bg-red-600' : 'border-slate-600'}
+          >
+            Ativos
+          </Button>
+          <Button
+            variant={filter === 'acknowledged' ? 'default' : 'outline'}
+            onClick={() => setFilter('acknowledged')}
+            className={filter === 'acknowledged' ? 'bg-yellow-500 hover:bg-yellow-600' : 'border-slate-600'}
+          >
+            Vistos
+          </Button>
+          <Button
+            variant={filter === 'all' ? 'default' : 'outline'}
+            onClick={() => setFilter('all')}
+            className={filter === 'all' ? 'bg-slate-600 hover:bg-slate-700' : 'border-slate-600'}
+          >
+            Todos
+          </Button>
+        </div>
+
+        {/* Alerts List */}
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <RefreshCw className="w-8 h-8 animate-spin text-cyan-400" />
+          </div>
+        ) : alerts?.length === 0 ? (
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <Bell className="w-12 h-12 text-slate-500 mb-4" />
+              <p className="text-slate-400 text-lg">Nenhum alerta encontrado</p>
+              <p className="text-slate-500 text-sm">Tudo certo com seu estoque!</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-4">
+            {alerts?.map((alert) => (
+              <motion.div
+                key={alert.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <Card className={`border ${getSeverityColor(alert.severity)} bg-slate-800/50`}>
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-4">
+                        <div className={`p-3 rounded-full ${getSeverityColor(alert.severity)}`}>
+                          {getAlertIcon(alert.type)}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-3">
+                            <h3 className="text-lg font-semibold text-white">{alert.message}</h3>
+                            {getStatusBadge(alert.status)}
+                          </div>
+                          <p className="text-slate-400 text-sm mt-1">
+                            Produto: <span className="text-white">{alert.itemName}</span>
+                          </p>
+                          <p className="text-slate-500 text-xs mt-2">
+                            Criado em: {formatDate(alert.createdAt)}
+                          </p>
+                          {alert.acknowledgedAt && (
+                            <p className="text-slate-500 text-xs">
+                              Visto em: {formatDate(alert.acknowledgedAt)}
+                            </p>
+                          )}
+                          {/* Details */}
+                          {alert.details && Object.keys(alert.details).length > 0 && (
+                            <div className="mt-3 p-3 rounded-lg bg-slate-700/50 text-sm">
+                              {Object.entries(alert.details).map(([key, value]) => (
+                                <div key={key} className="flex justify-between text-slate-300">
+                                  <span className="capitalize">{key.replace(/([A-Z])/g, ' $1')}:</span>
+                                  <span className="text-white">{String(value)}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
-                    )}
-
-                    <p className="text-xs text-gray-400 mt-2">
-                      <Clock className="w-3 h-3 inline mr-1" />
-                      {formatDate(alert.createdAt)}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => acknowledgeAlert(alert.id)}
-                    className="text-xs px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50"
-                    title="Marcar como visto"
-                  >
-                    Visto
-                  </button>
-                  <button
-                    onClick={() => resolveAlert(alert.id)}
-                    className="text-xs px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
-                    title="Resolver"
-                  >
-                    Resolver
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+                      <div className="flex gap-2">
+                        {alert.status === 'active' && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => acknowledgeMutation.mutate(alert.id)}
+                            disabled={acknowledgeMutation.isPending}
+                            className="border-slate-600 hover:bg-slate-700"
+                          >
+                            <Eye className="w-4 h-4 mr-1" />
+                            Marcar Visto
+                          </Button>
+                        )}
+                        {(alert.status === 'active' || alert.status === 'acknowledged') && (
+                          <Button
+                            size="sm"
+                            onClick={() => resolveMutation.mutate(alert.id)}
+                            disabled={resolveMutation.isPending}
+                            className="bg-green-600 hover:bg-green-700"
+                          >
+                            <Check className="w-4 h-4 mr-1" />
+                            Resolver
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
