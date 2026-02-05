@@ -630,7 +630,8 @@ export default function ProdutosPage() {
                 <p className="text-sm font-medium mb-2">Calculadora de Markup</p>
                 <div className="flex flex-wrap gap-2">
                   {[30, 50, 100, 150, 200].map(markup => {
-                    const suggestedPrice = formData.costPrice * (1 + markup / 100);
+                    const cost = formData.costPrice || 0;
+                    const suggestedPrice = cost * (1 + markup / 100);
                     return (
                       <Button
                         key={markup}
