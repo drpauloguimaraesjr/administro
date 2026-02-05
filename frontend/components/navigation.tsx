@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Home, DollarSign, Smartphone, Calendar, Users, Shield, LogOut, Share2, ClipboardList, Target, Settings, Activity, Brain } from 'lucide-react';
+import { Home, DollarSign, Smartphone, Calendar, Users, Shield, LogOut, Share2, ClipboardList, Target, Settings, Activity, Brain, Bot, Package, Receipt } from 'lucide-react';
 import { useAuth } from './auth/auth-provider';
 import { Button } from './ui/button';
 
@@ -22,6 +22,9 @@ export function Navigation() {
     { href: '/transactions', label: 'Financeiro', icon: <DollarSign className="w-4 h-4" /> },
     { href: '/whatsapp', label: 'WhatsApp', icon: <Smartphone className="w-4 h-4" /> },
     { href: '/crm', label: 'CRM', icon: <Target className="w-4 h-4" /> },
+    { href: '/atendimento', label: 'Atendimento IA', icon: <Bot className="w-4 h-4 text-purple-500" /> },
+    { href: '/estoque', label: 'Estoque', icon: <Package className="w-4 h-4" /> },
+    { href: '/faturamento', label: 'Faturamento', icon: <Receipt className="w-4 h-4" /> },
     { href: '/configuracoes', label: 'Configurações', icon: <Settings className="w-4 h-4" /> },
   ];
 
