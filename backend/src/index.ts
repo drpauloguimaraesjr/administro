@@ -21,6 +21,7 @@ import intercurrencesRoutes from './routes/intercurrencesRoutes.js';
 import knowledgeRoutes from './routes/knowledgeRoutes.js';
 import documentRoutes from './routes/documentRoutes.js';
 import inventoryRoutes from './routes/inventory.routes.js';
+import billingRoutes from './routes/billing.routes.js';
 
 const app = express();
 
@@ -72,6 +73,7 @@ app.use('/api/intercurrences', intercurrencesRoutes);
 app.use('/api/knowledge', knowledgeRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/inventory', inventoryRoutes);
+app.use('/api/billing', billingRoutes);
 
 // Inicia servidor
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;

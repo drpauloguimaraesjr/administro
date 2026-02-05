@@ -336,8 +336,9 @@ export default function ProdutosPage() {
                     <TableHead>Categoria</TableHead>
                     <TableHead className="text-center">Unidade</TableHead>
                     <TableHead className="text-center">Est. Mínimo</TableHead>
-                    <TableHead className="text-right">Preço Custo</TableHead>
-                    <TableHead className="text-right">Preço Venda</TableHead>
+                    <TableHead className="text-right">Custo</TableHead>
+                    <TableHead className="text-right">Venda</TableHead>
+                    <TableHead className="text-center">Margem</TableHead>
                     <TableHead className="text-center">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -377,10 +378,29 @@ export default function ProdutosPage() {
                       </TableCell>
                       <TableCell className="text-center">{product.minStock}</TableCell>
                       <TableCell className="text-right">
-                        {formatCurrency(product.costPrice)}
+                        <div>
+                          <p className="text-gray-500 text-xs">Custo</p>
+                          <p>{formatCurrency(product.costPrice)}</p>
+                        </div>
                       </TableCell>
                       <TableCell className="text-right">
-                        {formatCurrency(product.sellPrice)}
+                        <div>
+                          <p className="text-gray-500 text-xs">Venda</p>
+                          <p className="font-medium">{formatCurrency(product.sellPrice)}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {product.costPrice && product.sellPrice && product.sellPrice > 0 ? (
+                          <Badge className={
+                            product.sellPrice > product.costPrice 
+                              ? 'bg-green-100 text-green-700' 
+                              : 'bg-red-100 text-red-700'
+                          }>
+                            {(((product.sellPrice - product.costPrice) / product.sellPrice) * 100).toFixed(0)}%
+                          </Badge>
+                        ) : (
+                          <span className="text-gray-400">—</span>
+                        )}
                       </TableCell>
                       <TableCell className="text-center">
                         <DropdownMenu>
@@ -558,8 +578,8 @@ export default function ProdutosPage() {
 
             {/* Pricing */}
             <div className="border-t pt-4 mt-4">
-              <h3 className="font-medium mb-3">Preços</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <h3 className="font-medium mb-3">💰 Precificação</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label>Preço de Custo (R$)</Label>
                   <Input
@@ -569,6 +589,7 @@ export default function ProdutosPage() {
                     value={formData.costPrice}
                     onChange={(e) => setFormData({ ...formData, costPrice: parseFloat(e.target.value) || 0 })}
                   />
+                  <p className="text-xs text-gray-500">Quanto você paga</p>
                 </div>
                 <div className="space-y-2">
                   <Label>Preço de Venda (R$)</Label>
@@ -579,6 +600,51 @@ export default function ProdutosPage() {
                     value={formData.sellPrice}
                     onChange={(e) => setFormData({ ...formData, sellPrice: parseFloat(e.target.value) || 0 })}
                   />
+                  <p className="text-xs text-gray-500">Quanto você cobra</p>
+                </div>
+                <div className="space-y-2">
+                  <Label>Margem de Lucro</Label>
+                  <div className={`h-10 flex items-center justify-center rounded-md border text-lg font-bold ${
+                    formData.costPrice && formData.sellPrice && formData.sellPrice > formData.costPrice
+                      ? 'bg-green-50 border-green-200 text-green-700'
+                      : formData.costPrice && formData.sellPrice && formData.sellPrice < formData.costPrice
+                      ? 'bg-red-50 border-red-200 text-red-700'
+                      : 'bg-gray-50 border-gray-200 text-gray-500'
+                  }`}>
+                    {formData.costPrice && formData.sellPrice && formData.sellPrice > 0
+                      ? `${(((formData.sellPrice - formData.costPrice) / formData.sellPrice) * 100).toFixed(1)}%`
+                      : '—'
+                    }
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Lucro: {formData.costPrice && formData.sellPrice 
+                      ? formatCurrency(formData.sellPrice - formData.costPrice)
+                      : 'R$ 0,00'
+                    }
+                  </p>
+                </div>
+              </div>
+              
+              {/* Quick Markup Calculator */}
+              <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                <p className="text-sm font-medium mb-2">Calculadora de Markup</p>
+                <div className="flex flex-wrap gap-2">
+                  {[30, 50, 100, 150, 200].map(markup => {
+                    const suggestedPrice = formData.costPrice * (1 + markup / 100);
+                    return (
+                      <Button
+                        key={markup}
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="text-xs"
+                        onClick={() => setFormData({ ...formData, sellPrice: parseFloat(suggestedPrice.toFixed(2)) })}
+                        disabled={!formData.costPrice}
+                      >
+                        +{markup}% = {formatCurrency(suggestedPrice)}
+                      </Button>
+                    );
+                  })}
                 </div>
               </div>
             </div>

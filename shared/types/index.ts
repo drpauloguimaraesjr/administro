@@ -400,3 +400,4 @@ export interface AuditLog {
 
 // Inventory System
 export * from './inventory.js';
+export * from './billing.js';
