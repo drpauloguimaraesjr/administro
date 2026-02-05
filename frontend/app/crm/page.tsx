@@ -142,7 +142,7 @@ export default function CRMPage() {
             </div>
 
             {/* Content */}
-            <div className="flex-1 p-6 overflow-auto">
+            <div className={`flex-1 overflow-auto ${activeTab === 'pipeline' ? 'p-2' : 'p-6'}`}>
                 {activeTab === 'overview' && (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}

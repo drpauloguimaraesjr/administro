@@ -103,7 +103,7 @@ export function KanbanBoard() {
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
         >
-            <div className="flex h-full gap-4 overflow-x-auto pb-4 items-start">
+            <div className="flex h-full w-full gap-3 overflow-x-auto pb-4 items-start">
                 {COLUMNS.map((col) => {
                     const columnLeads = leads.filter(l => l.stage === col.id);
 

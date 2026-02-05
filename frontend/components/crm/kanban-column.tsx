@@ -21,7 +21,7 @@ export function KanbanColumn({ column, onAssign }: KanbanColumnProps) {
     const totalValue = column.leads.reduce((sum, lead) => sum + (lead.estimatedValue || 0), 0);
 
     return (
-        <div className="flex flex-col h-full min-w-[280px] w-[280px] rounded-lg bg-slate-50/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
+        <div className="flex flex-col h-full flex-1 min-w-[200px] max-w-[350px] rounded-lg bg-slate-50/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
             {/* Column Header */}
             <div className={cn("p-3 border-b-2", `border-[${column.color}]`)} style={{ borderColor: column.color }}>
                 <div className="flex items-center justify-between mb-1">
