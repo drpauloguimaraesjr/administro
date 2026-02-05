@@ -499,6 +499,229 @@ export const AlertService = {
 };
 
 // ====================================
+// CONSUMPTION ANALYTICS
+// ====================================
+
+export const ConsumptionService = {
+  async getProductConsumption(productId: string, days: number = 30): Promise<{
+    productId: string;
+    productName: string;
+    period: { start: string; end: string };
+    totalConsumed: number;
+    averageDaily: number;
+    consumptionByDay: Array<{ date: string; quantity: number }>;
+    consumptionTrend: 'increasing' | 'stable' | 'decreasing';
+    trendPercentage: number;
+    estimatedDaysUntilStockout: number | null;
+    currentStock: number;
+  }> {
+    const product = await ProductService.getById(productId);
+    if (!product) throw new Error('Product not found');
+
+    const now = new Date();
+    const startDate = new Date(now);
+    startDate.setDate(startDate.getDate() - days);
+
+    // Get all movements for this product
+    const movements = await MovementService.getByProduct(productId, 500);
+    
+    // Filter to date range and only 'out' movements
+    const relevantMovements = movements.filter(m => {
+      const moveDate = new Date(m.createdAt);
+      return moveDate >= startDate && moveDate <= now && m.type === 'out';
+    });
+
+    // Group by day
+    const consumptionByDay: Map<string, number> = new Map();
+    for (let d = new Date(startDate); d <= now; d.setDate(d.getDate() + 1)) {
+      consumptionByDay.set(d.toISOString().split('T')[0], 0);
+    }
+
+    for (const movement of relevantMovements) {
+      const day = movement.createdAt.split('T')[0];
+      const current = consumptionByDay.get(day) || 0;
+      consumptionByDay.set(day, current + movement.quantity);
+    }
+
+    const consumptionArray = Array.from(consumptionByDay.entries())
+      .map(([date, quantity]) => ({ date, quantity }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    const totalConsumed = consumptionArray.reduce((sum, d) => sum + d.quantity, 0);
+    const averageDaily = totalConsumed / days;
+
+    // Calculate trend (compare first half vs second half)
+    const midpoint = Math.floor(consumptionArray.length / 2);
+    const firstHalf = consumptionArray.slice(0, midpoint);
+    const secondHalf = consumptionArray.slice(midpoint);
+
+    const firstHalfAvg = firstHalf.reduce((sum, d) => sum + d.quantity, 0) / firstHalf.length || 0;
+    const secondHalfAvg = secondHalf.reduce((sum, d) => sum + d.quantity, 0) / secondHalf.length || 0;
+
+    let consumptionTrend: 'increasing' | 'stable' | 'decreasing' = 'stable';
+    let trendPercentage = 0;
+
+    if (firstHalfAvg > 0) {
+      trendPercentage = ((secondHalfAvg - firstHalfAvg) / firstHalfAvg) * 100;
+      if (trendPercentage > 15) consumptionTrend = 'increasing';
+      else if (trendPercentage < -15) consumptionTrend = 'decreasing';
+    }
+
+    // Get current stock
+    const batches = await BatchService.getByProduct(productId);
+    const currentStock = batches.reduce((sum, b) => sum + b.availableQuantity, 0);
+
+    // Estimate days until stockout
+    const estimatedDaysUntilStockout = averageDaily > 0 
+      ? Math.floor(currentStock / averageDaily) 
+      : null;
+
+    return {
+      productId,
+      productName: product.name,
+      period: {
+        start: startDate.toISOString(),
+        end: now.toISOString(),
+      },
+      totalConsumed,
+      averageDaily: Math.round(averageDaily * 100) / 100,
+      consumptionByDay: consumptionArray,
+      consumptionTrend,
+      trendPercentage: Math.round(trendPercentage * 10) / 10,
+      estimatedDaysUntilStockout,
+      currentStock,
+    };
+  },
+
+  async getAllProductsConsumption(days: number = 30): Promise<Array<{
+    productId: string;
+    productName: string;
+    category: string;
+    totalConsumed: number;
+    averageDaily: number;
+    consumptionTrend: 'increasing' | 'stable' | 'decreasing';
+    trendPercentage: number;
+    currentStock: number;
+    estimatedDaysUntilStockout: number | null;
+    status: 'ok' | 'warning' | 'critical';
+  }>> {
+    const products = await ProductService.getAll();
+    const results = [];
+
+    for (const product of products) {
+      try {
+        const consumption = await this.getProductConsumption(product.id, days);
+        
+        // Determine status
+        let status: 'ok' | 'warning' | 'critical' = 'ok';
+        if (consumption.estimatedDaysUntilStockout !== null) {
+          if (consumption.estimatedDaysUntilStockout <= 7) status = 'critical';
+          else if (consumption.estimatedDaysUntilStockout <= 14) status = 'warning';
+        }
+        if (consumption.consumptionTrend === 'increasing' && consumption.trendPercentage > 30) {
+          status = status === 'ok' ? 'warning' : status;
+        }
+
+        results.push({
+          productId: product.id,
+          productName: product.name,
+          category: product.category,
+          totalConsumed: consumption.totalConsumed,
+          averageDaily: consumption.averageDaily,
+          consumptionTrend: consumption.consumptionTrend,
+          trendPercentage: consumption.trendPercentage,
+          currentStock: consumption.currentStock,
+          estimatedDaysUntilStockout: consumption.estimatedDaysUntilStockout,
+          status,
+        });
+      } catch (error) {
+        console.error(`Error getting consumption for product ${product.id}:`, error);
+      }
+    }
+
+    // Sort by status priority, then by trend
+    return results.sort((a, b) => {
+      const statusOrder = { critical: 0, warning: 1, ok: 2 };
+      const statusDiff = statusOrder[a.status] - statusOrder[b.status];
+      if (statusDiff !== 0) return statusDiff;
+      return b.trendPercentage - a.trendPercentage;
+    });
+  },
+
+  async getConsumptionSummary(days: number = 30): Promise<{
+    period: { start: string; end: string; days: number };
+    totalMovements: number;
+    totalConsumed: number;
+    totalValue: number;
+    topConsumed: Array<{ productName: string; quantity: number; value: number }>;
+    trends: {
+      increasing: number;
+      stable: number;
+      decreasing: number;
+    };
+    alerts: {
+      lowStockSoon: number;
+      highConsumption: number;
+    };
+  }> {
+    const now = new Date();
+    const startDate = new Date(now);
+    startDate.setDate(startDate.getDate() - days);
+
+    const allConsumption = await this.getAllProductsConsumption(days);
+    const movements = await MovementService.getAll(1000);
+
+    const relevantMovements = movements.filter(m => {
+      const moveDate = new Date(m.createdAt);
+      return moveDate >= startDate && m.type === 'out';
+    });
+
+    const totalValue = relevantMovements.reduce((sum, m) => sum + (m.totalCost || 0), 0);
+
+    // Top consumed products
+    const topConsumed = allConsumption
+      .filter(p => p.totalConsumed > 0)
+      .slice(0, 5)
+      .map(p => ({
+        productName: p.productName,
+        quantity: p.totalConsumed,
+        value: 0, // Would need to calculate from movements
+      }));
+
+    // Trend counts
+    const trends = {
+      increasing: allConsumption.filter(p => p.consumptionTrend === 'increasing').length,
+      stable: allConsumption.filter(p => p.consumptionTrend === 'stable').length,
+      decreasing: allConsumption.filter(p => p.consumptionTrend === 'decreasing').length,
+    };
+
+    // Alert counts
+    const alerts = {
+      lowStockSoon: allConsumption.filter(p => 
+        p.estimatedDaysUntilStockout !== null && p.estimatedDaysUntilStockout <= 14
+      ).length,
+      highConsumption: allConsumption.filter(p => 
+        p.consumptionTrend === 'increasing' && p.trendPercentage > 30
+      ).length,
+    };
+
+    return {
+      period: {
+        start: startDate.toISOString(),
+        end: now.toISOString(),
+        days,
+      },
+      totalMovements: relevantMovements.length,
+      totalConsumed: allConsumption.reduce((sum, p) => sum + p.totalConsumed, 0),
+      totalValue,
+      topConsumed,
+      trends,
+      alerts,
+    };
+  },
+};
+
+// ====================================
 // SUMMARY / DASHBOARD
 // ====================================
 

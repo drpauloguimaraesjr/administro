@@ -5,6 +5,7 @@ import {
   MovementService,
   AlertService,
   InventoryService,
+  ConsumptionService,
 } from '../services/inventory.service.js';
 
 const router = Router();
@@ -302,6 +303,46 @@ router.post('/alerts/check', async (req, res) => {
     res.json({ success: true, alertsGenerated: count });
   } catch (error: any) {
     console.error('Error checking alerts:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ====================================
+// CONSUMPTION ANALYTICS
+// ====================================
+
+// GET /api/inventory/consumption/summary
+router.get('/consumption/summary', async (req, res) => {
+  try {
+    const days = parseInt(req.query.days as string) || 30;
+    const summary = await ConsumptionService.getConsumptionSummary(days);
+    res.json(summary);
+  } catch (error: any) {
+    console.error('Error getting consumption summary:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /api/inventory/consumption/all
+router.get('/consumption/all', async (req, res) => {
+  try {
+    const days = parseInt(req.query.days as string) || 30;
+    const consumption = await ConsumptionService.getAllProductsConsumption(days);
+    res.json(consumption);
+  } catch (error: any) {
+    console.error('Error getting all consumption:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /api/inventory/consumption/:productId
+router.get('/consumption/:productId', async (req, res) => {
+  try {
+    const days = parseInt(req.query.days as string) || 30;
+    const consumption = await ConsumptionService.getProductConsumption(req.params.productId, days);
+    res.json(consumption);
+  } catch (error: any) {
+    console.error('Error getting product consumption:', error);
     res.status(500).json({ error: error.message });
   }
 });

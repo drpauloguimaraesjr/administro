@@ -127,7 +127,19 @@ export default function EstoquePage() {
               Gerencie produtos, lotes e movimentações
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
+            <Link href="/estoque/alertas">
+              <Button variant="outline">
+                <AlertTriangle className="w-4 h-4 mr-2" />
+                Alertas
+              </Button>
+            </Link>
+            <Link href="/estoque/consumo">
+              <Button variant="outline">
+                <TrendingDown className="w-4 h-4 mr-2" />
+                Consumo
+              </Button>
+            </Link>
             <Link href="/estoque/produtos">
               <Button variant="outline">
                 <Package className="w-4 h-4 mr-2" />
