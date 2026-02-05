@@ -23,7 +23,9 @@ import { LegacyEditor, LegacyEditorRef } from '@/components/ui/legacy-editor';
 import { PrintParameters, PrintParametersModal } from '@/components/prescription/PrintParametersModal';
 import { PrescriptionPreviewModal } from '@/components/prescription/PrescriptionPreviewModal';
 import { FormulasPanel } from '@/components/prescription/FormulasPanel';
+import { StockConfirmDialog, StockConfirmData } from '@/components/prescription/StockConfirmDialog';
 import { PrescriptionFormula } from '@/types/prescription';
+import { useStockMatch, StockMatchResult } from '@/hooks/useStockMatch';
 import { toast } from 'sonner';
 
 interface Prescription {
@@ -77,6 +79,13 @@ export default function PrescriptionPage() {
     const [isSaveTemplateOpen, setIsSaveTemplateOpen] = useState(false);
     const [templateName, setTemplateName] = useState('');
     const [templateCategory, setTemplateCategory] = useState('geral');
+
+    // Stock integration states
+    const [isStockDialogOpen, setIsStockDialogOpen] = useState(false);
+    const [stockMatchResult, setStockMatchResult] = useState<StockMatchResult | null>(null);
+    const [pendingFormula, setPendingFormula] = useState<PrescriptionFormula | null>(null);
+    const [isCheckingStock, setIsCheckingStock] = useState(false);
+    const { checkMatch, registerUsage, isLoading: isStockLoading } = useStockMatch();
 
     // Fetch patient data
     const { data: patient } = useQuery({
@@ -230,9 +239,15 @@ export default function PrescriptionPage() {
         return age;
     };
 
-    const handleSelectFormula = (formula: PrescriptionFormula) => {
+    // Insert formula text into editor
+    const insertFormulaIntoEditor = (formula: PrescriptionFormula, stockInfo?: { batchNumber?: string; quantity?: number }) => {
         if (editorRef.current) {
             const via = formula.usage ? formula.usage.split(/[, ]/)[0] : '';
+            
+            // Add stock info if available
+            const stockNote = stockInfo?.batchNumber 
+                ? `<p><em style="color: #666; font-size: 11px">📦 Estoque: Lote ${stockInfo.batchNumber} (${stockInfo.quantity || 1} un)</em></p>`
+                : '';
 
             const text = `
             <p><strong><span style="font-size: 14px">USO INJETÁVEL</span></strong></p>
@@ -244,13 +259,112 @@ export default function PrescriptionPage() {
             <p><strong>Posologia:</strong> ${formula.dosage || '-'}</p>
             <p><strong>Fornecedor:</strong> ${formula.supplier || '-'}</p>
             <p><strong>Uso:</strong> ${formula.usage || ''} ${formula.presentation || ''}</p>
+            ${stockNote}
             <p>────────────────────────────────</p>
             <p></p>
             `;
 
             editorRef.current.insertContent(text);
-            toast.success(`${formula.name} adicionado!`);
         }
+    };
+
+    // Handle formula selection - check stock first
+    const handleSelectFormula = async (formula: PrescriptionFormula) => {
+        // Store the formula for later use
+        setPendingFormula(formula);
+        setIsCheckingStock(true);
+
+        try {
+            // Check if this formula matches something in stock
+            const match = await checkMatch(formula.name);
+            
+            if (match && match.found && match.hasStock && match.product && match.suggestedBatch) {
+                // Found in stock - show confirmation dialog
+                setStockMatchResult(match);
+                setIsStockDialogOpen(true);
+            } else {
+                // Not found in stock or no stock available - just insert
+                insertFormulaIntoEditor(formula);
+                toast.success(`${formula.name} adicionado!`);
+            }
+        } catch (error) {
+            console.error('Error checking stock:', error);
+            // On error, just insert without stock integration
+            insertFormulaIntoEditor(formula);
+            toast.success(`${formula.name} adicionado!`);
+        } finally {
+            setIsCheckingStock(false);
+        }
+    };
+
+    // Handle stock confirmation
+    const handleStockConfirm = async (data: StockConfirmData) => {
+        if (!pendingFormula || !patient || !currentPrescriptionId) {
+            // If no prescription ID yet, just insert and note it
+            if (pendingFormula) {
+                insertFormulaIntoEditor(pendingFormula, {
+                    batchNumber: stockMatchResult?.suggestedBatch?.batchNumber,
+                    quantity: data.quantity,
+                });
+                toast.success(`${pendingFormula.name} adicionado! (Salve a receita para registrar no estoque)`);
+            }
+            setIsStockDialogOpen(false);
+            setPendingFormula(null);
+            setStockMatchResult(null);
+            return;
+        }
+
+        try {
+            // Register the stock usage
+            await registerUsage(
+                data.productId,
+                data.quantity,
+                patientId,
+                patient.name,
+                currentPrescriptionId
+            );
+
+            // Insert formula with stock info
+            insertFormulaIntoEditor(pendingFormula, {
+                batchNumber: stockMatchResult?.suggestedBatch?.batchNumber,
+                quantity: data.quantity,
+            });
+
+            toast.success(`${pendingFormula.name} adicionado e registrado no estoque!`, {
+                description: data.generateBilling 
+                    ? `Cobrança de R$ ${(data.quantity * data.unitPrice).toFixed(2)} gerada`
+                    : undefined,
+            });
+
+            // TODO: If generateBilling is true, create billing item
+            if (data.generateBilling) {
+                // Future: api.post('/billing/items', { ... })
+                console.log('TODO: Generate billing item', data);
+            }
+
+        } catch (error: any) {
+            console.error('Error registering stock usage:', error);
+            toast.error('Erro ao registrar no estoque', {
+                description: error.message || 'Tente novamente',
+            });
+            // Still insert the formula even if stock registration fails
+            insertFormulaIntoEditor(pendingFormula);
+        } finally {
+            setIsStockDialogOpen(false);
+            setPendingFormula(null);
+            setStockMatchResult(null);
+        }
+    };
+
+    // Handle skipping stock registration
+    const handleStockSkip = () => {
+        if (pendingFormula) {
+            insertFormulaIntoEditor(pendingFormula);
+            toast.success(`${pendingFormula.name} adicionado!`);
+        }
+        setIsStockDialogOpen(false);
+        setPendingFormula(null);
+        setStockMatchResult(null);
     };
 
     const handleOpenPrintParams = (type: 'simples' | 'controlada') => {
@@ -800,6 +914,23 @@ export default function PrescriptionPage() {
                         email: patient.email,
                     }}
                     type={prescriptionType}
+                />
+            )}
+
+            {/* Stock Confirmation Dialog */}
+            {stockMatchResult && pendingFormula && (
+                <StockConfirmDialog
+                    open={isStockDialogOpen}
+                    onClose={() => {
+                        setIsStockDialogOpen(false);
+                        setPendingFormula(null);
+                        setStockMatchResult(null);
+                    }}
+                    onConfirm={handleStockConfirm}
+                    onSkip={handleStockSkip}
+                    matchResult={stockMatchResult}
+                    formulaName={pendingFormula.name}
+                    isLoading={isStockLoading}
                 />
             )}
         </div>
