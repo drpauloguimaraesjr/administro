@@ -92,6 +92,8 @@ app.listen(PORT, async () => {
   console.log(`   - /api/intercurrences`);
   console.log(`   - /api/knowledge`);
   console.log(`   - /api/documents (📄 Receitas, Atestados, Prontuários)`);
+  console.log(`   - /api/inventory (📦 Estoque)`);
+  console.log(`   - /api/billing (💰 Faturamento)`);
 
   // Inicializa WhatsApp se configurado
   if (process.env.WHATSAPP_AUTO_START === 'true') {
