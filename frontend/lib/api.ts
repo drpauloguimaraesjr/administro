@@ -1,12 +1,27 @@
 // lib/api.ts
 import axios from 'axios';
 
-let baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+// URL do backend - usa variável de ambiente ou fallback para produção/local
+const getBaseURL = () => {
+    // Se tiver variável de ambiente, usa ela
+    if (process.env.NEXT_PUBLIC_API_URL) {
+        let url = process.env.NEXT_PUBLIC_API_URL;
+        // Garante que tenha /api no final
+        if (!url.endsWith('/api')) {
+            url = url.endsWith('/') ? `${url}api` : `${url}/api`;
+        }
+        return url;
+    }
 
-// Garante que a URL tenha protocolo (https por padrão em produção)
-if (process.env.NODE_ENV === 'production' && !baseURL.startsWith('http')) {
-    baseURL = `https://${baseURL}`;
-}
+    // Fallback: produção ou local
+    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+        return 'https://backendcalyx.up.railway.app/api';
+    }
+
+    return 'http://localhost:4000/api';
+};
+
+let baseURL = getBaseURL();
 
 const api = axios.create({
     baseURL,
