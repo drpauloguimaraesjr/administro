@@ -3,16 +3,18 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { leadsService } from '@/services/leads-service';
 import { Lead, LeadStage } from '@/types/crm';
 
-// MOCK DATA FOR PRESENTATION
+const now = new Date().toISOString();
+
+// MOCK DATA FOR PRESENTATION (all required fields filled)
 const mockLeads: Lead[] = [
-    { id: '1', name: 'Juliana Paz', source: 'Instagram', stage: 'lead_frio', probableValue: 1500, createdAt: new Date().toISOString(), tags: ['Botox'] },
-    { id: '2', name: 'Marcos Viana', source: 'Google', stage: 'lead_frio', probableValue: 2500, createdAt: new Date().toISOString(), tags: ['Harmonização'] },
-    { id: '3', name: 'Ana Paula', source: 'Indicação', stage: 'marcacao_consulta', probableValue: 500, createdAt: new Date().toISOString(), tags: ['Consulta'] },
-    { id: '4', name: 'Carlos Preenchimento', source: 'WhatsApp', stage: 'marcacao_consulta', probableValue: 3500, createdAt: new Date().toISOString(), tags: ['Preenchimento'] },
-    { id: '5', name: 'Mariana Lipo', source: 'Instagram', stage: 'confirmacao_consulta', probableValue: 15000, createdAt: new Date().toISOString(), tags: ['Cirurgia'] },
-    { id: '6', name: 'Roberto Rino', source: 'Google', stage: 'confirmacao_procedimento', probableValue: 12000, createdAt: new Date().toISOString(), tags: ['Cirurgia'] },
-    { id: '7', name: 'Fernanda Dúvida', source: 'Site', stage: 'duvidas_intercorrencias', probableValue: 0, createdAt: new Date().toISOString(), tags: ['Dúvida'] },
-    { id: '8', name: 'Dr. Paulo VIP', source: 'Indicação', stage: 'dr_paulo', probableValue: 50000, createdAt: new Date().toISOString(), tags: ['VIP'] },
+    { id: '1', name: 'Juliana Paz', phone: '11999001001', source: 'instagram', stage: 'lead_frio', stageUpdatedAt: now, stageHistory: [], createdAt: now, updatedAt: now, createdBy: 'system', tags: ['Botox'], estimatedValue: 1500 },
+    { id: '2', name: 'Marcos Viana', phone: '11999002002', source: 'google', stage: 'lead_frio', stageUpdatedAt: now, stageHistory: [], createdAt: now, updatedAt: now, createdBy: 'system', tags: ['Harmonização'], estimatedValue: 2500 },
+    { id: '3', name: 'Ana Paula', phone: '11999003003', source: 'indication', stage: 'marcacao_consulta', stageUpdatedAt: now, stageHistory: [], createdAt: now, updatedAt: now, createdBy: 'system', tags: ['Consulta'], estimatedValue: 500 },
+    { id: '4', name: 'Carlos Eduardo', phone: '11999004004', source: 'whatsapp', stage: 'marcacao_consulta', stageUpdatedAt: now, stageHistory: [], createdAt: now, updatedAt: now, createdBy: 'system', tags: ['Preenchimento'], estimatedValue: 3500 },
+    { id: '5', name: 'Mariana Costa', phone: '11999005005', source: 'instagram', stage: 'confirmacao_consulta', stageUpdatedAt: now, stageHistory: [], createdAt: now, updatedAt: now, createdBy: 'system', tags: ['Cirurgia'], estimatedValue: 15000 },
+    { id: '6', name: 'Roberto Almeida', phone: '11999006006', source: 'google', stage: 'confirmacao_procedimento', stageUpdatedAt: now, stageHistory: [], createdAt: now, updatedAt: now, createdBy: 'system', tags: ['Cirurgia'], estimatedValue: 12000 },
+    { id: '7', name: 'Fernanda Lima', phone: '11999007007', source: 'website', stage: 'duvidas_intercorrencias', stageUpdatedAt: now, stageHistory: [], createdAt: now, updatedAt: now, createdBy: 'system', tags: ['Dúvida'], estimatedValue: 0 },
+    { id: '8', name: 'Dr. Paulo VIP', phone: '11999008008', source: 'indication', stage: 'dr_paulo', stageUpdatedAt: now, stageHistory: [], createdAt: now, updatedAt: now, createdBy: 'system', tags: ['VIP'], estimatedValue: 50000 },
 ];
 
 export function useLeads() {
@@ -33,7 +35,6 @@ export function useLeads() {
                 return [];
             }
         },
-        // Refetch a cada 1 minuto
         staleTime: 1000 * 60,
     });
 
@@ -49,26 +50,21 @@ export function useLeads() {
         },
     });
 
-    // Mutation: Mover Lead (Drag & Drop)
+    // Mutation: Mover Lead (Drag & Drop) com Optimistic Updates
     const moveLeadMutation = useMutation({
         mutationFn: ({ id, stage }: { id: string; stage: LeadStage }) =>
             leadsService.updateStage(id, stage),
         onMutate: async ({ id, stage }) => {
             await queryClient.cancelQueries({ queryKey: ['leads'] });
-
-            // Snapshot do valor anterior
             const previousLeads = queryClient.getQueryData<Lead[]>(['leads']);
-
-            // Atualiza otimisticamente
             if (previousLeads) {
                 queryClient.setQueryData<Lead[]>(['leads'], (old) =>
                     old?.map(lead => lead.id === id ? { ...lead, stage } : lead) || []
                 );
             }
-
             return { previousLeads };
         },
-        onError: (err, newTodo, context) => {
+        onError: (_err, _vars, context) => {
             if (context?.previousLeads) {
                 queryClient.setQueryData(['leads'], context.previousLeads);
             }
@@ -84,9 +80,7 @@ export function useLeads() {
             leadsService.assignTo(id, assignedTo),
         onMutate: async ({ id, assignedTo }) => {
             await queryClient.cancelQueries({ queryKey: ['leads'] });
-
             const previousLeads = queryClient.getQueryData<Lead[]>(['leads']);
-
             if (previousLeads) {
                 queryClient.setQueryData<Lead[]>(['leads'], (old) =>
                     old?.map(lead => lead.id === id ? {
@@ -96,10 +90,9 @@ export function useLeads() {
                     } : lead) || []
                 );
             }
-
             return { previousLeads };
         },
-        onError: (err, variables, context) => {
+        onError: (_err, _vars, context) => {
             if (context?.previousLeads) {
                 queryClient.setQueryData(['leads'], context.previousLeads);
             }
