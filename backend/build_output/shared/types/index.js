@@ -35,4 +35,8 @@ export const ROLE_PERMISSIONS = {
         { module: 'crm', actions: ['view', 'create', 'edit'] }
     ]
 };
+// Inventory System
+export * from './inventory.js';
+// Billing System
+export * from './billing.js';
 //# sourceMappingURL=index.js.map

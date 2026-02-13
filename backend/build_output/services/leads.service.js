@@ -73,6 +73,27 @@ export const LeadsService = {
                 // Poderia enviar outra mensagem aqui
             }
         }
+    },
+    // Atribuir lead a um membro da equipe
+    async assignTo(id, assignedTo) {
+        const docRef = collection.doc(id);
+        const doc = await docRef.get();
+        if (!doc.exists)
+            throw new Error('Lead not found');
+        const updateData = {
+            updatedAt: new Date().toISOString(),
+        };
+        if (assignedTo) {
+            updateData.assignedTo = assignedTo;
+            updateData.assignedAt = new Date().toISOString();
+        }
+        else {
+            // Remove atribuição
+            updateData.assignedTo = null;
+            updateData.assignedAt = null;
+        }
+        await docRef.update(updateData);
+        console.log(`✅ Lead ${id} atribuído para: ${assignedTo || 'ninguém'}`);
     }
 };
 //# sourceMappingURL=leads.service.js.map

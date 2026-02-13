@@ -257,4 +257,49 @@ export const deleteDraft = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+// Get all saved knowledge items from knowledge_base
+export const getKnowledgeBase = async (req, res) => {
+    try {
+        const { search, category, limit = 50 } = req.query;
+        let query = db.collection("knowledge_base")
+            .orderBy("savedAt", "desc")
+            .limit(Number(limit));
+        // If category filter is provided
+        if (category && category !== 'all') {
+            query = db.collection("knowledge_base")
+                .where("category", "==", category)
+                .orderBy("savedAt", "desc")
+                .limit(Number(limit));
+        }
+        const snapshot = await query.get();
+        let items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        // Client-side search filtering (Firestore doesn't support full-text search)
+        if (search && typeof search === 'string') {
+            const searchLower = search.toLowerCase();
+            items = items.filter((item) => item.topic?.toLowerCase().includes(searchLower) ||
+                item.keywords?.toLowerCase().includes(searchLower) ||
+                item.sophiaResponse?.toLowerCase().includes(searchLower));
+        }
+        // Get unique categories for filter dropdown
+        const allDocs = await db.collection("knowledge_base").get();
+        const categories = [...new Set(allDocs.docs.map(doc => doc.data().category).filter(Boolean))];
+        res.json({ items, categories, total: items.length });
+    }
+    catch (error) {
+        console.error("Error fetching knowledge base:", error);
+        res.status(500).json({ error: error.message });
+    }
+};
+// Delete a knowledge item
+export const deleteKnowledge = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await db.collection("knowledge_base").doc(id).delete();
+        res.json({ success: true });
+    }
+    catch (error) {
+        console.error("Error deleting knowledge:", error);
+        res.status(500).json({ error: error.message });
+    }
+};
 //# sourceMappingURL=knowledgeController.js.map

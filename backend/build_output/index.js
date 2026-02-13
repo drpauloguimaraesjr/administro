@@ -18,6 +18,9 @@ import { usersRouter } from './routes/users.js';
 import { whatsappQueuesRouter } from './routes/whatsapp-queues.js';
 import intercurrencesRoutes from './routes/intercurrencesRoutes.js';
 import knowledgeRoutes from './routes/knowledgeRoutes.js';
+import documentRoutes from './routes/documentRoutes.js';
+import inventoryRoutes from './routes/inventory.routes.js';
+import billingRoutes from './routes/billing.routes.js';
 const app = express();
 // Middlewares
 app.use(cors({
@@ -62,6 +65,9 @@ app.use('/api/whatsapp/queues', whatsappQueuesRouter);
 app.use('/api/medx', medxRoutes);
 app.use('/api/intercurrences', intercurrencesRoutes);
 app.use('/api/knowledge', knowledgeRoutes);
+app.use('/api/documents', documentRoutes);
+app.use('/api/inventory', inventoryRoutes);
+app.use('/api/billing', billingRoutes);
 // Inicia servidor
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
 const portEnv = process.env.PORT;
@@ -77,6 +83,9 @@ app.listen(PORT, async () => {
     console.log(`   - /api/users`);
     console.log(`   - /api/intercurrences`);
     console.log(`   - /api/knowledge`);
+    console.log(`   - /api/documents (📄 Receitas, Atestados, Prontuários)`);
+    console.log(`   - /api/inventory (📦 Estoque)`);
+    console.log(`   - /api/billing (💰 Faturamento)`);
     // Inicializa WhatsApp se configurado
     if (process.env.WHATSAPP_AUTO_START === 'true') {
         try {
