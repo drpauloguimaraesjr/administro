@@ -259,7 +259,7 @@ export default function IndicacoesPage() {
                             {patients
                                 .filter((p: Patient) => p.referralSource === 'indication')
                                 .slice(0, 5)
-                                .map((patient: Patient, i) => (
+                                .map((patient: Patient, i: number) => (
                                     <div
                                         key={patient.id || i}
                                         className="flex items-center justify-between p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors"
