@@ -2,81 +2,157 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ========================================
+   CALYX — BOTANICAL BRUTALISM
+   Charcoal + Sage + Bone | Zero Radius | No Shadows
+   Typography-driven. Every pixel earns its place.
+   ======================================== */
+
 @layer base {
   :root {
-    /* --- IDENTITY: MINIMALIST EMERALD --- */
-    /* Refined, discrete, professional. Based on Superior Template colors but tamed proportions. */
+    /* ===== BACKGROUND & FOREGROUND ===== */
+    --background: 30 20% 95%; /* #f5f0eb — Warm Bone */
+    --foreground: 0 0% 10%; /* #1a1a1a — Deep Charcoal */
 
-    /* SHADCN THEME MAPPING */
+    /* ===== CARD SURFACES ===== */
+    --card: 30 20% 97%; /* #f8f4f0 — Slightly lighter bone */
+    --card-foreground: 0 0% 10%; /* #1a1a1a */
 
-    --background: 0 0% 100%;
-    /* Pure White */
-    --foreground: 220 9% 13%;
-    /* Gray 900 - Crisp text */
+    /* ===== POPOVER/DROPDOWN ===== */
+    --popover: 30 20% 97%; /* #f8f4f0 */
+    --popover-foreground: 0 0% 10%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 220 9% 13%;
+    /* ===== PRIMARY (Sage Green) ===== */
+    --primary: 105 15% 53%; /* #7c9a72 — Sage */
+    --primary-foreground: 0 0% 100%; /* White */
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 9% 13%;
+    /* ===== SECONDARY ===== */
+    --secondary: 30 10% 90%; /* #e8e2dc — Warm gray */
+    --secondary-foreground: 0 0% 13%; /* #212121 */
 
-    /* PRIMARY: Emerald 600 (Slightly deeper/more serious than the template's 500) */
-    --primary: 161 94% 30%;
-    /* #059669 - Emerald 600 */
-    --primary-foreground: 0 0% 100%;
+    /* ===== MUTED ===== */
+    --muted: 30 10% 90%; /* #e8e2dc */
+    --muted-foreground: 0 0% 45%; /* #737373 — Medium gray */
 
-    /* SECONDARY: Very subtle Gray/Green tint */
-    --secondary: 210 40% 96.1%;
-    /* Zinc 100 */
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* ===== ACCENT ===== */
+    --accent: 105 10% 90%; /* Light sage tint */
+    --accent-foreground: 0 0% 13%; /* #212121 */
 
-    /* MUTED: Grays */
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* ===== DESTRUCTIVE ===== */
+    --destructive: 0 45% 55%; /* Muted rose — not screaming red */
+    --destructive-foreground: 0 0% 100%;
 
-    /* ACCENT: Very subtle interaction state */
-    --accent: 152 81% 96%;
-    /* Emerald 50 - Only shows on hover/active */
-    --accent-foreground: 161 94% 30%;
+    /* ===== BORDERS & INPUTS ===== */
+    --border: 30 8% 82%; /* #d4cec8 — Warm border */
+    --input: 30 8% 82%; /* #d4cec8 */
+    --ring: 105 15% 53%; /* Sage focus ring */
 
-    /* DESTRUCTIVE */
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* ===== RADIUS — ZERO. Brutal. ===== */
+    --radius: 0px;
 
-    /* BORDERS: Delicate */
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 161 94% 30%;
-    /* Match Primary */
+    /* ===== CHART COLORS ===== */
+    --chart-1: 105 15% 53%; /* Sage */
+    --chart-2: 35 50% 55%; /* Warm amber */
+    --chart-3: 0 0% 30%; /* Charcoal mid */
+    --chart-4: 180 12% 50%; /* Muted teal */
+    --chart-5: 0 35% 55%; /* Dusty rose */
 
-    /* RADIUS: Discrete/Modern (0.5rem = 8px) */
-    /* Not too round (childish), not square (brutalist). Just right. */
-    --radius: 0.5rem;
+    /* ===== SIDEBAR ===== */
+    --sidebar-background: 0 0% 10%; /* #1a1a1a — Charcoal */
+    --sidebar-foreground: 30 10% 75%; /* #c2b9ae — Warm light */
+    --sidebar-primary: 105 15% 53%; /* Sage */
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 16%; /* #292929 — Slightly lighter */
+    --sidebar-accent-foreground: 30 10% 90%;
+    --sidebar-border: 0 0% 20%; /* #333333 */
+    --sidebar-ring: 105 15% 53%; /* Sage */
 
-    /* CHARTS - Minimal palette */
-    --chart-1: 161 94% 30%;
-    /* Primary Emerald */
-    --chart-2: 151 55% 42%;
-    /* Secondary Green */
-    --chart-3: 215 16% 47%;
-    /* Gray */
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    /* ===== SEMANTIC COLORS ===== */
+    --success: 105 25% 45%; /* Deep sage-green */
+    --success-foreground: 0 0% 100%;
+    --warning: 35 70% 50%; /* Warm amber */
+    --warning-foreground: 0 0% 10%;
+    --info: 200 15% 50%; /* Muted blue-gray */
+    --info-foreground: 0 0% 100%;
 
-    /* SIDEBAR: Minimalist - White or very light gray, not heavy dark */
-    --sidebar: 0 0% 98%;
-    /* Gray 50 */
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 161 94% 30%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* ===== BRAND ===== */
+    --brand-sage: 105 15% 53%; /* #7c9a72 */
+    --brand-charcoal: 0 0% 10%; /* #1a1a1a */
+    --brand-bone: 30 20% 95%; /* #f5f0eb */
+    --brand-amber: 35 50% 55%; /* Warm accent */
   }
-}
 
-@layer base {
+  .dark {
+    /* ===== BACKGROUND & FOREGROUND ===== */
+    --background: 0 0% 7%; /* #121212 — Near black */
+    --foreground: 30 10% 85%; /* #dbd4cc — Warm off-white */
+
+    /* ===== CARD SURFACES ===== */
+    --card: 0 0% 10%; /* #1a1a1a */
+    --card-foreground: 30 10% 85%; /* #dbd4cc */
+
+    /* ===== POPOVER/DROPDOWN ===== */
+    --popover: 0 0% 10%; /* #1a1a1a */
+    --popover-foreground: 30 10% 85%;
+
+    /* ===== PRIMARY (Sage — slightly brighter) ===== */
+    --primary: 105 20% 58%; /* Brighter sage */
+    --primary-foreground: 0 0% 7%; /* Dark text on sage */
+
+    /* ===== SECONDARY ===== */
+    --secondary: 0 0% 15%; /* #262626 */
+    --secondary-foreground: 30 10% 85%;
+
+    /* ===== MUTED ===== */
+    --muted: 0 0% 15%; /* #262626 */
+    --muted-foreground: 30 5% 55%; /* #918a82 */
+
+    /* ===== ACCENT ===== */
+    --accent: 0 0% 15%; /* #262626 */
+    --accent-foreground: 30 10% 85%;
+
+    /* ===== DESTRUCTIVE ===== */
+    --destructive: 0 45% 50%; /* Muted rose */
+    --destructive-foreground: 30 10% 90%;
+
+    /* ===== BORDERS & INPUTS ===== */
+    --border: 0 0% 20%; /* #333333 */
+    --input: 0 0% 20%; /* #333333 */
+    --ring: 105 20% 58%; /* Sage */
+
+    /* ===== CHART COLORS ===== */
+    --chart-1: 105 20% 58%; /* Sage bright */
+    --chart-2: 35 55% 60%; /* Amber bright */
+    --chart-3: 0 0% 60%; /* Light gray */
+    --chart-4: 180 15% 55%; /* Teal bright */
+    --chart-5: 0 40% 60%; /* Rose bright */
+
+    /* ===== SIDEBAR ===== */
+    --sidebar-background: 0 0% 5%; /* #0d0d0d — Deepest black */
+    --sidebar-foreground: 30 5% 60%; /* Warm gray */
+    --sidebar-primary: 105 20% 58%;
+    --sidebar-primary-foreground: 0 0% 7%;
+    --sidebar-accent: 0 0% 12%; /* #1f1f1f */
+    --sidebar-accent-foreground: 30 10% 85%;
+    --sidebar-border: 0 0% 15%; /* #262626 */
+    --sidebar-ring: 105 20% 58%;
+
+    /* ===== SEMANTIC COLORS ===== */
+    --success: 105 25% 50%;
+    --success-foreground: 0 0% 7%;
+    --warning: 35 70% 55%;
+    --warning-foreground: 0 0% 7%;
+    --info: 200 18% 55%;
+    --info-foreground: 0 0% 7%;
+
+    /* ===== BRAND ===== */
+    --brand-sage: 105 20% 58%;
+    --brand-charcoal: 0 0% 7%;
+    --brand-bone: 30 10% 85%;
+    --brand-amber: 35 55% 60%;
+  }
+
+  /* ===== BASE STYLES ===== */
   * {
     @apply border-border;
   }
@@ -86,31 +162,292 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
-    /* Clean, no texture. Pure digital minimalism. */
-    font-feature-settings: "rlig" 1, "calt" 1;
+    @apply bg-background text-foreground;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.7;
+    letter-spacing: 0.01em;
+  }
+
+  /* ===== SELECTION — Sage highlight ===== */
+  ::selection {
+    background: hsl(105 15% 53% / 0.25);
+    color: hsl(0 0% 10%);
+  }
+
+  .dark ::selection {
+    background: hsl(105 20% 58% / 0.3);
+    color: hsl(30 10% 90%);
   }
 }
 
-@layer components {
-  /* MINIMALIST UTILITIES */
+/* ========================================
+   TYPOGRAPHY — Playfair Display + DM Mono
+   ======================================== */
 
-  /* Buttons: Discrete, no heavy shadows */
-  .btn-primary {
-    @apply bg-primary hover:bg-emerald-700 text-white rounded-md px-4 py-2 text-sm font-medium transition-colors shadow-sm;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-playfair), Georgia, "Times New Roman", serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+/* ========================================
+   COMPONENT UTILITIES
+   ======================================== */
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
   }
 
-  .btn-ghost-emerald {
-    @apply hover:bg-emerald-50 text-emerald-700 hover:text-emerald-800 transition-colors;
+  /* ===== BRUTAL CARD — no fill, border-only ===== */
+  .glass-card {
+    @apply bg-transparent border border-border;
+    @apply transition-colors duration-150;
+    @apply hover:border-foreground/30;
   }
 
-  /* Cards: Flat or super subtle shadow */
-  .card-minimal {
-    @apply bg-white rounded-lg border border-border shadow-sm hover:shadow-md transition-shadow duration-200;
+  /* ===== PANEL ===== */
+  .glass-panel {
+    @apply bg-background border-r border-border;
   }
 
-  /* Badges: Soft colors, small text */
-  .badge-minimal {
-    @apply bg-emerald-50 text-emerald-700 rounded-full px-2.5 py-0.5 text-xs font-medium border border-emerald-100;
+  /* ===== SKELETON LOADING ===== */
+  .skeleton {
+    @apply animate-pulse bg-muted;
+  }
+
+  /* ===== FOCUS RING ===== */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-1 focus:ring-offset-background;
+  }
+
+  /* ===== MONO LABEL — uppercase micro text ===== */
+  .mono-label {
+    font-family: var(--font-dm-mono), "Courier New", monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-size: 0.7rem;
+    font-weight: 500;
+  }
+}
+
+/* ========================================
+   SCROLLBAR — near-invisible
+   ======================================== */
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.4);
+}
+
+/* ========================================
+   FLUID TYPOGRAPHY
+   ======================================== */
+
+.text-fluid-xs {
+  font-size: clamp(0.7rem, 0.6rem + 0.25vw, 0.75rem);
+}
+
+.text-fluid-sm {
+  font-size: clamp(0.8rem, 0.75rem + 0.25vw, 0.875rem);
+}
+
+.text-fluid-base {
+  font-size: clamp(0.875rem, 0.825rem + 0.25vw, 1rem);
+}
+
+.text-fluid-lg {
+  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+}
+
+.text-fluid-xl {
+  font-size: clamp(1.125rem, 1rem + 0.625vw, 1.25rem);
+}
+
+.text-fluid-2xl {
+  font-size: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
+}
+
+.text-fluid-3xl {
+  font-size: clamp(1.5rem, 1.25rem + 1.25vw, 1.875rem);
+}
+
+/* ========================================
+   ANIMATIONS — sharp, fast, intentional
+   ======================================== */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.15s ease-out;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.2s ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.15s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.2s ease-out;
+}
+
+/* ========================================
+   FORM INPUTS — underline-style brutal
+   ======================================== */
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+input[type="search"],
+textarea,
+select {
+  @apply bg-transparent text-foreground;
+  @apply border border-input;
+  @apply placeholder:text-muted-foreground;
+  @apply focus:outline-none focus:ring-1 focus:ring-ring focus:border-foreground/50;
+  @apply transition-colors duration-150;
+  border-radius: 0;
+}
+
+/* ========================================
+   BUTTONS & INTERACTIVE ELEMENTS
+   ======================================== */
+
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  @apply outline-none ring-1 ring-ring ring-offset-1 ring-offset-background;
+}
+
+/* ========================================
+   CARD HOVER — subtle border shift
+   ======================================== */
+
+.card-hover {
+  @apply transition-colors duration-150;
+  @apply hover:border-foreground/40;
+}
+
+/* ========================================
+   STATUS INDICATOR DOTS
+   ======================================== */
+
+.status-dot {
+  @apply w-1.5 h-1.5 rounded-full;
+}
+
+.status-dot-success {
+  background: hsl(var(--success));
+}
+
+.status-dot-warning {
+  background: hsl(var(--warning));
+}
+
+.status-dot-error {
+  background: hsl(var(--destructive));
+}
+
+.status-dot-info {
+  background: hsl(var(--info));
+}
+
+/* ========================================
+   PAGE TRANSITIONS
+   ======================================== */
+
+.page-enter {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 0.15s ease-out,
+    transform 0.15s ease-out;
+}
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
   }
 }

@@ -1,11 +1,22 @@
 import type { Metadata, Viewport } from 'next';
-import { Manrope } from 'next/font/google';
+import { Playfair_Display, DM_Mono } from 'next/font/google';
 import './globals.css';
 import { MainLayout } from '@/components/layout/main-layout';
 import { AuthProvider } from '@/components/auth/auth-provider';
 import Providers from '@/components/providers';
 
-const font = Manrope({ subsets: ['latin'] });
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  variable: '--font-playfair',
+  display: 'swap',
+});
+
+const dmMono = DM_Mono({
+  subsets: ['latin'],
+  weight: ['300', '400', '500'],
+  variable: '--font-dm-mono',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'CALYX - Sistema Médico',
@@ -19,7 +30,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body className={font.className}>
+      <body className={`${playfair.variable} ${dmMono.variable} font-mono`}>
         <Providers>
           <AuthProvider>
             <MainLayout>

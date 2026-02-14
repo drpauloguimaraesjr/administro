@@ -8,7 +8,6 @@ import { useAuth } from '@/components/auth/auth-provider';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 
 interface Appointment {
   id: string;
@@ -36,14 +35,12 @@ export default function Home() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
 
-  // Redirect if not authenticated
   useEffect(() => {
     if (!authLoading && !user) {
       router.push('/login');
     }
   }, [user, authLoading, router]);
 
-  // Fetch today's appointments
   const today = new Date().toISOString().split('T')[0];
   const { data: apiAppointments = [] } = useQuery({
     queryKey: ['dashboard-appointments'],
@@ -58,49 +55,40 @@ export default function Home() {
 
   const appointments = apiAppointments.length > 0 ? apiAppointments : mockAppointments;
 
-  // Fetch all patients count
   const { data: patients = [] } = useQuery({
     queryKey: ['dashboard-patients'],
     queryFn: async () => {
       try {
         const res = await api.get('/patients');
         return res.data;
-      } catch (e) { return Array(1248).fill({}); } // Mock count
+      } catch (e) { return Array(1248).fill({}); }
     },
     enabled: !!user,
   });
 
-  // Find next appointment
-  const now = new Date();
   const upcomingToday = appointments
     .filter((apt: Appointment) => apt.status !== 'cancelled')
     .sort((a: Appointment, b: Appointment) => a.startTime.localeCompare(b.startTime));
 
-  const nextAppointment = upcomingToday.find((apt: Appointment) => {
-    const [hours, minutes] = apt.startTime.split(':').map(Number);
-    const aptTime = new Date(today);
-    aptTime.setHours(hours, minutes);
-    // Mock logic: simply take the first one if mock
-    return true;
-  }) || upcomingToday[0];
+  const nextAppointment = upcomingToday[0];
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.1 },
+      transition: { staggerChildren: 0.05 },
     },
   };
 
   const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1, transition: { duration: 0.5 } },
+    hidden: { y: 4, opacity: 0 },
+    visible: { y: 0, opacity: 1, transition: { duration: 0.15 } },
   };
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-8 h-8 border border-border border-t-primary animate-spin" />
       </div>
     );
   }
@@ -108,7 +96,7 @@ export default function Home() {
   if (!user) return null;
 
   return (
-    <div className="bg-secondary/30 min-h-screen p-6">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto space-y-8">
         <motion.div
           variants={containerVariants}
@@ -116,106 +104,103 @@ export default function Home() {
           animate="visible"
           className="space-y-8"
         >
-          {/* Header */}
+          {/* Page Header */}
           <motion.div variants={itemVariants} className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div className="space-y-1">
-              <motion.h1
-                className="text-3xl font-bold text-gray-900 tracking-tight"
-                whileHover={{ scale: 1.01 }}
-              >
-                Olá, Dr. Paulo
-              </motion.h1>
-              <p className="text-gray-500">
-                Aqui está o resumo do seu dia.
+              <h1 className="font-serif text-3xl font-bold text-foreground tracking-tight">
+                Dashboard
+              </h1>
+              <p className="font-mono text-sm text-muted-foreground">
+                Resumo do seu dia.
               </p>
             </div>
             <div className="flex gap-3">
               <Link href="/agenda">
-                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm">
-                  <Plus className="w-4 h-4 mr-2" /> Nova Consulta
-                </Button>
+                <button className="h-9 px-4 bg-[#7c9a72] hover:bg-[#6b8a62] text-white font-mono text-xs uppercase tracking-[0.15em] border-0 transition-colors duration-150 flex items-center gap-2">
+                  <Plus className="w-3.5 h-3.5" /> Nova Consulta
+                </button>
               </Link>
             </div>
           </motion.div>
 
           {/* Stats Cards */}
-          <motion.div variants={itemVariants} className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          <motion.div variants={itemVariants} className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <StatCard
-              icon={<Calendar className="w-5 h-5" />}
+              icon={<Calendar className="w-4 h-4" />}
               label="Consultas Hoje"
               value={appointments.length}
-              color="teal"
             />
             <StatCard
-              icon={<Clock className="w-5 h-5" />}
-              label="Próxima Consulta"
-              value={nextAppointment ? nextAppointment.startTime : '-'}
+              icon={<Clock className="w-4 h-4" />}
+              label="Próxima"
+              value={nextAppointment ? nextAppointment.startTime : '—'}
               subtext={nextAppointment?.patientName}
-              color="blue"
             />
             <StatCard
-              icon={<Users className="w-5 h-5" />}
+              icon={<Users className="w-4 h-4" />}
               label="Pacientes Ativos"
               value={patients.length || 1248}
-              color="emerald"
             />
             <StatCard
-              icon={<Activity className="w-5 h-5" />}
+              icon={<Activity className="w-4 h-4" />}
               label="Taxa de Faltas"
               value="2%"
-              color="purple"
             />
           </motion.div>
 
           {/* Today's Schedule & Quick Actions */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-            {/* Schedule (Takes 2 columns) */}
-            <motion.div variants={itemVariants} className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            {/* Schedule (2 columns) */}
+            <motion.div variants={itemVariants} className="lg:col-span-2 border border-border bg-card p-6">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-emerald-600" />
+                <h2 className="font-serif text-xl font-bold text-foreground flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-[#7c9a72]" />
                   Agenda de Hoje
                 </h2>
-                <Link href="/agenda" className="text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline flex items-center gap-1">
-                  Ver completa <ArrowRight className="w-4 h-4" />
+                <Link href="/agenda" className="mono-label text-[#7c9a72] hover:text-[#6b8a62] transition-colors duration-150 flex items-center gap-1">
+                  Ver completa <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>
 
               {appointments.length === 0 ? (
-                <div className="text-center py-12 text-gray-400 bg-gray-50 rounded-lg border border-dashed border-gray-200">
-                  <Calendar className="w-12 h-12 mx-auto mb-3 opacity-20" />
-                  <p>Nenhuma consulta agendada para hoje</p>
+                <div className="text-center py-12 text-muted-foreground border border-dashed border-border">
+                  <Calendar className="w-10 h-10 mx-auto mb-3 opacity-20" />
+                  <p className="font-mono text-sm">Nenhuma consulta agendada</p>
                   <Link href="/agenda">
-                    <Button variant="outline" className="mt-4 border-emerald-200 text-emerald-700 hover:bg-emerald-50">
+                    <button className="mt-4 px-4 py-2 border border-border text-foreground font-mono text-xs uppercase tracking-[0.15em] hover:border-foreground/40 transition-colors duration-150">
                       Agendar Consulta
-                    </Button>
+                    </button>
                   </Link>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-2">
                   {upcomingToday.slice(0, 5).map((apt: Appointment) => (
                     <div
                       key={apt.id}
-                      className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl hover:shadow-md hover:border-emerald-100 transition-all group"
+                      className="flex items-center justify-between p-4 border border-border hover:border-foreground/30 transition-colors duration-150 group"
                     >
-                      <div className="flex items-center gap-5">
-                        <div className="text-center bg-emerald-50 text-emerald-700 px-3 py-2 rounded-lg font-bold min-w-[70px]">
+                      <div className="flex items-center gap-4">
+                        <div className="font-mono text-lg font-medium text-foreground min-w-[60px]">
                           {apt.startTime}
                         </div>
+                        <div className="h-8 w-px bg-border" />
                         <div>
-                          <p className="font-semibold text-gray-900 group-hover:text-emerald-700 transition-colors">{apt.patientName}</p>
-                          <p className="text-sm text-gray-500">
+                          <p className="font-serif font-semibold text-foreground group-hover:text-[#7c9a72] transition-colors duration-150">
+                            {apt.patientName}
+                          </p>
+                          <p className="font-mono text-xs text-muted-foreground uppercase tracking-wider">
                             {apt.type === 'first_visit' ? 'Primeira Consulta' :
-                              apt.type === 'return' ? 'Retorno' : 'Avaliação'}
+                              apt.type === 'return' ? 'Retorno' : 'Procedimento'}
                           </p>
                         </div>
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium border ${apt.status === 'confirmed' ? 'bg-green-50 text-green-700 border-green-100' :
-                        apt.status === 'pending' ? 'bg-yellow-50 text-yellow-700 border-yellow-100' :
-                          apt.status === 'completed' ? 'bg-blue-50 text-blue-700 border-blue-100' :
-                            'bg-red-50 text-red-700 border-red-100'
-                        }`}>
+                      <span className={`font-mono text-[10px] uppercase tracking-[0.15em] px-2.5 py-1 border ${
+                        apt.status === 'confirmed' ? 'border-[#7c9a72]/30 text-[#6b8a62]' :
+                        apt.status === 'pending' ? 'border-[#c48a3a]/30 text-[#c48a3a]' :
+                        apt.status === 'completed' ? 'border-border text-muted-foreground' :
+                        'border-destructive/30 text-destructive'
+                      }`}>
                         {apt.status === 'confirmed' ? 'Confirmado' :
                           apt.status === 'pending' ? 'Pendente' :
                             apt.status === 'completed' ? 'Concluído' : 'Cancelado'}
@@ -226,30 +211,29 @@ export default function Home() {
               )}
             </motion.div>
 
-            {/* Quick Actions (Takes 1 column) */}
-            <motion.div variants={itemVariants} className="space-y-4">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4 px-1">Acesso Rápido</h2>
+            {/* Quick Actions (1 column) */}
+            <motion.div variants={itemVariants} className="space-y-3">
+              <h2 className="font-serif text-lg font-semibold text-foreground mb-4 px-1">
+                Acesso Rápido
+              </h2>
 
               <ActionCard
-                icon={<Users className="w-5 h-5" />}
+                icon={<Users className="w-4 h-4" />}
                 title="Novo Paciente"
                 description="Cadastrar ficha completa"
                 href="/patients"
-                color="emerald"
               />
               <ActionCard
-                icon={<Plus className="w-5 h-5" />}
+                icon={<Plus className="w-4 h-4" />}
                 title="Financeiro"
                 description="Registrar entrada/saída"
                 href="/transactions"
-                color="blue"
               />
               <ActionCard
-                icon={<Activity className="w-5 h-5" />}
+                icon={<Activity className="w-4 h-4" />}
                 title="CRM"
                 description="Gerenciar leads e pipeline"
                 href="/crm"
-                color="purple"
               />
             </motion.div>
 
@@ -265,37 +249,31 @@ function StatCard({
   label,
   value,
   subtext,
-  color,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string | number;
   subtext?: string;
-  color: string;
 }) {
-  const colorClasses: Record<string, string> = {
-    teal: 'bg-teal-50 text-teal-600',
-    blue: 'bg-blue-50 text-blue-600',
-    emerald: 'bg-emerald-50 text-emerald-600',
-    purple: 'bg-purple-50 text-purple-600',
-  };
-
   return (
-    <motion.div
-      className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow"
-      whileHover={{ y: -2 }}
-    >
+    <div className="border border-border bg-card p-5 hover:border-foreground/30 transition-colors duration-150">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-3xl font-bold text-gray-900 mb-1">{value}</p>
-          <p className="text-sm font-medium text-gray-500">{label}</p>
-          {subtext && <p className="text-xs text-gray-400 mt-1 truncate max-w-[120px]">{subtext}</p>}
+          <p className="font-mono text-3xl font-medium text-foreground mb-1 tracking-tight">
+            {value}
+          </p>
+          <p className="mono-label text-muted-foreground">{label}</p>
+          {subtext && (
+            <p className="font-serif text-xs text-muted-foreground mt-1.5 truncate max-w-[130px] italic">
+              {subtext}
+            </p>
+          )}
         </div>
-        <div className={`p-3 rounded-lg ${colorClasses[color]}`}>
+        <div className="text-[#7c9a72]">
           {icon}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -304,36 +282,26 @@ function ActionCard({
   title,
   description,
   href,
-  color,
 }: {
   icon: React.ReactNode;
   title: string;
   description: string;
   href: string;
-  color: string;
 }) {
   const router = useRouter();
-  const colorClasses: Record<string, string> = {
-    teal: 'bg-teal-50 text-teal-600 group-hover:bg-teal-100',
-    emerald: 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100',
-    blue: 'bg-blue-50 text-blue-600 group-hover:bg-blue-100',
-    purple: 'bg-purple-50 text-purple-600 group-hover:bg-purple-100',
-  };
 
   return (
-    <motion.button
+    <button
       onClick={() => router.push(href)}
-      className="bg-white rounded-xl shadow-sm p-5 text-left border border-gray-100 hover:border-emerald-200 hover:shadow-md transition-all w-full group flex items-center gap-4"
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
+      className="w-full text-left border border-border p-4 hover:border-foreground/30 transition-colors duration-150 group flex items-center gap-4 bg-card"
     >
-      <div className={`p-3 rounded-lg transition-colors ${colorClasses[color]}`}>
+      <div className="text-[#7c9a72] group-hover:text-[#6b8a62] transition-colors duration-150">
         {icon}
       </div>
       <div>
-        <h3 className="text-base font-semibold text-gray-900">{title}</h3>
-        <p className="text-xs text-gray-500">{description}</p>
+        <h3 className="font-serif text-sm font-semibold text-foreground">{title}</h3>
+        <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">{description}</p>
       </div>
-    </motion.button>
+    </button>
   );
 }

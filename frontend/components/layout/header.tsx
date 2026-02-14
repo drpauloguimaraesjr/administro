@@ -1,10 +1,9 @@
 'use client';
 
-import { Search, Bell, LogOut } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { LogOut } from 'lucide-react';
 import { useAuth } from '@/components/auth/auth-provider';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -14,53 +13,82 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
+function useGreeting(): string {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Bom dia';
+    if (hour < 18) return 'Boa tarde';
+    return 'Boa noite';
+}
+
+function useClock(): string {
+    const [time, setTime] = useState('');
+
+    useEffect(() => {
+        const update = () => {
+            const now = new Date();
+            setTime(
+                now.toLocaleTimeString('pt-BR', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                })
+            );
+        };
+        update();
+        const interval = setInterval(update, 1000);
+        return () => clearInterval(interval);
+    }, []);
+
+    return time;
+}
+
 export function Header() {
     const { user, logout } = useAuth();
+    const greeting = useGreeting();
+    const clock = useClock();
 
     return (
-        <div className="flex flex-1 items-center gap-4">
-            {/* Search Global */}
-            <div className="flex-1 max-w-xl relative hidden md:block">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
-                    placeholder="Buscar pacientes, consultas ou documentos..."
-                    className="pl-10 bg-gray-50 border-gray-200 focus:bg-white"
-                />
-            </div>
+        <div className="flex flex-1 items-center justify-between">
+            {/* Left — Serif Greeting */}
+            <h2 className="font-serif text-xl font-semibold text-foreground tracking-tight">
+                {greeting}, {user?.displayName?.split(' ')[0] || 'Dr.'}
+            </h2>
 
-            {/* Actions */}
-            <div className="ml-auto flex items-center gap-2">
-                <Button variant="ghost" size="icon" className="relative text-gray-500 hover:text-gray-900">
-                    <Bell className="w-5 h-5" />
-                    <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
-                </Button>
+            {/* Right — Mono Clock + Logout */}
+            <div className="flex items-center gap-4">
+                <span className="mono-label text-muted-foreground">
+                    {clock}
+                </span>
 
-                <div className="h-8 w-px bg-gray-200 mx-2" />
+                <div className="h-4 w-px bg-border" />
 
-                {/* User Profile */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="pl-0 hover:bg-transparent flex items-center gap-2">
-                            <Avatar className="h-9 w-9 border border-gray-200">
-                                <AvatarImage src={user?.photoURL || undefined} />
-                                <AvatarFallback className="bg-primary-100 text-primary-700">
-                                    {user?.displayName?.substring(0, 2).toUpperCase() || 'DR'}
-                                </AvatarFallback>
-                            </Avatar>
-                            <div className="text-left hidden sm:block">
-                                <p className="text-sm font-medium text-gray-900 leading-none">{user?.displayName || 'Dr. Usuario'}</p>
-                                <p className="text-xs text-gray-500 mt-1">{user?.email}</p>
-                            </div>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-muted-foreground hover:text-foreground font-mono text-xs uppercase tracking-widest h-8 px-2"
+                        >
+                            Menu
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56">
-                        <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
+                    <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuLabel className="font-mono text-xs uppercase tracking-wider">
+                            Conta
+                        </DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>Perfil</DropdownMenuItem>
-                        <DropdownMenuItem>Configurações</DropdownMenuItem>
+                        <DropdownMenuItem className="font-mono text-xs">
+                            Perfil
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="font-mono text-xs">
+                            Configurações
+                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-red-600 focus:text-red-600 cursor-pointer" onClick={logout}>
-                            <LogOut className="w-4 h-4 mr-2" />
+                        <DropdownMenuItem
+                            className="text-destructive focus:text-destructive cursor-pointer font-mono text-xs"
+                            onClick={logout}
+                        >
+                            <LogOut className="w-3.5 h-3.5 mr-2" />
                             Sair
                         </DropdownMenuItem>
                     </DropdownMenuContent>
