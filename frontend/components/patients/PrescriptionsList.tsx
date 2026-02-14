@@ -66,7 +66,7 @@ export function PrescriptionsList({ patientId, patientName }: PrescriptionsListP
                     {prescriptions.map((prescription: Prescription) => (
                         <div
                             key={prescription.id}
-                            className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4"
+                            className="bg-slate-50 rounded-lg p-4"
                         >
                             <div className="flex justify-between items-start mb-3">
                                 <div>
@@ -91,7 +91,7 @@ export function PrescriptionsList({ patientId, patientName }: PrescriptionsListP
 
                             <div className="space-y-2">
                                 {prescription.medications.map((med, idx) => (
-                                    <div key={idx} className="text-sm p-2 bg-white dark:bg-slate-600 rounded">
+                                    <div key={idx} className="text-sm p-2 bg-white rounded">
                                         <p className="font-medium">{med.name} - {med.dosage}</p>
                                         <p className="text-muted-foreground">
                                             {med.frequency} por {med.duration}
@@ -246,7 +246,7 @@ function PrescriptionModal({
                         <Label>Observações Gerais</Label>
                         <textarea
                             {...register('notes')}
-                            className="w-full p-3 border rounded-lg resize-none dark:bg-slate-700"
+                            className="w-full p-3 border rounded-lg resize-none"
                             rows={2}
                             placeholder="Orientações adicionais..."
                         />

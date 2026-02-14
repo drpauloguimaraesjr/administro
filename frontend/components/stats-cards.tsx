@@ -68,10 +68,10 @@ export function StatsCards({ balance, income, expenses, transactionsCount }: Sta
           <Card className="hover:shadow-lg transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <div className={`p-3 rounded-lg ${stat.color === 'blue' ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400' :
-                  stat.color === 'green' ? 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400' :
-                    stat.color === 'red' ? 'bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400' :
-                      'bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400'
+                <div className={`p-3 rounded-lg ${stat.color === 'blue' ? 'bg-blue-100 text-blue-600' :
+                  stat.color === 'green' ? 'bg-green-100 text-green-600' :
+                    stat.color === 'red' ? 'bg-red-100 text-red-600' :
+                      'bg-purple-100 text-purple-600'
                   }`}>
                   {stat.icon}
                 </div>

@@ -129,7 +129,7 @@ export default function PatientsPage() {
     };
 
     return (
-        <main className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50 to-emerald-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        <main className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50 to-emerald-50">
             <div className="container mx-auto px-4 py-6 max-w-7xl">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -205,9 +205,9 @@ export default function PatientsPage() {
                             </Button>
                         </div>
                     ) : (
-                        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+                        <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
                             {/* Header da lista */}
-                            <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                            <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                 <div className="col-span-4">Paciente</div>
                                 <div className="col-span-5 text-center">Relacionamento</div>
                                 <div className="col-span-2 text-center">Score</div>
@@ -215,18 +215,18 @@ export default function PatientsPage() {
                             </div>
 
                             {/* Lista de pacientes */}
-                            <div className="divide-y divide-slate-100 dark:divide-slate-700">
+                            <div className="divide-y divide-slate-100">
                                 {patients.map((patient: any) => (
                                     <motion.div
                                         key={patient.id}
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
-                                        className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors items-center"
+                                        className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-slate-50 transition-colors items-center"
                                     >
                                         {/* Coluna 1: Dados do Paciente */}
                                         <div className="col-span-4">
                                             <Link href={`/patients/${patient.id}`} className="group">
-                                                <h3 className="font-semibold text-slate-900 dark:text-white group-hover:text-teal-600 transition-colors">
+                                                <h3 className="font-semibold text-slate-900 group-hover:text-teal-600 transition-colors">
                                                     {patient.name}
                                                 </h3>
                                             </Link>
@@ -259,9 +259,9 @@ export default function PatientsPage() {
                                         <div className="col-span-5">
                                             <div className="grid grid-cols-3 gap-4 text-center">
                                                 {/* Desde */}
-                                                <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-2">
+                                                <div className="bg-slate-50 rounded-lg p-2">
                                                     <p className="text-[10px] uppercase text-slate-400 font-medium">Desde</p>
-                                                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                                                    <p className="text-sm font-semibold text-slate-700">
                                                         {patient.createdAt
                                                             ? new Date(patient.createdAt).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })
                                                             : '-'
@@ -270,15 +270,15 @@ export default function PatientsPage() {
                                                 </div>
 
                                                 {/* Indicado por */}
-                                                <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-2">
+                                                <div className="bg-slate-50 rounded-lg p-2">
                                                     <p className="text-[10px] uppercase text-slate-400 font-medium">Indicado por</p>
-                                                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 truncate" title={patient.referredBy || '-'}>
+                                                    <p className="text-sm font-semibold text-slate-700 truncate" title={patient.referredBy || '-'}>
                                                         {patient.referredBy || '-'}
                                                     </p>
                                                 </div>
 
                                                 {/* Indicações feitas */}
-                                                <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-2">
+                                                <div className="bg-slate-50 rounded-lg p-2">
                                                     <p className="text-[10px] uppercase text-slate-400 font-medium">Indicou</p>
                                                     <p className="text-sm font-semibold text-teal-600">
                                                         {patient.referralsCount || 0} pessoas
@@ -334,7 +334,7 @@ export default function PatientsPage() {
                             </div>
 
                             {/* Footer com contagem */}
-                            <div className="px-6 py-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700">
+                            <div className="px-6 py-3 bg-slate-50 border-t border-slate-200">
                                 <p className="text-sm text-slate-500">
                                     Total: <span className="font-semibold text-slate-700">{patients.length}</span> pacientes
                                 </p>

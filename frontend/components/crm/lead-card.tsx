@@ -67,7 +67,7 @@ export function LeadCard({ lead, onAssign }: LeadCardProps) {
             {...listeners}
             {...attributes}
             className={cn(
-                "w-full mb-3 cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow bg-white dark:bg-slate-950",
+                "w-full mb-3 cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow bg-white",
                 isDragging && "opacity-50 ring-2 ring-primary rotate-2 z-50 shadow-xl"
             )}
         >
@@ -85,14 +85,14 @@ export function LeadCard({ lead, onAssign }: LeadCardProps) {
                         </span>
                     )}
                 </div>
-                <h3 className="font-semibold text-sm leading-tight text-slate-900 dark:text-slate-100 line-clamp-2">
+                <h3 className="font-semibold text-sm leading-tight text-slate-900 line-clamp-2">
                     {lead.name}
                 </h3>
             </CardHeader>
 
             <CardContent className="p-3 py-2 space-y-2">
                 <div className="flex items-center gap-2 text-xs text-slate-500">
-                    <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">
+                    <div className="flex items-center gap-1 bg-slate-100 px-1.5 py-0.5 rounded">
                         {sourceIcons[lead.source]}
                         <span className="capitalize">{lead.source}</span>
                     </div>
@@ -110,7 +110,7 @@ export function LeadCard({ lead, onAssign }: LeadCardProps) {
                 {lead.tags && lead.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-1">
                         {lead.tags.slice(0, 3).map(tag => (
-                            <span key={tag} className="text-[10px] bg-slate-50 dark:bg-slate-900 border px-1 rounded text-slate-500">
+                            <span key={tag} className="text-[10px] bg-slate-50 border px-1 rounded text-slate-500">
                                 {tag}
                             </span>
                         ))}

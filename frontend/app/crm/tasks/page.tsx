@@ -78,12 +78,12 @@ export default function TasksPage() {
     const overdueTasks = tasks.filter(t => t.status === 'pending' && new Date(t.dueDate) < new Date());
 
     return (
-        <div className="flex flex-col h-[calc(100vh-4rem)] bg-slate-50 dark:bg-slate-950">
+        <div className="flex flex-col h-[calc(100vh-4rem)] bg-slate-50">
             {/* Header */}
             <div className="flex-none p-6 pb-0">
                 <div className="flex items-center justify-between mb-6">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Minhas Tarefas</h1>
+                        <h1 className="text-2xl font-bold tracking-tight text-slate-900">Minhas Tarefas</h1>
                         <p className="text-sm text-slate-500">
                             Gerencie suas atividades diárias e follow-ups.
                         </p>
@@ -95,7 +95,7 @@ export default function TasksPage() {
 
                 {/* Filters/Tabs */}
                 <Tabs defaultValue="all" className="w-full">
-                    <TabsList className="bg-white dark:bg-slate-900 border mb-4">
+                    <TabsList className="bg-white border mb-4">
                         <TabsTrigger value="all" className="px-6">Todas</TabsTrigger>
                         <TabsTrigger value="today">Hoje</TabsTrigger>
                         <TabsTrigger value="overdue" className="text-red-600 data-[state=active]:text-red-700">

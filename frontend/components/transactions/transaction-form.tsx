@@ -103,8 +103,8 @@ export function TransactionForm({ onClose, initialData }: TransactionFormProps) 
                 type="button"
                 onClick={() => setFormData({ ...formData, type: 'income' })}
                 className={`flex-1 p-3 rounded-lg border-2 transition-all ${formData.type === 'income'
-                  ? 'border-green-500 bg-green-50 dark:bg-green-900'
-                  : 'border-slate-200 dark:border-slate-700'
+                  ? 'border-green-500 bg-green-50
+                  : 'border-slate-200
                   }`}
               >
                 Receita
@@ -113,8 +113,8 @@ export function TransactionForm({ onClose, initialData }: TransactionFormProps) 
                 type="button"
                 onClick={() => setFormData({ ...formData, type: 'expense' })}
                 className={`flex-1 p-3 rounded-lg border-2 transition-all ${formData.type === 'expense'
-                  ? 'border-red-500 bg-red-50 dark:bg-red-900'
-                  : 'border-slate-200 dark:border-slate-700'
+                  ? 'border-red-500 bg-red-50
+                  : 'border-slate-200
                   }`}
               >
                 Despesa
@@ -208,8 +208,8 @@ export function TransactionForm({ onClose, initialData }: TransactionFormProps) 
                 type="button"
                 onClick={() => setFormData({ ...formData, contextId: 'HOME' })}
                 className={`flex-1 p-3 rounded-lg border-2 transition-all ${formData.contextId === 'HOME'
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900'
-                  : 'border-slate-200 dark:border-slate-700'
+                  ? 'border-blue-500 bg-blue-50
+                  : 'border-slate-200
                   }`}
               >
                 🏠 Casa
@@ -218,8 +218,8 @@ export function TransactionForm({ onClose, initialData }: TransactionFormProps) 
                 type="button"
                 onClick={() => setFormData({ ...formData, contextId: 'CLINIC' })}
                 className={`flex-1 p-3 rounded-lg border-2 transition-all ${formData.contextId === 'CLINIC'
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900'
-                  : 'border-slate-200 dark:border-slate-700'
+                  ? 'border-blue-500 bg-blue-50
+                  : 'border-slate-200
                   }`}
               >
                 🏥 Clínica
@@ -235,8 +235,8 @@ export function TransactionForm({ onClose, initialData }: TransactionFormProps) 
                 type="button"
                 onClick={() => setFormData({ ...formData, status: 'paid' })}
                 className={`flex-1 p-3 rounded-lg border-2 transition-all ${formData.status === 'paid'
-                  ? 'border-green-500 bg-green-50 dark:bg-green-900'
-                  : 'border-slate-200 dark:border-slate-700'
+                  ? 'border-green-500 bg-green-50
+                  : 'border-slate-200
                   }`}
               >
                 Pago
@@ -245,8 +245,8 @@ export function TransactionForm({ onClose, initialData }: TransactionFormProps) 
                 type="button"
                 onClick={() => setFormData({ ...formData, status: 'pending' })}
                 className={`flex-1 p-3 rounded-lg border-2 transition-all ${formData.status === 'pending'
-                  ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900'
-                  : 'border-slate-200 dark:border-slate-700'
+                  ? 'border-yellow-500 bg-yellow-50
+                  : 'border-slate-200
                   }`}
               >
                 Pendente

@@ -81,7 +81,7 @@ export default function IntercurrencesPage() {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold flex items-center gap-2 text-slate-800 dark:text-slate-100">
+                    <h1 className="text-3xl font-bold flex items-center gap-2 text-slate-800">
                         <Activity className="w-8 h-8 text-red-500" />
                         Central Sentinel
                     </h1>
@@ -136,11 +136,11 @@ export default function IntercurrencesPage() {
                                     <CardDescription>Paciente ID: {item.patientId}</CardDescription>
                                 </CardHeader>
                                 <CardContent>
-                                    <p className="text-slate-700 dark:text-slate-300 font-medium mb-2">
+                                    <p className="text-slate-700 font-medium mb-2">
                                         &quot;{item.description}&quot;
                                     </p>
                                     {item.aiAnalysis && (
-                                        <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-md text-sm italic border border-slate-100 dark:border-slate-700">
+                                        <div className="bg-slate-50 p-3 rounded-md text-sm italic border border-slate-100">
                                             🤖 AI: {item.aiAnalysis.summary}
                                         </div>
                                     )}
@@ -179,19 +179,19 @@ export default function IntercurrencesPage() {
 
                     {selectedItem && (
                         <div className="space-y-4 py-4">
-                            <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border">
+                            <div className="p-4 bg-slate-50 rounded-lg border">
                                 <h4 className="text-sm font-semibold text-slate-500 uppercase mb-2">Relato do Paciente</h4>
-                                <p className="text-lg text-slate-800 dark:text-slate-200">&quot;{selectedItem.description}&quot;</p>
+                                <p className="text-lg text-slate-800">&quot;{selectedItem.description}&quot;</p>
                             </div>
 
                             {selectedItem.aiAnalysis && (
-                                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
-                                    <div className="flex items-center gap-2 mb-2 text-blue-700 dark:text-blue-400">
+                                <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                                    <div className="flex items-center gap-2 mb-2 text-blue-700">
                                         <Activity className="w-4 h-4" />
                                         <h4 className="text-sm font-bold uppercase">Análise da Sophia (IA)</h4>
                                     </div>
-                                    <p className="text-sm text-slate-700 dark:text-slate-300 mb-2">{selectedItem.aiAnalysis.summary}</p>
-                                    <div className="bg-white dark:bg-slate-800 p-2 rounded text-sm font-medium border-l-4 border-blue-500">
+                                    <p className="text-sm text-slate-700 mb-2">{selectedItem.aiAnalysis.summary}</p>
+                                    <div className="bg-white p-2 rounded text-sm font-medium border-l-4 border-blue-500">
                                         💡 Sugestão: {selectedItem.aiAnalysis.suggestion}
                                     </div>
                                 </div>

@@ -237,7 +237,7 @@ export default function QuestionariosPage() {
     };
 
     return (
-        <main className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50 to-emerald-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        <main className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50 to-emerald-50">
             <div className="container mx-auto px-4 py-6 max-w-6xl">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -258,9 +258,9 @@ export default function QuestionariosPage() {
 
                     {/* Stats */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
+                        <div className="bg-white rounded-xl shadow-lg p-6">
                             <div className="flex items-center gap-4">
-                                <div className="p-3 bg-teal-100 dark:bg-teal-900 rounded-lg">
+                                <div className="p-3 bg-teal-100 rounded-lg">
                                     <ClipboardList className="w-6 h-6 text-teal-600" />
                                 </div>
                                 <div>
@@ -269,9 +269,9 @@ export default function QuestionariosPage() {
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
+                        <div className="bg-white rounded-xl shadow-lg p-6">
                             <div className="flex items-center gap-4">
-                                <div className="p-3 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                                <div className="p-3 bg-blue-100 rounded-lg">
                                     <Send className="w-6 h-6 text-blue-600" />
                                 </div>
                                 <div>
@@ -282,9 +282,9 @@ export default function QuestionariosPage() {
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
+                        <div className="bg-white rounded-xl shadow-lg p-6">
                             <div className="flex items-center gap-4">
-                                <div className="p-3 bg-green-100 dark:bg-green-900 rounded-lg">
+                                <div className="p-3 bg-green-100 rounded-lg">
                                     <CheckCircle className="w-6 h-6 text-green-600" />
                                 </div>
                                 <div>
@@ -296,7 +296,7 @@ export default function QuestionariosPage() {
                     </div>
 
                     {/* List */}
-                    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
+                    <div className="bg-white rounded-xl shadow-lg p-6">
                         <h2 className="text-lg font-semibold mb-4">Meus Questionários</h2>
 
                         {isLoading ? (
@@ -426,7 +426,7 @@ export default function QuestionariosPage() {
                             </div>
 
                             {sections.map((section, sIndex) => (
-                                <div key={section.id} className="mb-4 p-4 border rounded-lg bg-slate-50 dark:bg-slate-900">
+                                <div key={section.id} className="mb-4 p-4 border rounded-lg bg-slate-50">
                                     <Input
                                         value={section.title}
                                         onChange={(e) => {
@@ -439,7 +439,7 @@ export default function QuestionariosPage() {
                                     />
 
                                     {section.questions.map((question) => (
-                                        <div key={question.id} className="mb-3 p-3 bg-white dark:bg-slate-800 rounded border">
+                                        <div key={question.id} className="mb-3 p-3 bg-white rounded border">
                                             <div className="flex gap-2 mb-2">
                                                 <Input
                                                     value={question.text}
@@ -531,7 +531,7 @@ export default function QuestionariosPage() {
                             {patients.map((p: any) => (
                                 <label
                                     key={p.id}
-                                    className="flex items-center gap-3 p-3 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer border-b last:border-b-0"
+                                    className="flex items-center gap-3 p-3 hover:bg-slate-50 cursor-pointer border-b last:border-b-0"
                                 >
                                     <input
                                         type="checkbox"

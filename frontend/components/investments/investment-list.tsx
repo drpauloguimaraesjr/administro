@@ -62,7 +62,7 @@ function InvestmentCard({ investment }: { investment: Investment }) {
                 {investment.type.replace('_', ' ')}
               </p>
             </div>
-            <span className="px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 text-xs">
+            <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-600 text-xs">
               {investment.contextId === 'HOME' ? 'Casa' : 'Clínica'}
             </span>
           </div>
@@ -91,7 +91,7 @@ function InvestmentCard({ investment }: { investment: Investment }) {
               <span className="text-muted-foreground">Progresso</span>
               <span className="font-medium">{progress.toFixed(1)}%</span>
             </div>
-            <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+            <div className="w-full bg-slate-200 rounded-full h-2">
               <div
                 className="bg-blue-600 h-2 rounded-full transition-all"
                 style={{ width: `${progress}%` }}
@@ -108,7 +108,7 @@ function InvestmentCard({ investment }: { investment: Investment }) {
                 </span>
                 <span className="font-medium">{installmentProgress.toFixed(1)}%</span>
               </div>
-              <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+              <div className="w-full bg-slate-200 rounded-full h-2">
                 <div
                   className="bg-green-600 h-2 rounded-full transition-all"
                   style={{ width: `${installmentProgress}%` }}

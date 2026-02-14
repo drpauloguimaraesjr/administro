@@ -84,13 +84,12 @@ export function UserList({ users }: UserListProps) {
                   {/* Header */}
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${
-                        user.role === 'owner' 
-                          ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400'
+                      <div className={`p-2 rounded-lg ${user.role === 'owner'
+                          ? 'bg-blue-100 text-blue-600'
                           : user.role === 'spouse'
-                          ? 'bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400'
-                          : 'bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400'
-                      }`}>
+                            ? 'bg-purple-100 text-purple-600'
+                            : 'bg-gray-100 text-gray-600'
+                        }`}>
                         {user.role === 'owner' ? (
                           <Shield className="w-5 h-5" />
                         ) : (
@@ -105,11 +104,10 @@ export function UserList({ users }: UserListProps) {
                         </p>
                       </div>
                     </div>
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      user.active
-                        ? 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400'
-                        : 'bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400'
-                    }`}>
+                    <span className={`px-2 py-1 rounded-full text-xs ${user.active
+                        ? 'bg-green-100 text-green-600'
+                        : 'bg-red-100 text-red-600'
+                      }`}>
                       {user.active ? 'Ativo' : 'Inativo'}
                     </span>
                   </div>
@@ -118,8 +116,8 @@ export function UserList({ users }: UserListProps) {
                   <div>
                     <span className="text-sm text-muted-foreground">Perfil: </span>
                     <span className="text-sm font-medium capitalize">
-                      {user.role === 'owner' ? 'Proprietário' : 
-                       user.role === 'spouse' ? 'Cônjuge' : 'Secretária'}
+                      {user.role === 'owner' ? 'Proprietário' :
+                        user.role === 'spouse' ? 'Cônjuge' : 'Secretária'}
                     </span>
                   </div>
 

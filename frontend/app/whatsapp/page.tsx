@@ -132,7 +132,7 @@ export default function WhatsAppPage() {
 
     return (
         <div className="flex h-screen overflow-hidden">
-            <main className="flex-1 p-8 bg-slate-50 dark:bg-slate-950 overflow-y-auto relative">
+            <main className="flex-1 p-8 bg-slate-50 overflow-y-auto relative">
 
                 {/* Floating Button for Playbook */}
                 <button
@@ -146,8 +146,8 @@ export default function WhatsAppPage() {
                 <div className="max-w-4xl mx-auto space-y-8">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Conexão WhatsApp</h1>
-                            <p className="text-slate-500 dark:text-slate-400">Gerencie a conexão do bot para envio de mensagens e leitura de comprovantes.</p>
+                            <h1 className="text-3xl font-bold text-slate-900">Conexão WhatsApp</h1>
+                            <p className="text-slate-500">Gerencie a conexão do bot para envio de mensagens e leitura de comprovantes.</p>
                         </div>
                         <Button onClick={fetchStatus} variant="outline" disabled={loading}>
                             <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />

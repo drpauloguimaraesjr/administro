@@ -99,12 +99,12 @@ export function AnamnesisForm({ patientId }: AnamnesisFormProps) {
                             {isEditing ? (
                                 <textarea
                                     {...register(field.name as keyof AnamnesisData)}
-                                    className="w-full mt-1 p-3 border rounded-lg resize-none dark:bg-slate-700 dark:border-slate-600"
+                                    className="w-full mt-1 p-3 border rounded-lg resize-none"
                                     rows={3}
                                     placeholder={field.placeholder}
                                 />
                             ) : (
-                                <p className="mt-1 p-3 bg-slate-50 dark:bg-slate-700 rounded-lg min-h-[60px]">
+                                <p className="mt-1 p-3 bg-slate-50 rounded-lg min-h-[60px]">
                                     {(anamnesis as any)?.[field.name] || '-'}
                                 </p>
                             )}

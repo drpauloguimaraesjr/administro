@@ -114,9 +114,9 @@ export function DocumentsList({ patientId }: DocumentsListProps) {
                     {documents.map((doc: Document) => (
                         <div
                             key={doc.id}
-                            className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-700 rounded-lg"
+                            className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg"
                         >
-                            <div className="p-2 bg-teal-100 dark:bg-teal-900 rounded text-teal-600 dark:text-teal-400">
+                            <div className="p-2 bg-teal-100 rounded text-teal-600">
                                 {getIcon(doc.type)}
                             </div>
                             <div className="flex-1 min-w-0">

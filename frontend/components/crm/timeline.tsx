@@ -44,16 +44,16 @@ const interactionColors = {
 export function Timeline({ interactions }: TimelineProps) {
     return (
         <div className="space-y-6 relative">
-            <div className="absolute left-4 top-0 bottom-0 w-px bg-slate-200 dark:bg-slate-800" />
+            <div className="absolute left-4 top-0 bottom-0 w-px bg-slate-200" />
 
             {interactions.map((interaction) => (
                 <div key={interaction.id} className="relative pl-10 group">
                     {/* Icon Marker */}
-                    <div className={`absolute left-0 top-1 w-8 h-8 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-900 shadow-sm z-10 ${interactionColors[interaction.type]}`}>
+                    <div className={`absolute left-0 top-1 w-8 h-8 rounded-full flex items-center justify-center border-2 border-white shadow-sm z-10 ${interactionColors[interaction.type]}`}>
                         {interactionIcons[interaction.type]}
                     </div>
 
-                    <Card className="border-l-4 border-l-transparent hover:border-l-slate-300 dark:hover:border-l-slate-700 transition-all">
+                    <Card className="border-l-4 border-l-transparent hover:border-l-slate-300 transition-all">
                         <CardContent className="p-4 pt-3">
                             <div className="flex justify-between items-start mb-2">
                                 <div className="flex flex-col">
@@ -76,7 +76,7 @@ export function Timeline({ interactions }: TimelineProps) {
                                 )}
                             </div>
 
-                            <div className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
+                            <div className="text-sm text-slate-700 whitespace-pre-wrap">
                                 {interaction.content}
                             </div>
 
@@ -91,7 +91,7 @@ export function Timeline({ interactions }: TimelineProps) {
 
             {/* Create New Interaction Stub */}
             <div className="relative pl-10 pt-4">
-                <div className="absolute left-0 top-6 w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center border-2 border-slate-200 text-slate-400">
+                <div className="absolute left-0 top-6 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center border-2 border-slate-200 text-slate-400">
                     <MoreVertical className="w-4 h-4" />
                 </div>
                 <Button variant="outline" className="w-full justify-start text-slate-500 h-12 border-dashed">

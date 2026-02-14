@@ -21,15 +21,15 @@ export function KanbanColumn({ column, onAssign }: KanbanColumnProps) {
     const totalValue = column.leads.reduce((sum, lead) => sum + (lead.estimatedValue || 0), 0);
 
     return (
-        <div className="flex flex-col h-full flex-1 min-w-[200px] max-w-[350px] rounded-lg bg-slate-50/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
+        <div className="flex flex-col h-full flex-1 min-w-[200px] max-w-[350px] rounded-lg bg-slate-50/50 border border-slate-200">
             {/* Column Header */}
             <div className={cn("p-3 border-b-2", `border-[${column.color}]`)} style={{ borderColor: column.color }}>
                 <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wide">
+                        <span className="text-sm font-bold text-slate-700 uppercase tracking-wide">
                             {column.title}
                         </span>
-                        <span className="bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs px-2 py-0.5 rounded-full font-bold">
+                        <span className="bg-slate-200 text-slate-600 text-xs px-2 py-0.5 rounded-full font-bold">
                             {column.leads.length}
                         </span>
                     </div>
@@ -50,7 +50,7 @@ export function KanbanColumn({ column, onAssign }: KanbanColumnProps) {
                 ref={setNodeRef}
                 className={cn(
                     "flex-1 p-2 overflow-y-auto scrollbar-thin transition-colors",
-                    isOver ? "bg-slate-100/80 dark:bg-slate-800/80" : ""
+                    isOver ? "bg-slate-100/80" : ""
                 )}
             >
                 {column.leads.map((lead) => (
@@ -58,7 +58,7 @@ export function KanbanColumn({ column, onAssign }: KanbanColumnProps) {
                 ))}
 
                 {column.leads.length === 0 && (
-                    <div className="h-24 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-lg flex items-center justify-center text-slate-400 text-xs text-center p-4">
+                    <div className="h-24 border-2 border-dashed border-slate-200 rounded-lg flex items-center justify-center text-slate-400 text-xs text-center p-4">
                         Arraste leads para cá
                     </div>
                 )}

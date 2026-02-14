@@ -49,7 +49,7 @@ export function AssigneeDropdown({ value, onChange, disabled, compact }: Assigne
             <SelectTrigger
                 className={`
                     ${compact ? 'h-6 text-[10px] px-1.5 py-0' : 'h-8 text-xs px-2'}
-                    w-auto min-w-0 border-dashed bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors
+                    w-auto min-w-0 border-dashed bg-transparent hover:bg-slate-100 transition-colors
                 `}
                 onClick={(e) => e.stopPropagation()}
             >
@@ -112,7 +112,7 @@ export function AssigneeBadge({ memberId }: { memberId: string | null | undefine
     return (
         <div className="flex items-center gap-1">
             <div className={`w-2 h-2 rounded-full ${member.color}`} />
-            <span className="text-[10px] font-medium text-slate-600 dark:text-slate-400">
+            <span className="text-[10px] font-medium text-slate-600">
                 {member.name}
             </span>
         </div>

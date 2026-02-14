@@ -108,7 +108,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
             <Dialog.Portal>
                 <Dialog.Overlay className="fixed inset-0 bg-black/30" />
                 <Dialog.Content
-                    className="fixed top-1/2 left-1/2 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 focus:outline-none max-h-[90vh] overflow-y-auto"
+                    className="fixed top-1/2 left-1/2 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-lg p-6 focus:outline-none max-h-[90vh] overflow-y-auto"
                 >
                     <Dialog.Title className="text-xl font-semibold mb-4">
                         {appointmentId ? 'Editar Consulta' : 'Nova Consulta'}
@@ -123,16 +123,16 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
                                     placeholder="Buscar paciente..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full border rounded px-3 py-2 dark:bg-slate-700 dark:border-slate-600"
+                                    className="w-full border rounded px-3 py-2"
                                 />
                                 {searchTerm && filteredPatients.length > 0 && (
-                                    <div className="absolute z-10 w-full mt-1 bg-white dark:bg-slate-700 border rounded-md shadow-lg max-h-40 overflow-y-auto">
+                                    <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-40 overflow-y-auto">
                                         {filteredPatients.map((patient: Patient) => (
                                             <button
                                                 key={patient.id}
                                                 type="button"
                                                 onClick={() => handlePatientSelect(patient)}
-                                                className="w-full text-left px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-600"
+                                                className="w-full text-left px-3 py-2 hover:bg-slate-100"
                                             >
                                                 <span className="font-medium">{patient.name}</span>
                                                 <span className="text-sm text-muted-foreground ml-2">{patient.phone}</span>
@@ -163,7 +163,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
                                 <input
                                     type="date"
                                     {...register('date')}
-                                    className="w-full border rounded px-3 py-2 dark:bg-slate-700 dark:border-slate-600"
+                                    className="w-full border rounded px-3 py-2"
                                 />
                                 {errors.date && (
                                     <p className="text-red-600 text-sm">{errors.date.message}</p>
@@ -174,7 +174,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
                                 <input
                                     type="time"
                                     {...register('startTime')}
-                                    className="w-full border rounded px-3 py-2 dark:bg-slate-700 dark:border-slate-600"
+                                    className="w-full border rounded px-3 py-2"
                                 />
                                 {errors.startTime && (
                                     <p className="text-red-600 text-sm">{errors.startTime.message}</p>
@@ -189,14 +189,14 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
                                 <input
                                     type="time"
                                     {...register('endTime')}
-                                    className="w-full border rounded px-3 py-2 dark:bg-slate-700 dark:border-slate-600"
+                                    className="w-full border rounded px-3 py-2"
                                 />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium mb-1">Duração (min)</label>
                                 <select
                                     {...register('duration', { valueAsNumber: true })}
-                                    className="w-full border rounded px-3 py-2 dark:bg-slate-700 dark:border-slate-600"
+                                    className="w-full border rounded px-3 py-2"
                                 >
                                     <option value={30}>30 min</option>
                                     <option value={45}>45 min</option>
@@ -209,7 +209,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
                         {/* Type */}
                         <div>
                             <label className="block text-sm font-medium mb-1">Tipo</label>
-                            <select {...register('type')} className="w-full border rounded px-3 py-2 dark:bg-slate-700 dark:border-slate-600">
+                            <select {...register('type')} className="w-full border rounded px-3 py-2">
                                 <option value="first_visit">Primeira Consulta</option>
                                 <option value="return">Retorno</option>
                                 <option value="evaluation">Avaliação</option>
@@ -219,7 +219,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
                         {/* Status */}
                         <div>
                             <label className="block text-sm font-medium mb-1">Status</label>
-                            <select {...register('status')} className="w-full border rounded px-3 py-2 dark:bg-slate-700 dark:border-slate-600">
+                            <select {...register('status')} className="w-full border rounded px-3 py-2">
                                 <option value="pending">Pendente</option>
                                 <option value="confirmed">Confirmado</option>
                                 <option value="cancelled">Cancelado</option>
@@ -233,7 +233,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
                             <textarea
                                 {...register('notes')}
                                 rows={3}
-                                className="w-full border rounded px-3 py-2 dark:bg-slate-700 dark:border-slate-600"
+                                className="w-full border rounded px-3 py-2"
                                 placeholder="Observações sobre a consulta..."
                             />
                         </div>
@@ -241,7 +241,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
                         {/* Buttons */}
                         <div className="flex justify-end space-x-2 mt-4 pt-4 border-t">
                             <Dialog.Close asChild>
-                                <button type="button" className="px-4 py-2 bg-gray-200 dark:bg-slate-600 rounded hover:bg-gray-300 dark:hover:bg-slate-500">
+                                <button type="button" className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
                                     Cancelar
                                 </button>
                             </Dialog.Close>

@@ -93,7 +93,7 @@ export function EvolutionsList({ patientId }: EvolutionsListProps) {
                         <div
                             key={evolution.id}
                             onClick={() => handleView(evolution)}
-                            className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4 border-l-4 border-teal-600 cursor-pointer hover:shadow-md transition-shadow relative group"
+                            className="bg-slate-50 rounded-lg p-4 border-l-4 border-teal-600 cursor-pointer hover:shadow-md transition-shadow relative group"
                         >
                             <div className="flex justify-between items-start mb-3">
                                 <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
@@ -101,7 +101,7 @@ export function EvolutionsList({ patientId }: EvolutionsListProps) {
                                     {new Date(evolution.date).toLocaleDateString('pt-BR')}
                                     <span className="text-xs font-normal opacity-70 ml-2">(Clique para ver detalhes)</span>
                                 </div>
-                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity absolute right-4 top-4 bg-slate-50 dark:bg-slate-700 p-1 rounded-md shadow-sm">
+                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity absolute right-4 top-4 bg-slate-50 p-1 rounded-md shadow-sm">
                                     <Button variant="ghost" size="sm" onClick={(e) => handleEdit(e, evolution)}>
                                         <Edit className="w-4 h-4" />
                                     </Button>
@@ -118,12 +118,12 @@ export function EvolutionsList({ patientId }: EvolutionsListProps) {
 
                             <div className="grid grid-cols-1 gap-2 text-sm">
                                 <div>
-                                    <p className="font-semibold text-slate-700 dark:text-slate-300">Queixa:</p>
-                                    <p className="text-slate-600 dark:text-slate-400 line-clamp-2">{evolution.complaint || '-'}</p>
+                                    <p className="font-semibold text-slate-700">Queixa:</p>
+                                    <p className="text-slate-600 line-clamp-2">{evolution.complaint || '-'}</p>
                                 </div>
                                 <div>
-                                    <p className="font-semibold text-slate-700 dark:text-slate-300">Diagnóstico:</p>
-                                    <p className="text-slate-600 dark:text-slate-400 line-clamp-1">{evolution.diagnosis || '-'}</p>
+                                    <p className="font-semibold text-slate-700">Diagnóstico:</p>
+                                    <p className="text-slate-600 line-clamp-1">{evolution.diagnosis || '-'}</p>
                                 </div>
                             </div>
                         </div>
@@ -162,7 +162,7 @@ function EvolutionViewModal({
         <Dialog open={open} onOpenChange={onClose}>
             <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
                 <DialogHeader className="border-b pb-4 mb-4">
-                    <DialogTitle className="flex items-center gap-2 text-xl text-teal-700 dark:text-teal-400">
+                    <DialogTitle className="flex items-center gap-2 text-xl text-teal-700">
                         <Calendar className="w-5 h-5" />
                         Evolução de {new Date(evolution.date).toLocaleDateString('pt-BR')}
                     </DialogTitle>
@@ -192,11 +192,11 @@ function EvolutionViewModal({
 function SectionView({ title, content }: { title: string; content: string }) {
     if (!content) return null;
     return (
-        <div className="space-y-1 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg border border-slate-100 dark:border-slate-700">
-            <h4 className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+        <div className="space-y-1 bg-slate-50 p-4 rounded-lg border border-slate-100">
+            <h4 className="font-semibold text-slate-900 flex items-center gap-2">
                 {title}
             </h4>
-            <p className="text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{content}</p>
+            <p className="text-slate-700 whitespace-pre-wrap">{content}</p>
         </div>
     );
 }
@@ -288,7 +288,7 @@ function EvolutionModal({
                         <Label>Queixa / Motivo</Label>
                         <textarea
                             {...register('complaint')}
-                            className="w-full p-3 border rounded-lg resize-none dark:bg-slate-700"
+                            className="w-full p-3 border rounded-lg resize-none"
                             rows={2}
                             placeholder="Motivo da consulta..."
                         />
@@ -298,7 +298,7 @@ function EvolutionModal({
                         <Label>Exame Físico</Label>
                         <textarea
                             {...register('physicalExam')}
-                            className="w-full p-3 border rounded-lg resize-none dark:bg-slate-700"
+                            className="w-full p-3 border rounded-lg resize-none"
                             rows={3}
                             placeholder="Achados do exame físico..."
                         />
@@ -308,7 +308,7 @@ function EvolutionModal({
                         <Label>Hipótese Diagnóstica</Label>
                         <textarea
                             {...register('diagnosis')}
-                            className="w-full p-3 border rounded-lg resize-none dark:bg-slate-700"
+                            className="w-full p-3 border rounded-lg resize-none"
                             rows={2}
                             placeholder="Diagnóstico..."
                         />
@@ -318,7 +318,7 @@ function EvolutionModal({
                         <Label>Conduta / Tratamento</Label>
                         <textarea
                             {...register('treatment')}
-                            className="w-full p-3 border rounded-lg resize-none dark:bg-slate-700"
+                            className="w-full p-3 border rounded-lg resize-none"
                             rows={3}
                             placeholder="Prescrição, orientações..."
                         />
@@ -328,7 +328,7 @@ function EvolutionModal({
                         <Label>Observações</Label>
                         <textarea
                             {...register('notes')}
-                            className="w-full p-3 border rounded-lg resize-none dark:bg-slate-700"
+                            className="w-full p-3 border rounded-lg resize-none"
                             rows={2}
                             placeholder="Observações adicionais..."
                         />

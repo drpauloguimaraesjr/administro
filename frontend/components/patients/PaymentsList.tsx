@@ -87,15 +87,15 @@ export function PaymentsList({ patientId, patientName }: PaymentsListProps) {
         <div>
             {/* Summary Cards */}
             <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg">
-                    <p className="text-sm text-green-600 dark:text-green-400">Recebido</p>
-                    <p className="text-2xl font-bold text-green-700 dark:text-green-300">
+                <div className="bg-green-50 p-4 rounded-lg">
+                    <p className="text-sm text-green-600">Recebido</p>
+                    <p className="text-2xl font-bold text-green-700">
                         R$ {totalPaid.toFixed(2)}
                     </p>
                 </div>
-                <div className="bg-yellow-50 dark:bg-yellow-900/30 p-4 rounded-lg">
-                    <p className="text-sm text-yellow-600 dark:text-yellow-400">Pendente</p>
-                    <p className="text-2xl font-bold text-yellow-700 dark:text-yellow-300">
+                <div className="bg-yellow-50 p-4 rounded-lg">
+                    <p className="text-sm text-yellow-600">Pendente</p>
+                    <p className="text-2xl font-bold text-yellow-700">
                         R$ {totalPending.toFixed(2)}
                     </p>
                 </div>
@@ -122,10 +122,10 @@ export function PaymentsList({ patientId, patientName }: PaymentsListProps) {
                         <div
                             key={payment.id}
                             className={`p-4 rounded-lg border-l-4 ${payment.status === 'paid'
-                                    ? 'bg-green-50 dark:bg-green-900/20 border-green-500'
+                                    ? 'bg-green-50 border-green-500'
                                     : payment.status === 'pending'
-                                        ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-500'
-                                        : 'bg-red-50 dark:bg-red-900/20 border-red-500'
+                                        ? 'bg-yellow-50 border-yellow-500'
+                                        : 'bg-red-50 border-red-500'
                                 }`}
                         >
                             <div className="flex justify-between items-start">
@@ -276,7 +276,7 @@ function PaymentModal({
                         <Label>Método</Label>
                         <select
                             {...register('method')}
-                            className="w-full h-10 px-3 rounded-md border dark:bg-slate-700"
+                            className="w-full h-10 px-3 rounded-md border"
                         >
                             <option value="pix">PIX</option>
                             <option value="dinheiro">Dinheiro</option>
@@ -290,7 +290,7 @@ function PaymentModal({
                         <Label>Status</Label>
                         <select
                             {...register('status')}
-                            className="w-full h-10 px-3 rounded-md border dark:bg-slate-700"
+                            className="w-full h-10 px-3 rounded-md border"
                         >
                             <option value="pending">Pendente</option>
                             <option value="paid">Pago</option>

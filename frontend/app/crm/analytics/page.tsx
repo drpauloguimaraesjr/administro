@@ -44,7 +44,7 @@ const MOCK_DATA = {
 
 export default function CRMAnalyticsPage() {
     return (
-        <div className="flex flex-col h-[calc(100vh-4rem)] bg-slate-50 dark:bg-slate-950 overflow-y-auto">
+        <div className="flex flex-col h-[calc(100vh-4rem)] bg-slate-50 overflow-y-auto">
             <div className="container mx-auto p-6 space-y-8">
                 {/* Header */}
                 <div className="flex items-center gap-4">

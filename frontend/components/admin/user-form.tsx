@@ -103,7 +103,7 @@ export function UserForm({ onClose, initialData }: UserFormProps) {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="p-3 bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400 rounded-lg text-sm">
+            <div className="p-3 bg-red-100 text-red-600 rounded-lg text-sm">
               {error}
             </div>
           )}

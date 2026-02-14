@@ -36,12 +36,12 @@ export function ReportsTable({ transactions }: ReportsTableProps) {
             const isIncome = transaction.type === 'income';
 
             return (
-              <tr key={transaction.id} className="border-b hover:bg-slate-50 dark:hover:bg-slate-800">
+              <tr key={transaction.id} className="border-b hover:bg-slate-50">
                 <td className="p-3">{format(date, 'dd/MM/yyyy')}</td>
                 <td className="p-3 font-medium">{transaction.description}</td>
                 <td className="p-3">{transaction.category}</td>
                 <td className="p-3">
-                  <span className="px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 text-xs">
+                  <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-600 text-xs">
                     {transaction.contextId === 'HOME' ? 'Casa' : 'Clínica'}
                   </span>
                 </td>
@@ -51,8 +51,8 @@ export function ReportsTable({ transactions }: ReportsTableProps) {
                 </td>
                 <td className="p-3 text-center">
                   <span className={`px-2 py-1 rounded-full text-xs ${transaction.status === 'paid'
-                      ? 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400'
-                      : 'bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-400'
+                    ? 'bg-green-100 text-green-600'
+                    : 'bg-yellow-100 text-yellow-600'
                     }`}>
                     {transaction.status === 'paid' ? 'Pago' : 'Pendente'}
                   </span>

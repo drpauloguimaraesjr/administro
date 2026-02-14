@@ -67,8 +67,8 @@ function TransactionCard({ transaction }: { transaction: Transaction }) {
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-3 flex-1">
             <div className={`p-2 rounded-lg ${isIncome
-                ? 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400'
-                : 'bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400'
+                ? 'bg-green-100 text-green-600
+                : 'bg-red-100 text-red-600
               }`}>
               {isIncome ? (
                 <ArrowUpCircle className="w-5 h-5" />
@@ -91,7 +91,7 @@ function TransactionCard({ transaction }: { transaction: Transaction }) {
                 {transaction.contextId && (
                   <>
                     <span>•</span>
-                    <span className="px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 text-xs">
+                    <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-600 text-xs">
                       {transaction.contextId === 'HOME' ? 'Casa' : 'Clínica'}
                     </span>
                   </>
@@ -107,12 +107,12 @@ function TransactionCard({ transaction }: { transaction: Transaction }) {
           </div>
 
           <div className="text-right space-y-2">
-            <p className={`text-lg font-bold ${isIncome ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+            <p className={`text-lg font-bold ${isIncome ? 'text-green-600 : 'text-red-600
               }`}>
               {isIncome ? '+' : '-'}R$ {transaction.amount.toFixed(2)}
             </p>
             {transaction.status === 'pending' && (
-              <span className="text-xs text-yellow-600 dark:text-yellow-400">Pendente</span>
+              <span className="text-xs text-yellow-600">Pendente</span>
             )}
             <div className="flex justify-end gap-2">
               <Button

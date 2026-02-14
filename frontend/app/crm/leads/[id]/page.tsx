@@ -65,9 +65,9 @@ export default function LeadDetailsPage({ params }: { params: { id: string } }) 
     const lead = LEAD_DATA;
 
     return (
-        <div className="flex flex-col h-[calc(100vh-4rem)] bg-slate-50 dark:bg-slate-950">
+        <div className="flex flex-col h-[calc(100vh-4rem)] bg-slate-50">
             {/* Header */}
-            <div className="flex-none p-4 border-b bg-white dark:bg-slate-900 shadow-sm z-10">
+            <div className="flex-none p-4 border-b bg-white shadow-sm z-10">
                 <div className="flex items-center gap-4">
                     <Link href="/crm">
                         <Button variant="ghost" size="icon">
@@ -76,7 +76,7 @@ export default function LeadDetailsPage({ params }: { params: { id: string } }) 
                     </Link>
                     <div>
                         <div className="flex items-center gap-2">
-                            <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">{lead.name}</h1>
+                            <h1 className="text-xl font-bold text-slate-900">{lead.name}</h1>
                             <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Novo</Badge>
                             <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Alta Urgência</Badge>
                         </div>
@@ -173,7 +173,7 @@ export default function LeadDetailsPage({ params }: { params: { id: string } }) 
                         </div>
 
                         {/* Right Column: Timeline & Tabs */}
-                        <div className="col-span-8 bg-white dark:bg-slate-900 rounded-lg border shadow-sm flex flex-col overflow-hidden">
+                        <div className="col-span-8 bg-white rounded-lg border shadow-sm flex flex-col overflow-hidden">
                             <Tabs defaultValue="timeline" className="flex-1 flex flex-col">
                                 <div className="border-b px-4">
                                     <TabsList className="bg-transparent h-14 w-full justify-start gap-6">
@@ -189,7 +189,7 @@ export default function LeadDetailsPage({ params }: { params: { id: string } }) 
                                     </TabsList>
                                 </div>
 
-                                <div className="flex-1 overflow-y-auto p-6 bg-slate-50/50 dark:bg-slate-950/50">
+                                <div className="flex-1 overflow-y-auto p-6 bg-slate-50/50">
                                     <TabsContent value="timeline" className="mt-0 h-full">
                                         <Timeline interactions={lead.interactions} />
                                     </TabsContent>

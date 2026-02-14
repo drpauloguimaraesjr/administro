@@ -1,3 +1,7 @@
+# ============================================
+# ADMINISTRO - .gitignore
+# ============================================
+
 # Dependencies
 node_modules/
 /.pnp
@@ -23,12 +27,15 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Local env files
+# ============================================
+# LOCAL ENV FILES (NUNCA COMMITAR!)
+# ============================================
 .env
 .env.local
 .env*.local
 .env.production
 backend/.env
+frontend/.env
 frontend/.env.local
 
 # Arquivos com credenciais (não commitar)
@@ -36,35 +43,54 @@ RAILWAY_QUICK_COPY.txt
 RAILWAY_RAW_EDITOR.env
 RAILWAY_ENV_VARS.md
 
-# Vercel
+# ============================================
+# VERCEL
+# ============================================
 .vercel
 
-# Firebase
+# ============================================
+# FIREBASE
+# ============================================
 .firebase/
 firebase-debug.log
 firestore-debug.log
 *-debug.log
 
-# Service Account Keys
+# Service Account Keys (NUNCA COMMITAR!)
 **/serviceAccountKey.json
 **/service-account.json
 
-# WhatsApp Session
+# ============================================
+# WHATSAPP SESSION
+# ============================================
 **/auth_info_baileys/
 **/.wwebjs_auth/
 **/.wwebjs_cache/
 backend/sessions/
 **/sessions/
 
+# ============================================
 # IDE
+# ============================================
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
+# ============================================
 # OS
+# ============================================
 Thumbs.db
 
-frontend/components/superior-template
-frontend/components/superior-template
+# ============================================
+# TEMPLATE DE REFERÊNCIA (não faz parte do build)
+# ============================================
+frontend/components/superior-template/
+
+# ============================================
+# TEMP / BACKUP
+# ============================================
+repo_temp/
+SETUP_NOVA_MAQUINA.md
+
