@@ -23,6 +23,17 @@ const config = {
         serif: ["var(--font-playfair)", "Georgia", "Times New Roman", "serif"],
         mono: ["var(--font-dm-mono)", "Courier New", "monospace"],
       },
+      fontSize: {
+        "xs": ["0.7rem", { lineHeight: "1rem" }],
+        "sm": ["0.8rem", { lineHeight: "1.15rem" }],
+        "base": ["0.875rem", { lineHeight: "1.4rem" }],
+        "lg": ["1rem", { lineHeight: "1.5rem" }],
+        "xl": ["1.1rem", { lineHeight: "1.6rem" }],
+        "2xl": ["1.25rem", { lineHeight: "1.75rem" }],
+        "3xl": ["1.5rem", { lineHeight: "2rem" }],
+        "4xl": ["1.75rem", { lineHeight: "2.15rem" }],
+        "5xl": ["2rem", { lineHeight: "1.2" }],
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
