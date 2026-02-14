@@ -62,13 +62,13 @@ function TransactionCard({ transaction }: { transaction: Transaction }) {
   }
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className="hover:border-foreground/30 transition-colors duration-150">
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-3 flex-1">
-            <div className={`p-2 rounded-lg ${isIncome
-                ? 'bg-green-100 text-green-600
-                : 'bg-red-100 text-red-600
+            <div className={`p-2 ${isIncome
+                ? 'bg-primary/10 text-primary'
+                : 'bg-destructive/10 text-destructive'
               }`}>
               {isIncome ? (
                 <ArrowUpCircle className="w-5 h-5" />
@@ -91,7 +91,7 @@ function TransactionCard({ transaction }: { transaction: Transaction }) {
                 {transaction.contextId && (
                   <>
                     <span>•</span>
-                    <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-600 text-xs">
+                    <span className="px-2 py-0.5 border border-border text-muted-foreground text-xs">
                       {transaction.contextId === 'HOME' ? 'Casa' : 'Clínica'}
                     </span>
                   </>
@@ -107,7 +107,7 @@ function TransactionCard({ transaction }: { transaction: Transaction }) {
           </div>
 
           <div className="text-right space-y-2">
-            <p className={`text-lg font-bold ${isIncome ? 'text-green-600 : 'text-red-600
+            <p className={`text-lg font-bold font-mono ${isIncome ? 'text-primary' : 'text-destructive'
               }`}>
               {isIncome ? '+' : '-'}R$ {transaction.amount.toFixed(2)}
             </p>
@@ -119,7 +119,7 @@ function TransactionCard({ transaction }: { transaction: Transaction }) {
                 variant="ghost"
                 size="sm"
                 onClick={() => setEditing(true)}
-                className="text-blue-600 hover:text-blue-700"
+                className="text-muted-foreground hover:text-foreground"
               >
                 <Edit className="w-4 h-4" />
               </Button>

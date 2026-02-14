@@ -65,10 +65,8 @@ export default function PatientsPage() {
             return;
         }
 
-        // Definir cabeçalho
         const headers = ['Nome', 'CPF', 'Nascimento', 'Gênero', 'Telefone', 'Email', 'Criado em', 'Endereço', 'Convênio', 'MedX ID'];
 
-        // Mapear linhas
         const rows = patients.map((p: any) => [
             `"${p.name || ''}"`,
             `"${p.cpf || ''}"`,
@@ -82,13 +80,11 @@ export default function PatientsPage() {
             `"${p.medxId || ''}"`
         ]);
 
-        // Juntar tudo em uma string CSV
         const csvContent = [
             headers.join(','),
             ...rows.map((r: any[]) => r.join(','))
         ].join('\n');
 
-        // Criar Blob e link de download
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -129,20 +125,21 @@ export default function PatientsPage() {
     };
 
     return (
-        <main className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50 to-emerald-50">
+        <main className="min-h-screen bg-background">
             <div className="container mx-auto px-4 py-6 max-w-7xl">
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.15 }}
                     className="space-y-6"
                 >
                     {/* Header */}
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div>
-                            <h1 className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">
+                            <h1 className="font-serif text-3xl font-bold text-foreground">
                                 Pacientes
                             </h1>
-                            <p className="text-muted-foreground">
+                            <p className="font-mono text-xs text-muted-foreground uppercase tracking-[0.1em] mt-1">
                                 Gerencie seus pacientes
                             </p>
                         </div>
@@ -150,7 +147,6 @@ export default function PatientsPage() {
                             <Button
                                 onClick={handleExportCSV}
                                 variant="outline"
-                                className="border-gray-300 text-gray-600 hover:bg-gray-100"
                                 title="Exportar CSV"
                             >
                                 <FileDown className="w-4 h-4 mr-2" />
@@ -160,14 +156,14 @@ export default function PatientsPage() {
                                 onClick={handleMedxSync}
                                 variant="outline"
                                 disabled={isSyncing}
-                                className="border-teal-600 text-teal-600 hover:bg-teal-50"
+                                className="border-primary text-primary hover:bg-primary/10"
                             >
                                 <RefreshCw className={`w-4 h-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
                                 {isSyncing ? 'Sincronizando...' : 'Sincronizar MedX'}
                             </Button>
                             <Button
                                 onClick={() => setIsModalOpen(true)}
-                                className="bg-teal-600 hover:bg-teal-700"
+                                className="bg-primary text-primary-foreground hover:bg-primary/90"
                             >
                                 <Plus className="w-4 h-4 mr-2" />
                                 Novo Paciente
@@ -186,10 +182,11 @@ export default function PatientsPage() {
                         />
                     </div>
 
-                    {/* Patients List - Layout Vertical */}
+                    {/* Patients List */}
                     {isLoading ? (
-                        <div className="text-center py-12 text-muted-foreground">
-                            Carregando pacientes...
+                        <div className="text-center py-12">
+                            <div className="w-8 h-8 border border-border border-t-primary animate-spin mx-auto mb-4"></div>
+                            <p className="font-mono text-sm text-muted-foreground">Carregando pacientes...</p>
                         </div>
                     ) : patients.length === 0 ? (
                         <div className="text-center py-12">
@@ -205,36 +202,36 @@ export default function PatientsPage() {
                             </Button>
                         </div>
                     ) : (
-                        <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
-                            {/* Header da lista */}
-                            <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                        <div className="border border-border bg-card overflow-hidden">
+                            {/* Table Header */}
+                            <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-muted border-b border-border mono-label">
                                 <div className="col-span-4">Paciente</div>
                                 <div className="col-span-5 text-center">Relacionamento</div>
                                 <div className="col-span-2 text-center">Score</div>
                                 <div className="col-span-1 text-right">Ações</div>
                             </div>
 
-                            {/* Lista de pacientes */}
-                            <div className="divide-y divide-slate-100">
+                            {/* Patient Rows */}
+                            <div className="divide-y divide-border/50">
                                 {patients.map((patient: any) => (
                                     <motion.div
                                         key={patient.id}
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
-                                        className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-slate-50 transition-colors items-center"
+                                        className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-muted/50 transition-colors duration-150 items-center"
                                     >
-                                        {/* Coluna 1: Dados do Paciente */}
+                                        {/* Col 1: Patient Data */}
                                         <div className="col-span-4">
                                             <Link href={`/patients/${patient.id}`} className="group">
-                                                <h3 className="font-semibold text-slate-900 group-hover:text-teal-600 transition-colors">
+                                                <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors duration-150">
                                                     {patient.name}
                                                 </h3>
                                             </Link>
-                                            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-sm text-slate-500">
+                                            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 font-mono text-xs text-muted-foreground">
                                                 <span>CPF: {patient.cpf || '-'}</span>
                                                 <span>{calculateAge(patient.birthDate)}</span>
                                             </div>
-                                            <div className="flex flex-wrap gap-3 mt-2 text-xs text-slate-400">
+                                            <div className="flex flex-wrap gap-3 mt-2 font-mono text-xs text-muted-foreground/70">
                                                 {patient.phone && (
                                                     <span className="flex items-center gap-1">
                                                         <Phone className="w-3 h-3" />
@@ -255,13 +252,12 @@ export default function PatientsPage() {
                                             </div>
                                         </div>
 
-                                        {/* Coluna 2: Informações de Relacionamento */}
+                                        {/* Col 2: Relationship Info */}
                                         <div className="col-span-5">
                                             <div className="grid grid-cols-3 gap-4 text-center">
-                                                {/* Desde */}
-                                                <div className="bg-slate-50 rounded-lg p-2">
-                                                    <p className="text-[10px] uppercase text-slate-400 font-medium">Desde</p>
-                                                    <p className="text-sm font-semibold text-slate-700">
+                                                <div className="bg-muted/50 p-2 border border-border/50">
+                                                    <p className="mono-label">Desde</p>
+                                                    <p className="font-mono text-sm font-semibold text-foreground">
                                                         {patient.createdAt
                                                             ? new Date(patient.createdAt).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })
                                                             : '-'
@@ -269,48 +265,46 @@ export default function PatientsPage() {
                                                     </p>
                                                 </div>
 
-                                                {/* Indicado por */}
-                                                <div className="bg-slate-50 rounded-lg p-2">
-                                                    <p className="text-[10px] uppercase text-slate-400 font-medium">Indicado por</p>
-                                                    <p className="text-sm font-semibold text-slate-700 truncate" title={patient.referredBy || '-'}>
+                                                <div className="bg-muted/50 p-2 border border-border/50">
+                                                    <p className="mono-label">Indicado por</p>
+                                                    <p className="font-mono text-sm font-semibold text-foreground truncate" title={patient.referredBy || '-'}>
                                                         {patient.referredBy || '-'}
                                                     </p>
                                                 </div>
 
-                                                {/* Indicações feitas */}
-                                                <div className="bg-slate-50 rounded-lg p-2">
-                                                    <p className="text-[10px] uppercase text-slate-400 font-medium">Indicou</p>
-                                                    <p className="text-sm font-semibold text-teal-600">
+                                                <div className="bg-muted/50 p-2 border border-border/50">
+                                                    <p className="mono-label">Indicou</p>
+                                                    <p className="font-mono text-sm font-semibold text-primary">
                                                         {patient.referralsCount || 0} pessoas
                                                     </p>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        {/* Coluna 3: Score */}
+                                        {/* Col 3: Score */}
                                         <div className="col-span-2 text-center">
                                             {patient.grade ? (
                                                 <div className="inline-flex flex-col items-center">
                                                     <span className={`
-                                                        text-lg font-bold px-3 py-1 rounded-full
-                                                        ${patient.grade === 'AAA' ? 'bg-amber-100 text-amber-700' : ''}
-                                                        ${patient.grade === 'AA' ? 'bg-yellow-100 text-yellow-700' : ''}
-                                                        ${patient.grade === 'A' ? 'bg-slate-100 text-slate-600' : ''}
-                                                        ${patient.grade === 'B' ? 'bg-blue-100 text-blue-700' : ''}
-                                                        ${patient.grade === 'C' ? 'bg-red-100 text-red-700' : ''}
+                                                        font-mono text-lg font-bold px-3 py-1 border
+                                                        ${patient.grade === 'AAA' ? 'border-primary text-primary' : ''}
+                                                        ${patient.grade === 'AA' ? 'border-primary/60 text-primary/80' : ''}
+                                                        ${patient.grade === 'A' ? 'border-border text-muted-foreground' : ''}
+                                                        ${patient.grade === 'B' ? 'border-border text-muted-foreground' : ''}
+                                                        ${patient.grade === 'C' ? 'border-destructive/50 text-destructive' : ''}
                                                     `}>
                                                         {patient.grade}
                                                     </span>
-                                                    <span className="text-[10px] text-slate-400 mt-1">
+                                                    <span className="font-mono text-[10px] text-muted-foreground mt-1">
                                                         {patient.score || 0} pts
                                                     </span>
                                                 </div>
                                             ) : (
-                                                <span className="text-xs text-slate-400">-</span>
+                                                <span className="font-mono text-xs text-muted-foreground">-</span>
                                             )}
                                         </div>
 
-                                        {/* Coluna 4: Ações */}
+                                        {/* Col 4: Actions */}
                                         <div className="col-span-1 flex justify-end gap-1">
                                             <Button
                                                 variant="ghost"
@@ -324,7 +318,7 @@ export default function PatientsPage() {
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => handleDelete(patient)}
-                                                className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
+                                                className="h-8 w-8 p-0 text-destructive hover:text-destructive/80"
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>
@@ -333,10 +327,10 @@ export default function PatientsPage() {
                                 ))}
                             </div>
 
-                            {/* Footer com contagem */}
-                            <div className="px-6 py-3 bg-slate-50 border-t border-slate-200">
-                                <p className="text-sm text-slate-500">
-                                    Total: <span className="font-semibold text-slate-700">{patients.length}</span> pacientes
+                            {/* Footer */}
+                            <div className="px-6 py-3 bg-muted border-t border-border">
+                                <p className="font-mono text-xs text-muted-foreground">
+                                    Total: <span className="font-semibold text-foreground">{patients.length}</span> pacientes
                                 </p>
                             </div>
                         </div>

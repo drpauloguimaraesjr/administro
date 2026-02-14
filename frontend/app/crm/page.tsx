@@ -69,7 +69,6 @@ export default function CRMPage() {
     const [activeTab, setActiveTab] = useState('overview');
     const [searchTerm, setSearchTerm] = useState('');
 
-    // Fetch stats
     const { data: apiStats } = useQuery<PatientStats>({
         queryKey: ['patient-stats'],
         queryFn: async () => {
@@ -80,9 +79,8 @@ export default function CRMPage() {
         },
     });
 
-    const stats = apiStats || mockStats; // Fallback to mock
+    const stats = apiStats || mockStats;
 
-    // Fetch birthdays
     const { data: apiBirthdays = [] } = useQuery<Patient[]>({
         queryKey: ['patient-birthdays'],
         queryFn: async () => {
@@ -95,7 +93,6 @@ export default function CRMPage() {
 
     const birthdays = apiBirthdays.length > 0 ? apiBirthdays : mockBirthdays;
 
-    // Fetch inactive patients
     const { data: apiInactive = [] } = useQuery<Patient[]>({
         queryKey: ['patient-inactive'],
         queryFn: async () => {
@@ -108,7 +105,6 @@ export default function CRMPage() {
 
     const inactivePatients = apiInactive.length > 0 ? apiInactive : mockInactive;
 
-    // Fetch VIP patients
     const { data: vipPatients = [] } = useQuery<Patient[]>({
         queryKey: ['patient-vip'],
         queryFn: async () => {
@@ -146,15 +142,15 @@ export default function CRMPage() {
     const currentMonth = new Date().toLocaleDateString('pt-BR', { month: 'long' });
 
     return (
-        <div className="flex flex-col min-h-[calc(100vh-4rem)] bg-secondary/30">
+        <div className="flex flex-col min-h-[calc(100vh-4rem)] bg-background">
             {/* Header */}
-            <div className="flex-none p-6 border-b bg-white/80 backdrop-blur-sm shadow-sm">
+            <div className="flex-none p-6 border-b border-border bg-background">
                 <div className="flex items-center justify-between mb-4">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-                            CRM - Gestão de Pacientes
+                        <h1 className="font-serif text-2xl font-bold tracking-tight text-foreground">
+                            CRM — Gestão de Pacientes
                         </h1>
-                        <p className="text-sm text-slate-500">
+                        <p className="font-mono text-xs text-muted-foreground uppercase tracking-[0.1em] mt-1">
                             Acompanhe seus pacientes, aniversariantes e oportunidades.
                         </p>
                     </div>
@@ -171,11 +167,11 @@ export default function CRMPage() {
 
                 {/* Tabs */}
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                    <TabsList className="bg-slate-100">
-                        <TabsTrigger value="overview">📊 Visão Geral</TabsTrigger>
-                        <TabsTrigger value="pipeline">🎯 Pipeline</TabsTrigger>
-                        <TabsTrigger value="birthdays">🎂 Aniversariantes</TabsTrigger>
-                        <TabsTrigger value="inactive">⚠️ Inativos</TabsTrigger>
+                    <TabsList className="bg-muted">
+                        <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+                        <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
+                        <TabsTrigger value="birthdays">Aniversariantes</TabsTrigger>
+                        <TabsTrigger value="inactive">Inativos</TabsTrigger>
                     </TabsList>
                 </Tabs>
             </div>
@@ -184,105 +180,44 @@ export default function CRMPage() {
             <div className={`flex-1 overflow-auto ${activeTab === 'pipeline' ? 'p-2' : 'p-6'}`}>
                 {activeTab === 'overview' && (
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.15 }}
                         className="space-y-6"
                     >
-                        {/* Stats Cards */}
+                        {/* Stats Cards — border-only, mono numbers */}
                         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-                            <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0 shadow-md">
-                                <CardContent className="p-4">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="text-blue-100 text-xs font-medium">Total</p>
-                                            <p className="text-2xl font-bold">{stats?.total || 0}</p>
+                            {[
+                                { label: 'Total', value: stats?.total || 0, icon: Users },
+                                { label: 'VIP', value: stats?.vip || 0, icon: Star },
+                                { label: 'Novos (30d)', value: stats?.newLast30Days || 0, icon: UserPlus },
+                                { label: 'Recorrentes', value: stats?.recurring || 0, icon: TrendingUp },
+                                { label: 'Aniversários', value: stats?.birthdaysThisMonth || 0, icon: Cake },
+                                { label: 'Inativos', value: stats?.inactive90Days || 0, icon: UserX },
+                                { label: 'Tag Novo', value: stats?.new || 0, icon: Clock },
+                            ].map((stat) => (
+                                <Card key={stat.label} className="border border-border">
+                                    <CardContent className="p-4">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="mono-label">{stat.label}</p>
+                                                <p className="font-mono text-2xl font-bold text-foreground">{stat.value}</p>
+                                            </div>
+                                            <stat.icon className="w-6 h-6 text-muted-foreground/50" />
                                         </div>
-                                        <Users className="w-8 h-8 text-blue-200 opacity-80" />
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            <Card className="bg-gradient-to-br from-amber-500 to-orange-500 text-white border-0 shadow-md">
-                                <CardContent className="p-4">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="text-amber-100 text-xs font-medium">VIP</p>
-                                            <p className="text-2xl font-bold">{stats?.vip || 0}</p>
-                                        </div>
-                                        <Star className="w-8 h-8 text-amber-200 opacity-80" />
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            <Card className="bg-gradient-to-br from-green-500 to-emerald-500 text-white border-0 shadow-md">
-                                <CardContent className="p-4">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="text-green-100 text-xs font-medium">Novos (30d)</p>
-                                            <p className="text-2xl font-bold">{stats?.newLast30Days || 0}</p>
-                                        </div>
-                                        <UserPlus className="w-8 h-8 text-green-200 opacity-80" />
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            <Card className="bg-gradient-to-br from-purple-500 to-violet-500 text-white border-0 shadow-md">
-                                <CardContent className="p-4">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="text-purple-100 text-xs font-medium">Recorrentes</p>
-                                            <p className="text-2xl font-bold">{stats?.recurring || 0}</p>
-                                        </div>
-                                        <TrendingUp className="w-8 h-8 text-purple-200 opacity-80" />
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            <Card className="bg-gradient-to-br from-pink-500 to-rose-500 text-white border-0 shadow-md">
-                                <CardContent className="p-4">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="text-pink-100 text-xs font-medium">Aniversários</p>
-                                            <p className="text-2xl font-bold">{stats?.birthdaysThisMonth || 0}</p>
-                                        </div>
-                                        <Cake className="w-8 h-8 text-pink-200 opacity-80" />
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            <Card className="bg-gradient-to-br from-red-500 to-rose-600 text-white border-0 shadow-md">
-                                <CardContent className="p-4">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="text-red-100 text-xs font-medium">Inativos</p>
-                                            <p className="text-2xl font-bold">{stats?.inactive90Days || 0}</p>
-                                        </div>
-                                        <UserX className="w-8 h-8 text-red-200 opacity-80" />
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            <Card className="bg-gradient-to-br from-teal-500 to-cyan-500 text-white border-0 shadow-md">
-                                <CardContent className="p-4">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="text-teal-100 text-xs font-medium">Tag Novo</p>
-                                            <p className="text-2xl font-bold">{stats?.new || 0}</p>
-                                        </div>
-                                        <Clock className="w-8 h-8 text-teal-200 opacity-80" />
-                                    </div>
-                                </CardContent>
-                            </Card>
+                                    </CardContent>
+                                </Card>
+                            ))}
                         </div>
 
                         {/* Two Column Layout */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             {/* Birthdays Card */}
-                            <Card className="border-border shadow-sm">
-                                <CardHeader className="pb-3 border-b border-border/50">
+                            <Card className="border border-border">
+                                <CardHeader className="pb-3 border-b border-border">
                                     <div className="flex items-center justify-between">
-                                        <CardTitle className="text-lg flex items-center gap-2 text-gray-900">
-                                            <Gift className="w-5 h-5 text-pink-500" />
+                                        <CardTitle className="font-serif text-lg flex items-center gap-2 text-foreground">
+                                            <Gift className="w-5 h-5 text-primary" />
                                             Aniversariantes de {currentMonth}
                                         </CardTitle>
                                         <Button variant="ghost" size="sm" onClick={() => setActiveTab('birthdays')}>
@@ -292,28 +227,28 @@ export default function CRMPage() {
                                 </CardHeader>
                                 <CardContent className="pt-4">
                                     {birthdays.length === 0 ? (
-                                        <p className="text-center text-gray-500 py-4">Nenhum aniversariante este mês</p>
+                                        <p className="text-center text-muted-foreground py-4 font-mono text-sm">Nenhum aniversariante este mês</p>
                                     ) : (
-                                        <div className="space-y-3">
+                                        <div className="space-y-1">
                                             {birthdays.slice(0, 5).map((patient) => (
-                                                <div key={patient.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100">
-                                                    <Avatar className="h-10 w-10 border border-pink-100">
-                                                        <AvatarFallback className="bg-gradient-to-br from-pink-400 to-rose-500 text-white text-sm font-medium">
+                                                <div key={patient.id} className="flex items-center gap-3 p-2 hover:bg-muted/50 transition-colors duration-150 border-b border-border/50 last:border-0">
+                                                    <Avatar className="h-10 w-10 border border-border">
+                                                        <AvatarFallback className="bg-muted text-foreground text-sm font-mono">
                                                             {getInitials(patient.name)}
                                                         </AvatarFallback>
                                                     </Avatar>
                                                     <div className="flex-1 min-w-0">
-                                                        <p className="font-medium text-sm truncate text-gray-900">{patient.name}</p>
-                                                        <p className="text-xs text-gray-500">
+                                                        <p className="font-medium text-sm truncate text-foreground">{patient.name}</p>
+                                                        <p className="font-mono text-xs text-muted-foreground">
                                                             {formatDate(patient.birthDate!)}
                                                             {getDaysUntilBirthday(patient.birthDate!) <= 7 && (
-                                                                <Badge variant="secondary" className="ml-2 bg-pink-100 text-pink-700 text-[10px]">
+                                                                <Badge variant="secondary" className="ml-2 border border-primary/30 text-primary bg-transparent text-[10px] font-mono">
                                                                     Em {getDaysUntilBirthday(patient.birthDate!)} dias
                                                                 </Badge>
                                                             )}
                                                         </p>
                                                     </div>
-                                                    <Button size="sm" variant="ghost" className="text-green-600 hover:text-green-700 hover:bg-green-50">
+                                                    <Button size="sm" variant="ghost" className="text-primary hover:text-primary/80">
                                                         <MessageSquare className="w-4 h-4" />
                                                     </Button>
                                                 </div>
@@ -324,11 +259,11 @@ export default function CRMPage() {
                             </Card>
 
                             {/* Inactive Patients Card */}
-                            <Card className="border-border shadow-sm">
-                                <CardHeader className="pb-3 border-b border-border/50">
+                            <Card className="border border-border">
+                                <CardHeader className="pb-3 border-b border-border">
                                     <div className="flex items-center justify-between">
-                                        <CardTitle className="text-lg flex items-center gap-2 text-gray-900">
-                                            <AlertTriangle className="w-5 h-5 text-amber-500" />
+                                        <CardTitle className="font-serif text-lg flex items-center gap-2 text-foreground">
+                                            <AlertTriangle className="w-5 h-5 text-destructive" />
                                             Pacientes Inativos (+90 dias)
                                         </CardTitle>
                                         <Button variant="ghost" size="sm" onClick={() => setActiveTab('inactive')}>
@@ -338,27 +273,27 @@ export default function CRMPage() {
                                 </CardHeader>
                                 <CardContent className="pt-4">
                                     {inactivePatients.length === 0 ? (
-                                        <p className="text-center text-gray-500 py-4">Nenhum paciente inativo</p>
+                                        <p className="text-center text-muted-foreground py-4 font-mono text-sm">Nenhum paciente inativo</p>
                                     ) : (
-                                        <div className="space-y-3">
+                                        <div className="space-y-1">
                                             {inactivePatients.slice(0, 5).map((patient) => (
-                                                <div key={patient.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100">
-                                                    <Avatar className="h-10 w-10 border border-gray-100">
-                                                        <AvatarFallback className="bg-gray-200 text-gray-600 text-sm font-medium">
+                                                <div key={patient.id} className="flex items-center gap-3 p-2 hover:bg-muted/50 transition-colors duration-150 border-b border-border/50 last:border-0">
+                                                    <Avatar className="h-10 w-10 border border-border">
+                                                        <AvatarFallback className="bg-muted text-muted-foreground text-sm font-mono">
                                                             {getInitials(patient.name)}
                                                         </AvatarFallback>
                                                     </Avatar>
                                                     <div className="flex-1 min-w-0">
-                                                        <p className="font-medium text-sm truncate text-gray-900">{patient.name}</p>
-                                                        <p className="text-xs text-gray-500">
+                                                        <p className="font-medium text-sm truncate text-foreground">{patient.name}</p>
+                                                        <p className="font-mono text-xs text-muted-foreground">
                                                             Última visita: {patient.lastVisit ? formatDate(patient.lastVisit) : 'Nunca'}
                                                         </p>
                                                     </div>
                                                     <div className="flex gap-1">
-                                                        <Button size="sm" variant="ghost" className="text-blue-600 hover:bg-blue-50">
+                                                        <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-foreground">
                                                             <Phone className="w-4 h-4" />
                                                         </Button>
-                                                        <Button size="sm" variant="ghost" className="text-green-600 hover:bg-green-50">
+                                                        <Button size="sm" variant="ghost" className="text-primary hover:text-primary/80">
                                                             <MessageSquare className="w-4 h-4" />
                                                         </Button>
                                                     </div>
@@ -376,6 +311,7 @@ export default function CRMPage() {
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
+                        transition={{ duration: 0.15 }}
                         className="h-full"
                     >
                         <KanbanBoard />
@@ -384,31 +320,32 @@ export default function CRMPage() {
 
                 {activeTab === 'birthdays' && (
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.15 }}
                     >
-                        <Card className="border-border shadow-sm">
+                        <Card className="border border-border">
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-gray-900">
-                                    <Cake className="w-5 h-5 text-pink-500" />
+                                <CardTitle className="font-serif flex items-center gap-2 text-foreground">
+                                    <Cake className="w-5 h-5 text-primary" />
                                     Aniversariantes de {currentMonth}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
                                 {birthdays.length === 0 ? (
-                                    <p className="text-center text-gray-500 py-8">Nenhum aniversariante este mês</p>
+                                    <p className="text-center text-muted-foreground py-8 font-mono text-sm">Nenhum aniversariante este mês</p>
                                 ) : (
-                                    <div className="space-y-2">
+                                    <div className="space-y-1">
                                         {birthdays.map((patient) => (
-                                            <div key={patient.id} className="flex items-center gap-4 p-3 rounded-lg border hover:bg-pink-50 transition-colors">
-                                                <Avatar className="h-12 w-12 border border-pink-100">
-                                                    <AvatarFallback className="bg-gradient-to-br from-pink-400 to-rose-500 text-white font-medium">
+                                            <div key={patient.id} className="flex items-center gap-4 p-3 border-b border-border/50 last:border-0 hover:bg-muted/50 transition-colors duration-150">
+                                                <Avatar className="h-12 w-12 border border-border">
+                                                    <AvatarFallback className="bg-muted text-foreground font-mono">
                                                         {getInitials(patient.name)}
                                                     </AvatarFallback>
                                                 </Avatar>
                                                 <div className="flex-1">
-                                                    <p className="font-medium text-gray-900">{patient.name}</p>
-                                                    <p className="text-sm text-gray-500">{formatDate(patient.birthDate!)}</p>
+                                                    <p className="font-medium text-foreground">{patient.name}</p>
+                                                    <p className="font-mono text-sm text-muted-foreground">{formatDate(patient.birthDate!)}</p>
                                                 </div>
                                                 <div className="flex gap-2">
                                                     {patient.phone && (
@@ -416,7 +353,7 @@ export default function CRMPage() {
                                                             <Phone className="w-4 h-4 mr-1" /> Ligar
                                                         </Button>
                                                     )}
-                                                    <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+                                                    <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 font-mono text-xs uppercase tracking-[0.1em]">
                                                         <MessageSquare className="w-4 h-4 mr-1" /> WhatsApp
                                                     </Button>
                                                 </div>
@@ -431,31 +368,32 @@ export default function CRMPage() {
 
                 {activeTab === 'inactive' && (
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.15 }}
                     >
-                        <Card className="border-border shadow-sm">
+                        <Card className="border border-border">
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-gray-900">
-                                    <UserX className="w-5 h-5 text-red-500" />
+                                <CardTitle className="font-serif flex items-center gap-2 text-foreground">
+                                    <UserX className="w-5 h-5 text-destructive" />
                                     Pacientes Inativos (sem consulta há mais de 90 dias)
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
                                 {inactivePatients.length === 0 ? (
-                                    <p className="text-center text-gray-500 py-8">Nenhum paciente inativo</p>
+                                    <p className="text-center text-muted-foreground py-8 font-mono text-sm">Nenhum paciente inativo</p>
                                 ) : (
-                                    <div className="space-y-2">
+                                    <div className="space-y-1">
                                         {inactivePatients.map((patient) => (
-                                            <div key={patient.id} className="flex items-center gap-4 p-3 rounded-lg border hover:bg-red-50 transition-colors">
-                                                <Avatar className="h-12 w-12 border border-gray-100">
-                                                    <AvatarFallback className="bg-gray-200 text-gray-600 font-medium">
+                                            <div key={patient.id} className="flex items-center gap-4 p-3 border-b border-border/50 last:border-0 hover:bg-muted/50 transition-colors duration-150">
+                                                <Avatar className="h-12 w-12 border border-border">
+                                                    <AvatarFallback className="bg-muted text-muted-foreground font-mono">
                                                         {getInitials(patient.name)}
                                                     </AvatarFallback>
                                                 </Avatar>
                                                 <div className="flex-1">
-                                                    <p className="font-medium text-gray-900">{patient.name}</p>
-                                                    <p className="text-sm text-gray-500">
+                                                    <p className="font-medium text-foreground">{patient.name}</p>
+                                                    <p className="font-mono text-sm text-muted-foreground">
                                                         Última visita: {patient.lastVisit ? formatDate(patient.lastVisit) : 'Nunca registrada'}
                                                     </p>
                                                 </div>
@@ -465,7 +403,7 @@ export default function CRMPage() {
                                                             Ver Perfil
                                                         </Button>
                                                     </Link>
-                                                    <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+                                                    <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 font-mono text-xs uppercase tracking-[0.1em]">
                                                         <MessageSquare className="w-4 h-4 mr-1" /> Reativar
                                                     </Button>
                                                 </div>
