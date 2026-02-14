@@ -123,8 +123,8 @@ export function PatientScoreCard({ patient, className }: PatientScoreCardProps) 
                             className={cn('h-full rounded-full transition-all',
                                 result.score >= 80 ? 'bg-amber-500' :
                                     result.score >= 60 ? 'bg-yellow-500' :
-                                        result.score >= 40 ? 'bg-slate-500' :
-                                            result.score >= 20 ? 'bg-blue-500' : 'bg-red-500'
+                                        result.score >= 40 ? 'bg-muted/500' :
+                                            result.score >= 20 ? 'bg-primary/100' : 'bg-destructive/100'
                             )}
                             style={{ width: `${result.score}%` }}
                         />

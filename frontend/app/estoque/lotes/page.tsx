@@ -211,7 +211,7 @@ export default function LotesPage() {
       return <Badge variant="destructive">Vencido</Badge>;
     }
     if (days <= 15) {
-      return <Badge className="bg-red-100 text-red-700">Vence em {days}d</Badge>;
+      return <Badge className="bg-destructive/15 text-red-700">Vence em {days}d</Badge>;
     }
     if (days <= 30) {
       return <Badge className="bg-yellow-100 text-yellow-700">Vence em {days}d</Badge>;
@@ -219,7 +219,7 @@ export default function LotesPage() {
     if (status === 'low') {
       return <Badge className="bg-orange-100 text-orange-700">Estoque Baixo</Badge>;
     }
-    return <Badge className="bg-green-100 text-green-700">OK</Badge>;
+    return <Badge className="bg-primary/15 text-primary">OK</Badge>;
   };
 
   // Summary stats
@@ -262,8 +262,8 @@ export default function LotesPage() {
           <Card>
             <CardContent className="pt-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Box className="w-5 h-5 text-blue-600" />
+                <div className="p-2 bg-primary/15 rounded-lg">
+                  <Box className="w-5 h-5 text-primary" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{stats.total}</p>
@@ -276,11 +276,11 @@ export default function LotesPage() {
           <Card>
             <CardContent className="pt-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <Package className="w-5 h-5 text-green-600" />
+                <div className="p-2 bg-primary/15 rounded-lg">
+                  <Package className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-green-600">{stats.active}</p>
+                  <p className="text-2xl font-bold text-primary">{stats.active}</p>
                   <p className="text-xs text-gray-500">Ativos</p>
                 </div>
               </div>
@@ -304,11 +304,11 @@ export default function LotesPage() {
           <Card>
             <CardContent className="pt-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-red-100 rounded-lg">
-                  <AlertTriangle className="w-5 h-5 text-red-600" />
+                <div className="p-2 bg-destructive/15 rounded-lg">
+                  <AlertTriangle className="w-5 h-5 text-destructive" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-red-600">{stats.expired}</p>
+                  <p className="text-2xl font-bold text-destructive">{stats.expired}</p>
                   <p className="text-xs text-gray-500">Vencidos</p>
                 </div>
               </div>
@@ -545,7 +545,7 @@ export default function LotesPage() {
               </div>
               <div className="space-y-2">
                 <Label>Custo Total</Label>
-                <div className="h-10 flex items-center justify-center rounded-md border bg-gray-50 font-bold text-green-700">
+                <div className="h-10 flex items-center justify-center rounded-md border bg-gray-50 font-bold text-primary">
                   {formatCurrency(formData.initialQuantity * formData.unitCost)}
                 </div>
               </div>

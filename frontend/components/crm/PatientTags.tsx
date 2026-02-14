@@ -22,11 +22,11 @@ interface PatientTagsProps {
 // Predefined tags with colors and icons
 const PREDEFINED_TAGS = [
     { name: 'VIP', color: 'bg-amber-100 text-amber-800 border-amber-300', icon: Crown },
-    { name: 'Novo', color: 'bg-green-100 text-green-800 border-green-300', icon: UserPlus },
-    { name: 'Recorrente', color: 'bg-blue-100 text-blue-800 border-blue-300', icon: RefreshCw },
-    { name: 'Indicação', color: 'bg-purple-100 text-purple-800 border-purple-300', icon: Heart },
-    { name: 'Corporativo', color: 'bg-slate-100 text-slate-800 border-slate-300', icon: Briefcase },
-    { name: 'Prioritário', color: 'bg-red-100 text-red-800 border-red-300', icon: Star },
+    { name: 'Novo', color: 'bg-primary/15 text-green-800 border-green-300', icon: UserPlus },
+    { name: 'Recorrente', color: 'bg-primary/15 text-blue-800 border-blue-300', icon: RefreshCw },
+    { name: 'Indicação', color: 'bg-primary/15 text-purple-800 border-purple-300', icon: Heart },
+    { name: 'Corporativo', color: 'bg-muted text-foreground border-border', icon: Briefcase },
+    { name: 'Prioritário', color: 'bg-destructive/15 text-red-800 border-red-300', icon: Star },
 ];
 
 export function PatientTags({ patientId, currentTags = [], onTagsUpdate }: PatientTagsProps) {

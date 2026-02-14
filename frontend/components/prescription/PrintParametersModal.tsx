@@ -309,7 +309,7 @@ export function PrintParametersModal({ open, onClose, onGenerate, doctorName = '
                 </div>
 
                 <DialogFooter>
-                    <Button onClick={() => onGenerate(params)} className="w-full bg-purple-600 hover:bg-purple-700">
+                    <Button onClick={() => onGenerate(params)} className="w-full bg-primary hover:bg-purple-700">
                         Gerar Prévia de Impressão
                     </Button>
                 </DialogFooter>

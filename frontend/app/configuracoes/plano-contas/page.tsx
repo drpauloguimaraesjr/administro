@@ -211,25 +211,25 @@ export default function PlanoContasPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className="bg-green-50 border-green-200">
+          <Card className="bg-primary/10 border-primary/30">
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <TrendingUp className="w-8 h-8 text-green-600" />
+                <TrendingUp className="w-8 h-8 text-primary" />
                 <div>
-                  <p className="text-sm text-green-600">Contas de Receita</p>
-                  <p className="text-2xl font-bold text-green-700">
+                  <p className="text-sm text-primary">Contas de Receita</p>
+                  <p className="text-2xl font-bold text-primary">
                     {planoContas.filter(c => c.tipo === 'receita' && c.ativo).length}
                   </p>
                 </div>
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-red-50 border-red-200">
+          <Card className="bg-destructive/10 border-destructive/30">
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <TrendingDown className="w-8 h-8 text-red-600" />
+                <TrendingDown className="w-8 h-8 text-destructive" />
                 <div>
-                  <p className="text-sm text-red-600">Contas de Despesa</p>
+                  <p className="text-sm text-destructive">Contas de Despesa</p>
                   <p className="text-2xl font-bold text-red-700">
                     {planoContas.filter(c => c.tipo === 'despesa' && c.ativo).length}
                   </p>
@@ -292,8 +292,8 @@ export default function PlanoContasPage() {
                       </TableCell>
                       <TableCell>
                         <Badge className={conta.tipo === 'receita' 
-                          ? 'bg-green-100 text-green-700' 
-                          : 'bg-red-100 text-red-700'
+                          ? 'bg-primary/15 text-primary' 
+                          : 'bg-destructive/15 text-red-700'
                         }>
                           {conta.tipo === 'receita' ? (
                             <><TrendingUp className="w-3 h-3 mr-1" /> Receita</>
@@ -326,7 +326,7 @@ export default function PlanoContasPage() {
                               Editar
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              className="text-red-600"
+                              className="text-destructive"
                               onClick={() => handleDelete(conta.id)}
                             >
                               <Trash2 className="w-4 h-4 mr-2" />
@@ -377,13 +377,13 @@ export default function PlanoContasPage() {
                   <SelectContent>
                     <SelectItem value="receita">
                       <div className="flex items-center gap-2">
-                        <TrendingUp className="w-4 h-4 text-green-600" />
+                        <TrendingUp className="w-4 h-4 text-primary" />
                         Receita
                       </div>
                     </SelectItem>
                     <SelectItem value="despesa">
                       <div className="flex items-center gap-2">
-                        <TrendingDown className="w-4 h-4 text-red-600" />
+                        <TrendingDown className="w-4 h-4 text-destructive" />
                         Despesa
                       </div>
                     </SelectItem>

@@ -143,14 +143,14 @@ export default function AgendaSetoresPage() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
-              <LayoutGrid className="w-8 h-8 text-blue-600" />
+              <LayoutGrid className="w-8 h-8 text-primary" />
               Setores da Agenda
             </h1>
             <p className="text-muted-foreground">
               Consultórios, salas e locais de atendimento
             </p>
           </div>
-          <Button onClick={() => handleOpenForm()} className="bg-blue-600 hover:bg-blue-700">
+          <Button onClick={() => handleOpenForm()} className="bg-primary hover:bg-primary/90">
             <Plus className="w-4 h-4 mr-2" />
             Novo Setor
           </Button>
@@ -259,7 +259,7 @@ export default function AgendaSetoresPage() {
                               Editar
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              className="text-red-600"
+                              className="text-destructive"
                               onClick={() => handleDelete(setor.id)}
                             >
                               <Trash2 className="w-4 h-4 mr-2" />
@@ -385,7 +385,7 @@ export default function AgendaSetoresPage() {
             <Button variant="outline" onClick={handleCloseForm}>
               Cancelar
             </Button>
-            <Button onClick={handleSubmit} className="bg-blue-600 hover:bg-blue-700">
+            <Button onClick={handleSubmit} className="bg-primary hover:bg-primary/90">
               Salvar
             </Button>
           </DialogFooter>

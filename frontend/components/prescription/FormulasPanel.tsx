@@ -56,7 +56,7 @@ export function FormulasPanel({ onSelectFormula }: FormulasPanelProps) {
                     <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2">
                         📚 Biblioteca de Fórmulas
                     </h3>
-                    <Badge variant="secondary" className="text-xs bg-purple-50 text-purple-700 hover:bg-purple-100">
+                    <Badge variant="secondary" className="text-xs bg-primary/10 text-primary hover:bg-primary/15">
                         {filteredFormulas.length} itens
                     </Badge>
                 </div>
@@ -79,7 +79,7 @@ export function FormulasPanel({ onSelectFormula }: FormulasPanelProps) {
                         variant={categoryFilter === null ? 'outline' : 'ghost'}
                         size="sm"
                         onClick={() => setCategoryFilter(null)}
-                        className={`h-6 text-[10px] px-2 rounded-full ${categoryFilter === null ? 'border-purple-200 bg-purple-50 text-purple-700' : 'text-gray-500'}`}
+                        className={`h-6 text-[10px] px-2 rounded-full ${categoryFilter === null ? 'border-primary/30 bg-primary/10 text-primary' : 'text-gray-500'}`}
                     >
                         Todos
                     </Button>
@@ -87,7 +87,7 @@ export function FormulasPanel({ onSelectFormula }: FormulasPanelProps) {
                         variant={categoryFilter === 'Injetáveis' ? 'outline' : 'ghost'}
                         size="sm"
                         onClick={() => setCategoryFilter('Injetáveis')}
-                        className={`h-6 text-[10px] px-2 rounded-full ${categoryFilter === 'Injetáveis' ? 'border-blue-200 bg-blue-50 text-blue-700' : 'text-gray-500'}`}
+                        className={`h-6 text-[10px] px-2 rounded-full ${categoryFilter === 'Injetáveis' ? 'border-primary/30 bg-primary/10 text-primary' : 'text-gray-500'}`}
                     >
                         Injetáveis
                     </Button>
@@ -95,7 +95,7 @@ export function FormulasPanel({ onSelectFormula }: FormulasPanelProps) {
                         variant={categoryFilter === 'Vitaminas' ? 'outline' : 'ghost'}
                         size="sm"
                         onClick={() => setCategoryFilter('Vitaminas')}
-                        className={`h-6 text-[10px] px-2 rounded-full ${categoryFilter === 'Vitaminas' ? 'border-green-200 bg-green-50 text-green-700' : 'text-gray-500'}`}
+                        className={`h-6 text-[10px] px-2 rounded-full ${categoryFilter === 'Vitaminas' ? 'border-primary/30 bg-primary/10 text-primary' : 'text-gray-500'}`}
                     >
                         Vitaminas
                     </Button>
@@ -150,7 +150,7 @@ export function FormulasPanel({ onSelectFormula }: FormulasPanelProps) {
             <div className="p-3 border-t border-gray-200 bg-white">
                 <Button
                     variant="ghost"
-                    className="w-full justify-center text-purple-600 hover:text-purple-700 hover:bg-purple-50 h-9"
+                    className="w-full justify-center text-primary hover:text-primary hover:bg-primary/10 h-9"
                     onClick={() => {
                         // TODO: Implement create modal
                         alert('Funcionalidade de criar nova fórmula em desenvolvimento');
@@ -178,13 +178,13 @@ function FormulaCard({ formula, onSelect }: { formula: PrescriptionFormula; onSe
         <TooltipProvider>
             <Tooltip delayDuration={500}>
                 <TooltipTrigger asChild>
-                    <div className="group relative bg-white border border-gray-200 rounded-lg p-3 hover:border-purple-300 hover:shadow-md transition-all cursor-default">
+                    <div className="group relative bg-white border border-gray-200 rounded-lg p-3 hover:border-purple-300 hover: transition-all cursor-default">
 
                         <div className="flex justify-between items-start gap-3">
                             <Button
                                 size="icon"
                                 variant="ghost"
-                                className="h-8 w-8 text-gray-300 hover:text-purple-600 hover:bg-purple-50 rounded-full shrink-0 -ml-1 -mt-1"
+                                className="h-8 w-8 text-gray-300 hover:text-primary hover:bg-primary/10 rounded-full shrink-0 -ml-1 -mt-1"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     onSelect();
@@ -195,7 +195,7 @@ function FormulaCard({ formula, onSelect }: { formula: PrescriptionFormula; onSe
 
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-1.5 mb-1">
-                                    <div className={`p-1 rounded-md ${formula.category === 'Hormônios' ? 'bg-orange-100 text-orange-600' : 'bg-blue-50 text-blue-600'}`}>
+                                    <div className={`p-1 rounded-md ${formula.category === 'Hormônios' ? 'bg-orange-100 text-orange-600' : 'bg-primary/10 text-primary'}`}>
                                         {getIcon()}
                                     </div>
                                     <h4 className="font-semibold text-gray-800 text-xs truncate leading-tight" title={formula.name}>
@@ -218,7 +218,7 @@ function FormulaCard({ formula, onSelect }: { formula: PrescriptionFormula; onSe
                         </div>
                     </div>
                 </TooltipTrigger>
-                <TooltipContent side="left" className="w-64 p-3 bg-slate-800 text-slate-100 border-slate-700">
+                <TooltipContent side="left" className="w-64 p-3 bg-foreground/90 text-slate-100 border-border">
                     <p className="font-bold text-xs mb-1">{formula.name}</p>
                     <p className="text-[10px] opacity-90 leading-relaxed line-clamp-6">{formula.description}</p>
                 </TooltipContent>

@@ -34,9 +34,9 @@ const typeIcons = {
 };
 
 const priorityColors = {
-    low: 'bg-slate-100 text-slate-700',
+    low: 'bg-muted text-foreground/80',
     medium: 'bg-yellow-100 text-yellow-700',
-    high: 'bg-red-100 text-red-700',
+    high: 'bg-destructive/15 text-red-700',
 };
 
 export function TaskCard({ task, onToggle }: TaskCardProps) {
@@ -45,7 +45,7 @@ export function TaskCard({ task, onToggle }: TaskCardProps) {
     return (
         <Card className={cn(
             "transition-all hover:shadow-sm",
-            task.status === 'completed' && "opacity-60 bg-slate-50",
+            task.status === 'completed' && "opacity-60 bg-muted/50",
             isExpired && "border-l-4 border-l-red-500"
         )}>
             <CardContent className="p-4 flex items-start gap-3">
@@ -59,7 +59,7 @@ export function TaskCard({ task, onToggle }: TaskCardProps) {
                     <div className="flex items-start justify-between">
                         <h4 className={cn(
                             "font-medium text-sm leading-none",
-                            task.status === 'completed' && "line-through text-slate-500"
+                            task.status === 'completed' && "line-through text-muted-foreground"
                         )}>
                             {task.title}
                         </h4>
@@ -68,19 +68,19 @@ export function TaskCard({ task, onToggle }: TaskCardProps) {
                         </Badge>
                     </div>
 
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-muted-foreground">
                         {task.description || (task.leadName ? `Relacionado a ${task.leadName}` : 'Sem descrição')}
                     </p>
 
                     <div className="flex items-center gap-3 pt-1">
-                        <div className="flex items-center gap-1 text-xs text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
                             {typeIcons[task.type]}
                             <span className="capitalize">{task.type.replace('_', ' ')}</span>
                         </div>
 
                         <div className={cn(
                             "flex items-center gap-1 text-xs",
-                            isExpired ? "text-red-600 font-medium" : "text-slate-400"
+                            isExpired ? "text-destructive font-medium" : "text-muted-foreground/70"
                         )}>
                             <CalendarIcon className="w-3 h-3" />
                             <span>
@@ -89,8 +89,8 @@ export function TaskCard({ task, onToggle }: TaskCardProps) {
                         </div>
 
                         {task.assignedTo && (
-                            <div className="flex items-center gap-1 text-xs text-slate-400 ml-auto">
-                                <span className="w-4 h-4 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-[10px] font-bold">
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground/70 ml-auto">
+                                <span className="w-4 h-4 rounded-full bg-primary/15 text-primary flex items-center justify-center text-[10px] font-bold">
                                     {task.assignedTo.substring(0, 2).toUpperCase()}
                                 </span>
                             </div>

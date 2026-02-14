@@ -142,8 +142,8 @@ export function InvestmentForm({ onClose, initialData }: InvestmentFormProps) {
                 type="button"
                 onClick={() => setFormData({ ...formData, contextId: 'HOME' })}
                 className={`flex-1 p-3 rounded-lg border-2 ${formData.contextId === 'HOME'
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-slate-200'
+                    ? 'border-primary bg-primary/10'
+                    : 'border-border'
                   }`}
               >
                 🏠 Casa
@@ -152,8 +152,8 @@ export function InvestmentForm({ onClose, initialData }: InvestmentFormProps) {
                 type="button"
                 onClick={() => setFormData({ ...formData, contextId: 'CLINIC' })}
                 className={`flex-1 p-3 rounded-lg border-2 ${formData.contextId === 'CLINIC'
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-slate-200'
+                    ? 'border-primary bg-primary/10'
+                    : 'border-border'
                   }`}
               >
                 🏥 Clínica

@@ -132,7 +132,7 @@ export default function DesignSystemPage() {
                     {/* Typography */}
                     <section>
                         <h2 className="text-2xl font-bold mb-6">✍️ Tipografia</h2>
-                        <div className="space-y-4 p-6 bg-card rounded-xl border">
+                        <div className="space-y-4 p-6 bg-card  border">
                             <h1 className="text-4xl font-bold">Heading 1 - 4xl Bold</h1>
                             <h2 className="text-3xl font-bold">Heading 2 - 3xl Bold</h2>
                             <h3 className="text-2xl font-semibold">Heading 3 - 2xl Semibold</h3>
@@ -147,7 +147,7 @@ export default function DesignSystemPage() {
                     {/* Buttons */}
                     <section>
                         <h2 className="text-2xl font-bold mb-6">🔘 Botões</h2>
-                        <div className="space-y-6 p-6 bg-card rounded-xl border">
+                        <div className="space-y-6 p-6 bg-card  border">
                             <div>
                                 <p className="text-sm font-medium mb-3">Variants</p>
                                 <div className="flex flex-wrap gap-3">
@@ -192,7 +192,7 @@ export default function DesignSystemPage() {
                     {/* Form Inputs */}
                     <section>
                         <h2 className="text-2xl font-bold mb-6">📝 Inputs & Forms</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-card rounded-xl border">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-card  border">
                             <div className="space-y-4">
                                 <div>
                                     <Label htmlFor="text">Text Input</Label>
@@ -259,14 +259,14 @@ export default function DesignSystemPage() {
                     <section>
                         <h2 className="text-2xl font-bold mb-6">📦 Cards</h2>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="bg-card border rounded-xl p-6">
+                            <div className="bg-card border  p-6">
                                 <h3 className="font-semibold text-lg mb-2">Card Simples</h3>
                                 <p className="text-muted-foreground text-sm">
                                     Um card básico com borda e fundo card.
                                 </p>
                             </div>
 
-                            <div className="bg-card border rounded-xl p-6 shadow-lg">
+                            <div className="bg-card border  p-6 ">
                                 <div className="flex items-center gap-3 mb-4">
                                     <div className="p-2 bg-primary/10 rounded-lg">
                                         <Users className="w-5 h-5 text-primary" />
@@ -277,7 +277,7 @@ export default function DesignSystemPage() {
                                 <p className="text-muted-foreground text-sm">Pacientes ativos</p>
                             </div>
 
-                            <div className="bg-gradient-to-br from-[var(--chart-2)] to-[var(--chart-4)] text-white rounded-xl p-6">
+                            <div className="bg-gradient-to-br from-[var(--chart-2)] to-[var(--chart-4)] text-white  p-6">
                                 <h3 className="font-semibold text-lg mb-2">Card Gradiente</h3>
                                 <p className="text-white/80 text-sm">
                                     Usando cores de chart para gradiente.
@@ -290,7 +290,7 @@ export default function DesignSystemPage() {
                     {/* Alerts / Badges */}
                     <section>
                         <h2 className="text-2xl font-bold mb-6">🏷️ Badges & Alerts</h2>
-                        <div className="space-y-4 p-6 bg-card rounded-xl border">
+                        <div className="space-y-4 p-6 bg-card  border">
                             <div className="flex flex-wrap gap-3">
                                 <span className="px-3 py-1 bg-primary text-primary-foreground rounded-full text-sm font-medium">
                                     Primary
@@ -301,23 +301,23 @@ export default function DesignSystemPage() {
                                 <span className="px-3 py-1 bg-destructive text-destructive-foreground rounded-full text-sm font-medium">
                                     Destructive
                                 </span>
-                                <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                                <span className="px-3 py-1 bg-primary/15 text-primary rounded-full text-sm font-medium">
                                     Success
                                 </span>
                                 <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-medium">
                                     Warning
                                 </span>
-                                <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+                                <span className="px-3 py-1 bg-primary/15 text-primary rounded-full text-sm font-medium">
                                     Info
                                 </span>
                             </div>
 
                             <div className="space-y-3 mt-6">
-                                <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
+                                <div className="flex items-center gap-3 p-4 bg-primary/10 border border-primary/30 rounded-lg text-primary">
                                     <Check className="w-5 h-5" />
                                     <span>Sucesso! Operação realizada com sucesso.</span>
                                 </div>
-                                <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+                                <div className="flex items-center gap-3 p-4 bg-destructive/10 border border-destructive/30 rounded-lg text-red-700">
                                     <X className="w-5 h-5" />
                                     <span>Erro! Algo deu errado.</span>
                                 </div>
@@ -325,7 +325,7 @@ export default function DesignSystemPage() {
                                     <AlertCircle className="w-5 h-5" />
                                     <span>Atenção! Revise antes de continuar.</span>
                                 </div>
-                                <div className="flex items-center gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-700">
+                                <div className="flex items-center gap-3 p-4 bg-primary/10 border border-primary/30 rounded-lg text-primary">
                                     <Info className="w-5 h-5" />
                                     <span>Informação importante.</span>
                                 </div>
@@ -336,7 +336,7 @@ export default function DesignSystemPage() {
                     {/* Icons */}
                     <section>
                         <h2 className="text-2xl font-bold mb-6">🎯 Ícones (Lucide)</h2>
-                        <div className="grid grid-cols-6 md:grid-cols-12 gap-4 p-6 bg-card rounded-xl border">
+                        <div className="grid grid-cols-6 md:grid-cols-12 gap-4 p-6 bg-card  border">
                             {[Plus, Edit, Trash2, Search, Calendar, Users, DollarSign, Settings, Bell, Check, X, AlertCircle].map((Icon, i) => (
                                 <div key={i} className="p-4 border rounded-lg flex items-center justify-center hover:bg-muted transition-colors">
                                     <Icon className="w-6 h-6" />
@@ -379,14 +379,14 @@ export default function DesignSystemPage() {
                     {/* Spacing & Radius */}
                     <section>
                         <h2 className="text-2xl font-bold mb-6">📐 Spacing & Radius</h2>
-                        <div className="p-6 bg-card rounded-xl border space-y-4">
+                        <div className="p-6 bg-card  border space-y-4">
                             <div>
                                 <p className="text-sm font-medium mb-3">Border Radius</p>
                                 <div className="flex gap-4">
                                     <div className="w-20 h-20 bg-primary rounded-sm flex items-center justify-center text-primary-foreground text-xs">sm</div>
                                     <div className="w-20 h-20 bg-primary rounded-md flex items-center justify-center text-primary-foreground text-xs">md</div>
                                     <div className="w-20 h-20 bg-primary rounded-lg flex items-center justify-center text-primary-foreground text-xs">lg</div>
-                                    <div className="w-20 h-20 bg-primary rounded-xl flex items-center justify-center text-primary-foreground text-xs">xl</div>
+                                    <div className="w-20 h-20 bg-primary  flex items-center justify-center text-primary-foreground text-xs">xl</div>
                                     <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-xs">full</div>
                                 </div>
                             </div>
@@ -396,9 +396,9 @@ export default function DesignSystemPage() {
                                 <div className="flex gap-4">
                                     <div className="w-20 h-20 bg-card border rounded-lg shadow-sm flex items-center justify-center text-xs">sm</div>
                                     <div className="w-20 h-20 bg-card border rounded-lg shadow flex items-center justify-center text-xs">default</div>
-                                    <div className="w-20 h-20 bg-card border rounded-lg shadow-md flex items-center justify-center text-xs">md</div>
-                                    <div className="w-20 h-20 bg-card border rounded-lg shadow-lg flex items-center justify-center text-xs">lg</div>
-                                    <div className="w-20 h-20 bg-card border rounded-lg shadow-xl flex items-center justify-center text-xs">xl</div>
+                                    <div className="w-20 h-20 bg-card border rounded-lg  flex items-center justify-center text-xs">md</div>
+                                    <div className="w-20 h-20 bg-card border rounded-lg  flex items-center justify-center text-xs">lg</div>
+                                    <div className="w-20 h-20 bg-card border rounded-lg  flex items-center justify-center text-xs">xl</div>
                                 </div>
                             </div>
                         </div>

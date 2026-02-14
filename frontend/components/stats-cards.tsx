@@ -65,18 +65,18 @@ export function StatsCards({ balance, income, expenses, transactionsCount }: Sta
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.1 }}
         >
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card className="hover: transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <div className={`p-3 rounded-lg ${stat.color === 'blue' ? 'bg-blue-100 text-blue-600' :
-                  stat.color === 'green' ? 'bg-green-100 text-green-600' :
-                    stat.color === 'red' ? 'bg-red-100 text-red-600' :
-                      'bg-purple-100 text-purple-600'
+                <div className={`p-3 rounded-lg ${stat.color === 'blue' ? 'bg-primary/15 text-primary' :
+                  stat.color === 'green' ? 'bg-primary/15 text-primary' :
+                    stat.color === 'red' ? 'bg-destructive/15 text-destructive' :
+                      'bg-primary/15 text-primary'
                   }`}>
                   {stat.icon}
                 </div>
                 {stat.trend && (
-                  <span className={`text-sm font-medium ${stat.trendUp ? 'text-green-600' : 'text-red-600'
+                  <span className={`text-sm font-medium ${stat.trendUp ? 'text-primary' : 'text-destructive'
                     }`}>
                     {stat.trend}
                   </span>

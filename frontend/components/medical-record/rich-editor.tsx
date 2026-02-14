@@ -129,7 +129,7 @@ export const RichEditor = forwardRef<RichEditorRef, RichEditorProps>(({ content 
                     <Button
                         variant="ghost"
                         size="sm"
-                        className="text-teal-600 hover:text-teal-700 hover:bg-teal-50 mr-1"
+                        className="text-primary hover:text-teal-700 hover:bg-primary/10 mr-1"
                         onClick={() => {
                             if (!('webkitSpeechRecognition' in window)) {
                                 alert('Seu navegador não suporta reconhecimento de voz.');
@@ -160,7 +160,7 @@ export const RichEditor = forwardRef<RichEditorRef, RichEditorProps>(({ content 
                     {/* Templates Macro (New Feature) */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 mr-2 text-xs font-medium">
+                            <Button variant="ghost" size="sm" className="text-primary hover:text-primary hover:bg-primary/10 mr-2 text-xs font-medium">
                                 + Modelo
                             </Button>
                         </DropdownMenuTrigger>
@@ -192,7 +192,7 @@ export const RichEditor = forwardRef<RichEditorRef, RichEditorProps>(({ content 
                                 <DropdownMenuItem
                                     key={font.value}
                                     onClick={() => editor.chain().focus().setFontFamily(font.value).run()}
-                                    className={editor.isActive('textStyle', { fontFamily: font.value }) ? 'bg-purple-50 text-purple-700' : ''}
+                                    className={editor.isActive('textStyle', { fontFamily: font.value }) ? 'bg-primary/10 text-primary' : ''}
                                     style={{ fontFamily: font.value }}
                                 >
                                     {font.name}

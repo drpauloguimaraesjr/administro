@@ -20,8 +20,8 @@ function PlaybookSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
     ];
 
     return (
-        <div className="fixed right-0 top-0 h-full w-80 bg-white border-l border-gray-200 shadow-xl z-50 flex flex-col transform transition-transform duration-300 ease-in-out">
-            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-teal-50">
+        <div className="fixed right-0 top-0 h-full w-80 bg-white border-l border-gray-200  z-50 flex flex-col transform transition-transform duration-300 ease-in-out">
+            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-primary/10">
                 <div className="flex items-center gap-2">
                     <BookOpen className="w-5 h-5 text-teal-700" />
                     <h3 className="font-bold text-teal-800">Roteiro de Atendimento</h3>
@@ -34,24 +34,24 @@ function PlaybookSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
             <ScrollArea className="flex-1 p-4">
                 <div className="space-y-6">
                     {steps.map((step, index) => (
-                        <div key={step.id} className="relative pl-4 border-l-2 border-slate-200 hover:border-teal-400 transition-colors group">
-                            <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-slate-100 border-2 border-slate-300 group-hover:border-teal-500 group-hover:bg-white flex items-center justify-center text-[10px] font-bold text-slate-500">
+                        <div key={step.id} className="relative pl-4 border-l-2 border-border hover:border-teal-400 transition-colors group">
+                            <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-muted border-2 border-border group-hover:border-teal-500 group-hover:bg-white flex items-center justify-center text-[10px] font-bold text-muted-foreground">
                                 {index + 1}
                             </div>
-                            <h4 className="text-sm font-semibold text-slate-800 mb-2">{step.title}</h4>
+                            <h4 className="text-sm font-semibold text-foreground mb-2">{step.title}</h4>
 
                             {step.type === 'script' ? (
-                                <div className="bg-slate-50 p-3 rounded-md border border-slate-200 text-sm text-slate-600 cursor-pointer hover:bg-teal-50 hover:border-teal-200 hover:text-teal-800 transition-all"
+                                <div className="bg-muted/50 p-3 rounded-md border border-border text-sm text-muted-foreground cursor-pointer hover:bg-primary/10 hover:border-teal-200 hover:text-teal-800 transition-all"
                                     onClick={() => navigator.clipboard.writeText(step.content || '')}
                                     title="Clique para copiar">
                                     &quot;{step.content}&quot;
                                 </div>
                             ) : (
                                 <div className="space-y-1">
-                                    <label className="text-xs text-slate-500">{step.label}</label>
+                                    <label className="text-xs text-muted-foreground">{step.label}</label>
                                     <input
                                         type="text"
-                                        className="w-full text-sm p-2 border border-slate-300 rounded-md focus:ring-1 focus:ring-teal-500 outline-none"
+                                        className="w-full text-sm p-2 border border-border rounded-md focus:ring-1 focus:ring-teal-500 outline-none"
                                         placeholder={step.placeholder}
                                     />
                                     <Button size="sm" variant="outline" className="w-full text-xs h-7 mt-1">Salvar Dado</Button>
@@ -62,8 +62,8 @@ function PlaybookSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                 </div>
             </ScrollArea>
 
-            <div className="p-4 border-t border-gray-100 bg-slate-50">
-                <div className="text-xs text-center text-slate-400">
+            <div className="p-4 border-t border-gray-100 bg-muted/50">
+                <div className="text-xs text-center text-muted-foreground/70">
                     Playbook: <strong>Triagem Padrão</strong>
                 </div>
             </div>
@@ -132,12 +132,12 @@ export default function WhatsAppPage() {
 
     return (
         <div className="flex h-screen overflow-hidden">
-            <main className="flex-1 p-8 bg-slate-50 overflow-y-auto relative">
+            <main className="flex-1 p-8 bg-muted/50 overflow-y-auto relative">
 
                 {/* Floating Button for Playbook */}
                 <button
                     onClick={() => setShowPlaybook(!showPlaybook)}
-                    className="fixed right-6 top-24 z-40 bg-teal-600 text-white p-3 rounded-full shadow-lg hover:bg-teal-700 transition-all hover:scale-105"
+                    className="fixed right-6 top-24 z-40 bg-primary text-white p-3 rounded-full  hover:bg-teal-700 transition-all hover:scale-105"
                     title="Abrir Roteiro de Atendimento"
                 >
                     <BookOpen className="w-6 h-6" />
@@ -146,8 +146,8 @@ export default function WhatsAppPage() {
                 <div className="max-w-4xl mx-auto space-y-8">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold text-slate-900">Conexão WhatsApp</h1>
-                            <p className="text-slate-500">Gerencie a conexão do bot para envio de mensagens e leitura de comprovantes.</p>
+                            <h1 className="text-3xl font-bold text-foreground">Conexão WhatsApp</h1>
+                            <p className="text-muted-foreground">Gerencie a conexão do bot para envio de mensagens e leitura de comprovantes.</p>
                         </div>
                         <Button onClick={fetchStatus} variant="outline" disabled={loading}>
                             <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
@@ -164,10 +164,10 @@ export default function WhatsAppPage() {
                             <CardContent className="flex flex-col items-center justify-center py-8 space-y-4">
                                 {status === 'connected' ? (
                                     <>
-                                        <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
-                                            <CheckCircle className="w-8 h-8 text-green-600" />
+                                        <div className="w-16 h-16 rounded-full bg-primary/15 flex items-center justify-center">
+                                            <CheckCircle className="w-8 h-8 text-primary" />
                                         </div>
-                                        <h3 className="text-xl font-semibold text-green-600">Conectado!</h3>
+                                        <h3 className="text-xl font-semibold text-primary">Conectado!</h3>
                                         <p className="text-center text-gray-500">O sistema está pronto para enviar e receber mensagens.</p>
                                     </>
                                 ) : status === 'connecting' ? (
@@ -180,10 +180,10 @@ export default function WhatsAppPage() {
                                     </>
                                 ) : (
                                     <>
-                                        <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
-                                            <AlertTriangle className="w-8 h-8 text-red-600" />
+                                        <div className="w-16 h-16 rounded-full bg-destructive/15 flex items-center justify-center">
+                                            <AlertTriangle className="w-8 h-8 text-destructive" />
                                         </div>
-                                        <h3 className="text-xl font-semibold text-red-600">Desconectado</h3>
+                                        <h3 className="text-xl font-semibold text-destructive">Desconectado</h3>
                                         <p className="text-center text-gray-500">Escaneie o QR Code ao lado para conectar.</p>
                                     </>
                                 )}

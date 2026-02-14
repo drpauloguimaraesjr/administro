@@ -93,7 +93,7 @@ export function StockConfirmDialog({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Package className="w-5 h-5 text-purple-600" />
+            <Package className="w-5 h-5 text-primary" />
             Registrar no Estoque?
           </DialogTitle>
           <DialogDescription>
@@ -103,21 +103,21 @@ export function StockConfirmDialog({
 
         <div className="space-y-4 py-4">
           {/* Product Match Info */}
-          <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+          <div className="bg-primary/10 border border-primary/30 rounded-lg p-4">
             <div className="flex items-start justify-between">
               <div>
                 <p className="font-medium text-purple-900">{product.name}</p>
                 {product.genericName && (
-                  <p className="text-sm text-purple-700">{product.genericName}</p>
+                  <p className="text-sm text-primary">{product.genericName}</p>
                 )}
               </div>
-              <Badge className="bg-purple-100 text-purple-700">
+              <Badge className="bg-primary/15 text-primary">
                 Match encontrado
               </Badge>
             </div>
             
             {formulaName !== product.name && (
-              <p className="text-xs text-purple-600 mt-2">
+              <p className="text-xs text-primary mt-2">
                 Pesquisado: "{formulaName}"
               </p>
             )}
@@ -135,7 +135,7 @@ export function StockConfirmDialog({
                 <Box className="w-4 h-4" />
                 Disponível
               </span>
-              <span className={`font-medium ${isLowStock ? 'text-orange-600' : 'text-green-600'}`}>
+              <span className={`font-medium ${isLowStock ? 'text-orange-600' : 'text-primary'}`}>
                 {batch.availableQuantity} {product.unit}(s)
                 {isLowStock && (
                   <Badge variant="outline" className="ml-2 text-orange-600 border-orange-300">
@@ -216,7 +216,7 @@ export function StockConfirmDialog({
           </div>
 
           {/* Billing Option */}
-          <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+          <div className="flex items-center justify-between p-3 bg-primary/10 border border-primary/30 rounded-lg">
             <div className="flex items-center gap-2">
               <Checkbox
                 id="generateBilling"
@@ -228,7 +228,7 @@ export function StockConfirmDialog({
               </Label>
             </div>
             {generateBilling && (
-              <span className="font-bold text-green-700">
+              <span className="font-bold text-primary">
                 {formatCurrency(totalPrice)}
               </span>
             )}
@@ -248,7 +248,7 @@ export function StockConfirmDialog({
           <Button
             onClick={handleConfirm}
             disabled={isLoading || quantity > batch.availableQuantity}
-            className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700"
+            className="w-full sm:w-auto bg-primary hover:bg-purple-700"
           >
             {isLoading ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />

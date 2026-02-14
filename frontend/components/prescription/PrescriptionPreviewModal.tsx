@@ -105,8 +105,8 @@ export function PrescriptionPreviewModal({
                 </div>
 
                 {/* Left Column: Preview */}
-                <div className="flex-1 bg-slate-800 p-4 overflow-y-auto flex justify-center relative">
-                    <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-slate-900/80 backdrop-blur text-white px-4 py-2 rounded-full flex gap-4 z-10">
+                <div className="flex-1 bg-foreground/90 p-4 overflow-y-auto flex justify-center relative">
+                    <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-foreground/80 backdrop-blur text-white px-4 py-2 rounded-full flex gap-4 z-10">
                         <span className="text-sm">1 / 1</span>
                         <div className="w-px bg-white/20"></div>
                         <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-white"><Download className="w-4 h-4" /></Button>
@@ -217,9 +217,9 @@ export function PrescriptionPreviewModal({
                                             <img src={qrCodeUrl} alt="QR Code" className="w-24 h-24" />
                                         )}
                                         <div className="text-[10px] text-gray-600">
-                                            <p className="text-green-700">Este documento foi gerado assinado eletronicamente.</p>
+                                            <p className="text-primary">Este documento foi gerado assinado eletronicamente.</p>
                                             <p>Para verificar a autenticidade acesse:</p>
-                                            <p className="text-blue-600">{validationUrl}</p>
+                                            <p className="text-primary">{validationUrl}</p>
                                             <p>Documento gerado em: {formatDateTime(currentDate)} Ip: 000.000.00.000</p>
                                         </div>
                                     </div>
@@ -305,9 +305,9 @@ export function PrescriptionPreviewModal({
                                             <div className="flex gap-2 items-center">
                                                 <img src={qrCodeUrl} alt="QR Code" className="w-20 h-20" />
                                                 <div className="text-[10px] text-gray-500 max-w-[180px]">
-                                                    <p className="font-bold text-green-700">Documento assinado eletronicamente.</p>
+                                                    <p className="font-bold text-primary">Documento assinado eletronicamente.</p>
                                                     <p>Para verificar acesse:</p>
-                                                    <p className="text-blue-600 underline break-all">{validationUrl}</p>
+                                                    <p className="text-primary underline break-all">{validationUrl}</p>
                                                 </div>
                                             </div>
                                         )}
@@ -340,7 +340,7 @@ export function PrescriptionPreviewModal({
                 </div>
 
                 {/* Right Column: Actions */}
-                <div className="w-[400px] bg-white border-l flex flex-col shadow-xl z-10">
+                <div className="w-[400px] bg-white border-l flex flex-col  z-10">
                     <div className="p-4 border-b flex justify-between items-center bg-gray-50">
                         <h3 className="font-semibold flex items-center gap-2">
                             <Mail className="w-4 h-4" /> Envio por email
@@ -383,7 +383,7 @@ export function PrescriptionPreviewModal({
                         </div>
 
                         <div className="grid grid-cols-2 gap-2 pt-2">
-                            <Button className="bg-purple-600 hover:bg-purple-700 w-full text-xs">
+                            <Button className="bg-primary hover:bg-purple-700 w-full text-xs">
                                 <Mail className="w-3 h-3 mr-2" /> Enviar por email
                             </Button>
                             <Button className="bg-green-600 hover:bg-green-700 w-full text-xs">
@@ -391,9 +391,9 @@ export function PrescriptionPreviewModal({
                             </Button>
                         </div>
 
-                        <div className="mt-6 border rounded-lg p-3 bg-green-50 border-green-200">
+                        <div className="mt-6 border rounded-lg p-3 bg-primary/10 border-primary/30">
                             <div className="flex gap-3">
-                                <ShieldCheck className="w-8 h-8 text-green-600 shrink-0" />
+                                <ShieldCheck className="w-8 h-8 text-primary shrink-0" />
                                 <p className="text-xs text-green-800">
                                     <span className="font-bold">Não imprima.</span> Utilize seu certificado digital A3 ICP Brasil e assine digitalmente suas receitas, atestados e documentos. A natureza agradece.
                                 </p>

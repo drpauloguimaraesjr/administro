@@ -237,7 +237,7 @@ export default function QuestionariosPage() {
     };
 
     return (
-        <main className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50 to-emerald-50">
+        <main className="min-h-screen bg-background
             <div className="container mx-auto px-4 py-6 max-w-6xl">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -250,7 +250,7 @@ export default function QuestionariosPage() {
                             <h1 className="text-2xl font-bold">Questionários</h1>
                             <p className="text-muted-foreground">Crie e envie formulários para seus pacientes</p>
                         </div>
-                        <Button onClick={openNewModal} className="bg-teal-600 hover:bg-teal-700">
+                        <Button onClick={openNewModal} className="bg-primary hover:bg-teal-700">
                             <Plus className="w-4 h-4 mr-2" />
                             Novo Questionário
                         </Button>
@@ -258,10 +258,10 @@ export default function QuestionariosPage() {
 
                     {/* Stats */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="bg-white rounded-xl shadow-lg p-6">
+                        <div className="bg-white   p-6">
                             <div className="flex items-center gap-4">
                                 <div className="p-3 bg-teal-100 rounded-lg">
-                                    <ClipboardList className="w-6 h-6 text-teal-600" />
+                                    <ClipboardList className="w-6 h-6 text-primary" />
                                 </div>
                                 <div>
                                     <p className="text-3xl font-bold">{questionnaires.length}</p>
@@ -269,10 +269,10 @@ export default function QuestionariosPage() {
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white rounded-xl shadow-lg p-6">
+                        <div className="bg-white   p-6">
                             <div className="flex items-center gap-4">
-                                <div className="p-3 bg-blue-100 rounded-lg">
-                                    <Send className="w-6 h-6 text-blue-600" />
+                                <div className="p-3 bg-primary/15 rounded-lg">
+                                    <Send className="w-6 h-6 text-primary" />
                                 </div>
                                 <div>
                                     <p className="text-3xl font-bold">
@@ -282,10 +282,10 @@ export default function QuestionariosPage() {
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white rounded-xl shadow-lg p-6">
+                        <div className="bg-white   p-6">
                             <div className="flex items-center gap-4">
-                                <div className="p-3 bg-green-100 rounded-lg">
-                                    <CheckCircle className="w-6 h-6 text-green-600" />
+                                <div className="p-3 bg-primary/15 rounded-lg">
+                                    <CheckCircle className="w-6 h-6 text-primary" />
                                 </div>
                                 <div>
                                     <p className="text-3xl font-bold">{questionnaires.filter((q: Questionnaire) => q.isActive).length}</p>
@@ -296,7 +296,7 @@ export default function QuestionariosPage() {
                     </div>
 
                     {/* List */}
-                    <div className="bg-white rounded-xl shadow-lg p-6">
+                    <div className="bg-white   p-6">
                         <h2 className="text-lg font-semibold mb-4">Meus Questionários</h2>
 
                         {isLoading ? (
@@ -361,7 +361,7 @@ export default function QuestionariosPage() {
                                                     }
                                                 }}
                                             >
-                                                <Trash2 className="w-4 h-4 text-red-500" />
+                                                <Trash2 className="w-4 h-4 text-destructive" />
                                             </Button>
                                         </div>
                                     </div>
@@ -426,7 +426,7 @@ export default function QuestionariosPage() {
                             </div>
 
                             {sections.map((section, sIndex) => (
-                                <div key={section.id} className="mb-4 p-4 border rounded-lg bg-slate-50">
+                                <div key={section.id} className="mb-4 p-4 border rounded-lg bg-muted/50">
                                     <Input
                                         value={section.title}
                                         onChange={(e) => {
@@ -465,7 +465,7 @@ export default function QuestionariosPage() {
                                                     size="sm"
                                                     onClick={() => removeQuestion(section.id, question.id)}
                                                 >
-                                                    <Trash2 className="w-4 h-4 text-red-500" />
+                                                    <Trash2 className="w-4 h-4 text-destructive" />
                                                 </Button>
                                             </div>
                                             <label className="flex items-center gap-2 text-sm">
@@ -497,7 +497,7 @@ export default function QuestionariosPage() {
                             <Button
                                 onClick={handleSubmit}
                                 disabled={!title || createMutation.isPending || updateMutation.isPending}
-                                className="bg-teal-600 hover:bg-teal-700"
+                                className="bg-primary hover:bg-teal-700"
                             >
                                 {createMutation.isPending || updateMutation.isPending ? 'Salvando...' : 'Salvar'}
                             </Button>
@@ -531,7 +531,7 @@ export default function QuestionariosPage() {
                             {patients.map((p: any) => (
                                 <label
                                     key={p.id}
-                                    className="flex items-center gap-3 p-3 hover:bg-slate-50 cursor-pointer border-b last:border-b-0"
+                                    className="flex items-center gap-3 p-3 hover:bg-muted/50 cursor-pointer border-b last:border-b-0"
                                 >
                                     <input
                                         type="checkbox"
@@ -561,7 +561,7 @@ export default function QuestionariosPage() {
                             <Button
                                 onClick={handleSend}
                                 disabled={selectedPatients.length === 0 || sendMutation.isPending}
-                                className="bg-teal-600 hover:bg-teal-700"
+                                className="bg-primary hover:bg-teal-700"
                             >
                                 <Send className="w-4 h-4 mr-2" />
                                 {sendMutation.isPending ? 'Enviando...' : 'Enviar via WhatsApp'}
@@ -595,7 +595,7 @@ export default function QuestionariosPage() {
                                             </p>
                                         </div>
                                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${r.status === 'completed'
-                                                ? 'bg-green-100 text-green-700'
+                                                ? 'bg-primary/15 text-primary'
                                                 : 'bg-yellow-100 text-yellow-700'
                                             }`}>
                                             {r.status === 'completed' ? 'Respondido' : 'Pendente'}

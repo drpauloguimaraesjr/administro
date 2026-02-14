@@ -27,9 +27,9 @@ interface LeadCardProps {
 }
 
 const urgencyColors = {
-    low: 'bg-blue-100 text-blue-700 hover:bg-blue-200',
+    low: 'bg-primary/15 text-primary hover:bg-blue-200',
     medium: 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200',
-    high: 'bg-red-100 text-red-700 hover:bg-red-200',
+    high: 'bg-destructive/15 text-red-700 hover:bg-red-200',
 };
 
 const sourceIcons = {
@@ -67,8 +67,8 @@ export function LeadCard({ lead, onAssign }: LeadCardProps) {
             {...listeners}
             {...attributes}
             className={cn(
-                "w-full mb-3 cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow bg-white",
-                isDragging && "opacity-50 ring-2 ring-primary rotate-2 z-50 shadow-xl"
+                "w-full mb-3 cursor-grab active:cursor-grabbing hover: transition-shadow bg-white",
+                isDragging && "opacity-50 ring-2 ring-primary rotate-2 z-50 "
             )}
         >
             <CardHeader className="p-3 pb-0 space-y-2">
@@ -80,25 +80,25 @@ export function LeadCard({ lead, onAssign }: LeadCardProps) {
                         {lead.urgency ? lead.urgency.toUpperCase() : 'NORMAL'}
                     </Badge>
                     {lead.score && (
-                        <span className="text-[10px] font-bold text-slate-400">
+                        <span className="text-[10px] font-bold text-muted-foreground/70">
                             {lead.score} pts
                         </span>
                     )}
                 </div>
-                <h3 className="font-semibold text-sm leading-tight text-slate-900 line-clamp-2">
+                <h3 className="font-semibold text-sm leading-tight text-foreground line-clamp-2">
                     {lead.name}
                 </h3>
             </CardHeader>
 
             <CardContent className="p-3 py-2 space-y-2">
-                <div className="flex items-center gap-2 text-xs text-slate-500">
-                    <div className="flex items-center gap-1 bg-slate-100 px-1.5 py-0.5 rounded">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1 bg-muted px-1.5 py-0.5 rounded">
                         {sourceIcons[lead.source]}
                         <span className="capitalize">{lead.source}</span>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-1 text-xs text-slate-400" title="Último contato">
+                <div className="flex items-center gap-1 text-xs text-muted-foreground/70" title="Último contato">
                     <Clock className="w-3 h-3" />
                     <span>
                         {lead.lastContactAt
@@ -110,11 +110,11 @@ export function LeadCard({ lead, onAssign }: LeadCardProps) {
                 {lead.tags && lead.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-1">
                         {lead.tags.slice(0, 3).map(tag => (
-                            <span key={tag} className="text-[10px] bg-slate-50 border px-1 rounded text-slate-500">
+                            <span key={tag} className="text-[10px] bg-muted/50 border px-1 rounded text-muted-foreground">
                                 {tag}
                             </span>
                         ))}
-                        {lead.tags.length > 3 && <span className="text-[10px] text-slate-400">+{lead.tags.length - 3}</span>}
+                        {lead.tags.length > 3 && <span className="text-[10px] text-muted-foreground/70">+{lead.tags.length - 3}</span>}
                     </div>
                 )}
             </CardContent>
@@ -131,14 +131,14 @@ export function LeadCard({ lead, onAssign }: LeadCardProps) {
 
                 {/* Ações */}
                 <div className="flex items-center gap-0.5 ml-auto">
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-green-600 hover:bg-green-50">
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground/70 hover:text-primary hover:bg-primary/10">
                         <MessageCircle className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-blue-600 hover:bg-blue-50">
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground/70 hover:text-primary hover:bg-primary/10">
                         <Phone className="w-4 h-4" />
                     </Button>
                     <Link href={`/crm/leads/${lead.id}`}>
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-purple-600 hover:bg-purple-50">
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground/70 hover:text-primary hover:bg-primary/10">
                             <Eye className="w-4 h-4" />
                         </Button>
                     </Link>

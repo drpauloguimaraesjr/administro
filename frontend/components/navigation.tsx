@@ -13,7 +13,7 @@ export function Navigation() {
 
   const navItems = [
     { href: '/knowledge', label: 'Cérebro', icon: <Brain className="w-4 h-4 text-purple-500" /> },
-    { href: '/intercurrences', label: 'Alertas', icon: <Activity className="w-4 h-4 text-red-500" /> },
+    { href: '/intercurrences', label: 'Alertas', icon: <Activity className="w-4 h-4 text-destructive" /> },
     { href: '/', label: 'Dashboard', icon: <Home className="w-4 h-4" /> },
     { href: '/agenda', label: 'Agenda', icon: <Calendar className="w-4 h-4" /> },
     { href: '/patients', label: 'Pacientes', icon: <Users className="w-4 h-4" /> },
@@ -49,8 +49,8 @@ export function Navigation() {
                     key={item.href}
                     href={item.href}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${isActive
-                      ? 'bg-blue-100 text-blue-600'
-                      : 'text-slate-600 hover:bg-slate-100'
+                      ? 'bg-primary/15 text-primary'
+                      : 'text-muted-foreground hover:bg-muted'
                       }`}
                   >
                     {item.icon}

@@ -60,19 +60,19 @@ export default function IntercurrencesPage() {
 
     const getSeverityColor = (s: string) => {
         switch (s) {
-            case 'critical': return 'bg-red-100 text-red-700 border-red-200 animate-pulse';
+            case 'critical': return 'bg-destructive/15 text-red-700 border-destructive/30 animate-pulse';
             case 'high': return 'bg-orange-100 text-orange-700 border-orange-200';
             case 'medium': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-            default: return 'bg-blue-100 text-blue-700 border-blue-200';
+            default: return 'bg-primary/15 text-primary border-primary/30';
         }
     };
 
     const getSeverityIcon = (s: string) => {
         switch (s) {
-            case 'critical': return <AlertOctagon className="w-5 h-5 text-red-600" />;
+            case 'critical': return <AlertOctagon className="w-5 h-5 text-destructive" />;
             case 'high': return <AlertTriangle className="w-5 h-5 text-orange-600" />;
             case 'medium': return <Activity className="w-5 h-5 text-yellow-600" />;
-            default: return <MessageSquare className="w-5 h-5 text-blue-600" />;
+            default: return <MessageSquare className="w-5 h-5 text-primary" />;
         }
     };
 
@@ -81,23 +81,23 @@ export default function IntercurrencesPage() {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold flex items-center gap-2 text-slate-800">
-                        <Activity className="w-8 h-8 text-red-500" />
+                    <h1 className="text-3xl font-bold flex items-center gap-2 text-foreground">
+                        <Activity className="w-8 h-8 text-destructive" />
                         Central Sentinel
                     </h1>
                     <p className="text-muted-foreground">Monitoramento de riscos e efeitos colaterais em tempo real.</p>
                 </div>
 
-                <div className="flex bg-slate-100 p-1 rounded-lg">
+                <div className="flex bg-muted p-1 rounded-lg">
                     <button
                         onClick={() => setFilter('open')}
-                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filter === 'open' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
+                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filter === 'open' ? 'bg-white shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground/80'}`}
                     >
                         Em Aberto
                     </button>
                     <button
                         onClick={() => setFilter('resolved')}
-                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filter === 'resolved' ? 'bg-white shadow-sm text-green-600' : 'text-slate-500 hover:text-slate-700'}`}
+                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filter === 'resolved' ? 'bg-white shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground/80'}`}
                     >
                         Resolvidos
                     </button>
@@ -116,7 +116,7 @@ export default function IntercurrencesPage() {
                             layout
                         >
                             <Card
-                                className={`border-l-4 cursor-pointer hover:shadow-lg transition-all ${item.severity === 'critical' ? 'border-l-red-500' :
+                                className={`border-l-4 cursor-pointer hover: transition-all ${item.severity === 'critical' ? 'border-l-red-500' :
                                     item.severity === 'high' ? 'border-l-orange-500' :
                                         item.severity === 'medium' ? 'border-l-yellow-500' : 'border-l-blue-500'
                                     }`}
@@ -128,7 +128,7 @@ export default function IntercurrencesPage() {
                                             {getSeverityIcon(item.severity)}
                                             {item.severity === 'critical' ? 'Crítico' : item.severity}
                                         </div>
-                                        <span className="text-xs text-slate-400">
+                                        <span className="text-xs text-muted-foreground/70">
                                             {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </span>
                                     </div>
@@ -136,18 +136,18 @@ export default function IntercurrencesPage() {
                                     <CardDescription>Paciente ID: {item.patientId}</CardDescription>
                                 </CardHeader>
                                 <CardContent>
-                                    <p className="text-slate-700 font-medium mb-2">
+                                    <p className="text-foreground/80 font-medium mb-2">
                                         &quot;{item.description}&quot;
                                     </p>
                                     {item.aiAnalysis && (
-                                        <div className="bg-slate-50 p-3 rounded-md text-sm italic border border-slate-100">
+                                        <div className="bg-muted/50 p-3 rounded-md text-sm italic border border-slate-100">
                                             🤖 AI: {item.aiAnalysis.summary}
                                         </div>
                                     )}
                                 </CardContent>
-                                <CardFooter className="pt-0 flex justify-end gap-2 text-xs text-slate-500">
+                                <CardFooter className="pt-0 flex justify-end gap-2 text-xs text-muted-foreground">
                                     {item.status === 'open' && <span className="flex items-center text-orange-500"><Clock className="w-3 h-3 mr-1" /> Pendente</span>}
-                                    {item.status === 'investigating' && <span className="flex items-center text-blue-500"><Search className="w-3 h-3 mr-1" /> Em Análise</span>}
+                                    {item.status === 'investigating' && <span className="flex items-center text-primary"><Search className="w-3 h-3 mr-1" /> Em Análise</span>}
                                     {item.status === 'resolved' && <span className="flex items-center text-green-500"><CheckCircle2 className="w-3 h-3 mr-1" /> Resolvido</span>}
                                 </CardFooter>
                             </Card>
@@ -156,7 +156,7 @@ export default function IntercurrencesPage() {
                 </AnimatePresence>
 
                 {filteredItems.length === 0 && !isLoading && (
-                    <div className="col-span-full flex flex-col items-center justify-center py-12 text-slate-400 opacity-50">
+                    <div className="col-span-full flex flex-col items-center justify-center py-12 text-muted-foreground/70 opacity-50">
                         <CheckCircle2 className="w-16 h-16 mb-4" />
                         <p className="text-lg">Tudo tranquilo por aqui, Doutor.</p>
                         <p className="text-sm">Nenhum alerta do Sentinel no momento.</p>
@@ -179,25 +179,25 @@ export default function IntercurrencesPage() {
 
                     {selectedItem && (
                         <div className="space-y-4 py-4">
-                            <div className="p-4 bg-slate-50 rounded-lg border">
-                                <h4 className="text-sm font-semibold text-slate-500 uppercase mb-2">Relato do Paciente</h4>
-                                <p className="text-lg text-slate-800">&quot;{selectedItem.description}&quot;</p>
+                            <div className="p-4 bg-muted/50 rounded-lg border">
+                                <h4 className="text-sm font-semibold text-muted-foreground uppercase mb-2">Relato do Paciente</h4>
+                                <p className="text-lg text-foreground">&quot;{selectedItem.description}&quot;</p>
                             </div>
 
                             {selectedItem.aiAnalysis && (
-                                <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
-                                    <div className="flex items-center gap-2 mb-2 text-blue-700">
+                                <div className="p-4 bg-primary/10 rounded-lg border border-blue-100">
+                                    <div className="flex items-center gap-2 mb-2 text-primary">
                                         <Activity className="w-4 h-4" />
                                         <h4 className="text-sm font-bold uppercase">Análise da Sophia (IA)</h4>
                                     </div>
-                                    <p className="text-sm text-slate-700 mb-2">{selectedItem.aiAnalysis.summary}</p>
-                                    <div className="bg-white p-2 rounded text-sm font-medium border-l-4 border-blue-500">
+                                    <p className="text-sm text-foreground/80 mb-2">{selectedItem.aiAnalysis.summary}</p>
+                                    <div className="bg-white p-2 rounded text-sm font-medium border-l-4 border-primary">
                                         💡 Sugestão: {selectedItem.aiAnalysis.suggestion}
                                     </div>
                                 </div>
                             )}
 
-                            <div className="text-xs text-slate-400 mt-4">
+                            <div className="text-xs text-muted-foreground/70 mt-4">
                                 Alerta ID: {selectedItem.id} • Criado em {new Date(selectedItem.createdAt).toLocaleString()}
                             </div>
                         </div>

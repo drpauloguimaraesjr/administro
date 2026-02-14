@@ -227,11 +227,11 @@ export default function NFSePage() {
         </div>
 
         {/* Status Card */}
-        <Card className={formData.ativo ? 'border-green-200 bg-green-50' : 'border-yellow-200 bg-yellow-50'}>
+        <Card className={formData.ativo ? 'border-primary/30 bg-primary/10' : 'border-yellow-200 bg-yellow-50'}>
           <CardContent className="py-4">
             <div className="flex items-center gap-3">
               {formData.ativo ? (
-                <CheckCircle className="w-5 h-5 text-green-600" />
+                <CheckCircle className="w-5 h-5 text-primary" />
               ) : (
                 <AlertCircle className="w-5 h-5 text-yellow-600" />
               )}

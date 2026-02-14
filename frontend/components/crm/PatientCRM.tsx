@@ -62,10 +62,10 @@ export function PatientTimeline({ patientId }: PatientTimelineProps) {
 
     const getTypeColor = (type: string) => {
         switch (type) {
-            case 'patient_created': return 'bg-blue-500';
-            case 'prescription': return 'bg-green-500';
+            case 'patient_created': return 'bg-primary/100';
+            case 'prescription': return 'bg-primary/100';
             case 'note': return 'bg-amber-500';
-            case 'anamnesis': return 'bg-purple-500';
+            case 'anamnesis': return 'bg-primary/100';
             default: return 'bg-gray-500';
         }
     };
@@ -107,7 +107,7 @@ export function PatientTimeline({ patientId }: PatientTimelineProps) {
                 {timeline.map((event, index) => (
                     <div key={`${event.type}-${event.date}-${index}`} className="relative flex gap-4">
                         {/* Icon */}
-                        <div className={`relative z-10 w-10 h-10 rounded-full ${getTypeColor(event.type)} flex items-center justify-center text-white shadow-md`}>
+                        <div className={`relative z-10 w-10 h-10 rounded-full ${getTypeColor(event.type)} flex items-center justify-center text-white `}>
                             {getIcon(event.icon)}
                         </div>
 
@@ -190,9 +190,9 @@ export function PatientNotes({ patientId }: PatientNotesProps) {
 
     const getNoteTypeColor = (type: string) => {
         switch (type) {
-            case 'alert': return 'border-l-red-500 bg-red-50';
+            case 'alert': return 'border-l-red-500 bg-destructive/10';
             case 'follow-up': return 'border-l-amber-500 bg-amber-50';
-            default: return 'border-l-blue-500 bg-blue-50';
+            default: return 'border-l-blue-500 bg-primary/10';
         }
     };
 
@@ -272,7 +272,7 @@ export function PatientNotes({ patientId }: PatientNotesProps) {
                                 <div className="flex items-start justify-between">
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2 mb-1">
-                                            {note.type === 'alert' && <AlertCircle className="w-4 h-4 text-red-500" />}
+                                            {note.type === 'alert' && <AlertCircle className="w-4 h-4 text-destructive" />}
                                             {note.type === 'follow-up' && <Clock className="w-4 h-4 text-amber-500" />}
                                             <Badge variant="outline" className="text-xs">
                                                 {getNoteTypeLabel(note.type)}
@@ -285,7 +285,7 @@ export function PatientNotes({ patientId }: PatientNotesProps) {
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => deleteNoteMutation.mutate(note.id)}
-                                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                        className="text-destructive hover:text-red-700 hover:bg-destructive/10"
                                     >
                                         <Trash2 className="w-4 h-4" />
                                     </Button>

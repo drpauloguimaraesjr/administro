@@ -43,7 +43,7 @@ export default function ConsumoPage() {
     switch (trend) {
       case 'increasing': return <TrendingUp className="w-4 h-4 text-red-400" />;
       case 'decreasing': return <TrendingDown className="w-4 h-4 text-green-400" />;
-      default: return <Minus className="w-4 h-4 text-slate-400" />;
+      default: return <Minus className="w-4 h-4 text-muted-foreground/70" />;
     }
   };
 
@@ -51,16 +51,16 @@ export default function ConsumoPage() {
     switch (trend) {
       case 'increasing': return 'text-red-400';
       case 'decreasing': return 'text-green-400';
-      default: return 'text-slate-400';
+      default: return 'text-muted-foreground/70';
     }
   };
 
   const getStockoutBadge = (days: number) => {
-    if (days < 0) return <Badge className="bg-green-500">Sem consumo</Badge>;
-    if (days <= 7) return <Badge className="bg-red-500">Crítico ({days} dias)</Badge>;
+    if (days < 0) return <Badge className="bg-primary/100">Sem consumo</Badge>;
+    if (days <= 7) return <Badge className="bg-destructive/100">Crítico ({days} dias)</Badge>;
     if (days <= 14) return <Badge className="bg-orange-500">Alerta ({days} dias)</Badge>;
     if (days <= 30) return <Badge className="bg-yellow-500">Atenção ({days} dias)</Badge>;
-    return <Badge className="bg-green-500">{days} dias</Badge>;
+    return <Badge className="bg-primary/100">{days} dias</Badge>;
   };
 
   // Estatísticas
@@ -71,7 +71,7 @@ export default function ConsumoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+    <div className="min-h-screen bg-background text-white">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -82,14 +82,14 @@ export default function ConsumoPage() {
               </Button>
             </Link>
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-emerald-500 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold bg-primary bg-clip-text text-transparent">
                 Análise de Consumo
               </h1>
-              <p className="text-slate-400 mt-1">Tendências e previsões de estoque</p>
+              <p className="text-muted-foreground/70 mt-1">Tendências e previsões de estoque</p>
             </div>
           </div>
           <Select value={period} onValueChange={setPeriod}>
-            <SelectTrigger className="w-40 bg-slate-800 border-slate-700">
+            <SelectTrigger className="w-40 bg-foreground/90 border-border">
               <SelectValue placeholder="Período" />
             </SelectTrigger>
             <SelectContent>
@@ -105,13 +105,13 @@ export default function ConsumoPage() {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-            <Card className="bg-slate-800/50 border-slate-700">
+            <Card className="bg-foreground/90/50 border-border">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-slate-400 text-sm">Total Consumido</p>
+                    <p className="text-muted-foreground/70 text-sm">Total Consumido</p>
                     <p className="text-2xl font-bold text-white">{stats.totalConsumed}</p>
-                    <p className="text-slate-500 text-xs">nos últimos {period} dias</p>
+                    <p className="text-muted-foreground text-xs">nos últimos {period} dias</p>
                   </div>
                   <div className="p-3 rounded-full bg-cyan-500/20">
                     <BarChart3 className="w-6 h-6 text-cyan-400" />
@@ -122,15 +122,15 @@ export default function ConsumoPage() {
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-            <Card className="bg-slate-800/50 border-slate-700">
+            <Card className="bg-foreground/90/50 border-border">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-slate-400 text-sm">Consumo Crescente</p>
+                    <p className="text-muted-foreground/70 text-sm">Consumo Crescente</p>
                     <p className="text-2xl font-bold text-red-400">{stats.increasing}</p>
-                    <p className="text-slate-500 text-xs">produtos com alta demanda</p>
+                    <p className="text-muted-foreground text-xs">produtos com alta demanda</p>
                   </div>
-                  <div className="p-3 rounded-full bg-red-500/20">
+                  <div className="p-3 rounded-full bg-destructive/100/20">
                     <TrendingUp className="w-6 h-6 text-red-400" />
                   </div>
                 </div>
@@ -139,13 +139,13 @@ export default function ConsumoPage() {
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-            <Card className="bg-slate-800/50 border-slate-700">
+            <Card className="bg-foreground/90/50 border-border">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-slate-400 text-sm">Risco de Falta</p>
+                    <p className="text-muted-foreground/70 text-sm">Risco de Falta</p>
                     <p className="text-2xl font-bold text-orange-400">{stats.critical}</p>
-                    <p className="text-slate-500 text-xs">esgotam em até 14 dias</p>
+                    <p className="text-muted-foreground text-xs">esgotam em até 14 dias</p>
                   </div>
                   <div className="p-3 rounded-full bg-orange-500/20">
                     <AlertTriangle className="w-6 h-6 text-orange-400" />
@@ -162,15 +162,15 @@ export default function ConsumoPage() {
             <RefreshCw className="w-8 h-8 animate-spin text-cyan-400" />
           </div>
         ) : consumptions?.length === 0 ? (
-          <Card className="bg-slate-800/50 border-slate-700">
+          <Card className="bg-foreground/90/50 border-border">
             <CardContent className="flex flex-col items-center justify-center py-12">
-              <Package className="w-12 h-12 text-slate-500 mb-4" />
-              <p className="text-slate-400 text-lg">Nenhum dado de consumo</p>
-              <p className="text-slate-500 text-sm">Registre movimentações de saída para ver análises</p>
+              <Package className="w-12 h-12 text-muted-foreground mb-4" />
+              <p className="text-muted-foreground/70 text-lg">Nenhum dado de consumo</p>
+              <p className="text-muted-foreground text-sm">Registre movimentações de saída para ver análises</p>
             </CardContent>
           </Card>
         ) : (
-          <Card className="bg-slate-800/50 border-slate-700">
+          <Card className="bg-foreground/90/50 border-border">
             <CardHeader>
               <CardTitle className="text-white">Produtos Mais Consumidos</CardTitle>
             </CardHeader>
@@ -178,14 +178,14 @@ export default function ConsumoPage() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-slate-700">
-                      <th className="text-left py-3 px-4 text-slate-400 font-medium">Produto</th>
-                      <th className="text-right py-3 px-4 text-slate-400 font-medium">Consumido</th>
-                      <th className="text-right py-3 px-4 text-slate-400 font-medium">Média/Dia</th>
-                      <th className="text-center py-3 px-4 text-slate-400 font-medium">Tendência</th>
-                      <th className="text-right py-3 px-4 text-slate-400 font-medium">Estoque Atual</th>
-                      <th className="text-center py-3 px-4 text-slate-400 font-medium">Previsão Esgotamento</th>
-                      <th className="text-center py-3 px-4 text-slate-400 font-medium">Repor Até</th>
+                    <tr className="border-b border-border">
+                      <th className="text-left py-3 px-4 text-muted-foreground/70 font-medium">Produto</th>
+                      <th className="text-right py-3 px-4 text-muted-foreground/70 font-medium">Consumido</th>
+                      <th className="text-right py-3 px-4 text-muted-foreground/70 font-medium">Média/Dia</th>
+                      <th className="text-center py-3 px-4 text-muted-foreground/70 font-medium">Tendência</th>
+                      <th className="text-right py-3 px-4 text-muted-foreground/70 font-medium">Estoque Atual</th>
+                      <th className="text-center py-3 px-4 text-muted-foreground/70 font-medium">Previsão Esgotamento</th>
+                      <th className="text-center py-3 px-4 text-muted-foreground/70 font-medium">Repor Até</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -195,12 +195,12 @@ export default function ConsumoPage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: index * 0.05 }}
-                        className="border-b border-slate-700/50 hover:bg-slate-700/30"
+                        className="border-b border-border/50 hover:bg-slate-700/30"
                       >
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-3">
                             <div className="p-2 rounded-lg bg-slate-700/50">
-                              <Package className="w-4 h-4 text-slate-400" />
+                              <Package className="w-4 h-4 text-muted-foreground/70" />
                             </div>
                             <span className="text-white font-medium">{item.itemName}</span>
                           </div>
@@ -208,7 +208,7 @@ export default function ConsumoPage() {
                         <td className="py-3 px-4 text-right text-white font-semibold">
                           {item.totalConsumed}
                         </td>
-                        <td className="py-3 px-4 text-right text-slate-300">
+                        <td className="py-3 px-4 text-right text-muted-foreground/50">
                           {item.averageDaily.toFixed(1)}
                         </td>
                         <td className="py-3 px-4 text-center">
@@ -225,14 +225,14 @@ export default function ConsumoPage() {
                         <td className="py-3 px-4 text-center">
                           {getStockoutBadge(item.estimatedDaysUntilStockout)}
                         </td>
-                        <td className="py-3 px-4 text-center text-slate-300">
+                        <td className="py-3 px-4 text-center text-muted-foreground/50">
                           {item.recommendedReorderDate ? (
                             <div className="flex items-center justify-center gap-2">
                               <Calendar className="w-4 h-4 text-cyan-400" />
                               {new Date(item.recommendedReorderDate).toLocaleDateString('pt-BR')}
                             </div>
                           ) : (
-                            <span className="text-slate-500">-</span>
+                            <span className="text-muted-foreground">-</span>
                           )}
                         </td>
                       </motion.tr>

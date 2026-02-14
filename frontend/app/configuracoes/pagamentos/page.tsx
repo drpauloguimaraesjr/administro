@@ -264,7 +264,7 @@ export default function PagamentosPage() {
                       </TableCell>
                       <TableCell className="text-center">
                         {forma.taxaPercentual > 0 || forma.taxaFixa > 0 ? (
-                          <span className="text-sm text-red-600">
+                          <span className="text-sm text-destructive">
                             {forma.taxaPercentual > 0 && `${forma.taxaPercentual}%`}
                             {forma.taxaPercentual > 0 && forma.taxaFixa > 0 && ' + '}
                             {forma.taxaFixa > 0 && `R$ ${forma.taxaFixa.toFixed(2)}`}
@@ -277,7 +277,7 @@ export default function PagamentosPage() {
                         {forma.diasRecebimento > 0 ? (
                           <Badge variant="outline">{forma.diasRecebimento} dias</Badge>
                         ) : (
-                          <Badge className="bg-green-100 text-green-700">Imediato</Badge>
+                          <Badge className="bg-primary/15 text-primary">Imediato</Badge>
                         )}
                       </TableCell>
                       <TableCell className="text-center">
@@ -305,7 +305,7 @@ export default function PagamentosPage() {
                               Editar
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              className="text-red-600"
+                              className="text-destructive"
                               onClick={() => handleDelete(forma.id)}
                             >
                               <Trash2 className="w-4 h-4 mr-2" />

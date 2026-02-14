@@ -85,9 +85,9 @@ export function UserList({ users }: UserListProps) {
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <div className={`p-2 rounded-lg ${user.role === 'owner'
-                          ? 'bg-blue-100 text-blue-600'
+                          ? 'bg-primary/15 text-primary'
                           : user.role === 'spouse'
-                            ? 'bg-purple-100 text-purple-600'
+                            ? 'bg-primary/15 text-primary'
                             : 'bg-gray-100 text-gray-600'
                         }`}>
                         {user.role === 'owner' ? (
@@ -105,8 +105,8 @@ export function UserList({ users }: UserListProps) {
                       </div>
                     </div>
                     <span className={`px-2 py-1 rounded-full text-xs ${user.active
-                        ? 'bg-green-100 text-green-600'
-                        : 'bg-red-100 text-red-600'
+                        ? 'bg-primary/15 text-primary'
+                        : 'bg-destructive/15 text-destructive'
                       }`}>
                       {user.active ? 'Ativo' : 'Inativo'}
                     </span>
@@ -142,7 +142,7 @@ export function UserList({ users }: UserListProps) {
                       variant="outline"
                       size="sm"
                       onClick={() => user.id && handleDelete(user.id)}
-                      className="text-red-600 hover:text-red-700"
+                      className="text-destructive hover:text-red-700"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>

@@ -223,7 +223,7 @@ export default function RelatoriosEstoquePage() {
   const statusChartData = [
     { label: 'Normal', value: metrics.stockByStatus.ok, color: 'text-green-500', percent: 0 },
     { label: 'Baixo', value: metrics.stockByStatus.low, color: 'text-yellow-500', percent: 0 },
-    { label: 'Crítico', value: metrics.stockByStatus.critical, color: 'text-red-500', percent: 0 },
+    { label: 'Crítico', value: metrics.stockByStatus.critical, color: 'text-destructive', percent: 0 },
     { label: 'Esgotado', value: metrics.stockByStatus.out, color: 'text-gray-400', percent: 0 },
   ];
   const totalStatus = statusChartData.reduce((sum, d) => sum + d.value, 0);
@@ -235,14 +235,14 @@ export default function RelatoriosEstoquePage() {
     .map(([label, data]) => ({
       label,
       value: data.value,
-      color: 'bg-purple-500',
+      color: 'bg-primary/100',
     }));
   const maxCategoryValue = Math.max(...categoryChartData.map(d => d.value), 1);
 
   const consumptionChartData = metrics.topConsumed.map((item, i) => ({
     label: item.name.length > 20 ? item.name.slice(0, 20) + '...' : item.name,
     value: item.quantity,
-    color: ['bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-purple-500', 'bg-pink-500'][i],
+    color: ['bg-primary/100', 'bg-primary/100', 'bg-yellow-500', 'bg-primary/100', 'bg-pink-500'][i],
   }));
   const maxConsumption = Math.max(...consumptionChartData.map(d => d.value), 1);
 
@@ -289,8 +289,8 @@ export default function RelatoriosEstoquePage() {
                   <p className="text-2xl font-bold">{formatCurrency(stockSummary?.totalValue || 0)}</p>
                   <p className="text-xs text-gray-500">{stockSummary?.totalProducts || 0} produtos</p>
                 </div>
-                <div className="p-3 bg-blue-100 rounded-lg">
-                  <Package className="w-6 h-6 text-blue-600" />
+                <div className="p-3 bg-primary/15 rounded-lg">
+                  <Package className="w-6 h-6 text-primary" />
                 </div>
               </div>
             </CardContent>
@@ -301,11 +301,11 @@ export default function RelatoriosEstoquePage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">Entradas ({periodo}d)</p>
-                  <p className="text-2xl font-bold text-green-600">{metrics.totalEntries}</p>
+                  <p className="text-2xl font-bold text-primary">{metrics.totalEntries}</p>
                   <p className="text-xs text-gray-500">{formatCurrency(metrics.entriesValue)}</p>
                 </div>
-                <div className="p-3 bg-green-100 rounded-lg">
-                  <TrendingUp className="w-6 h-6 text-green-600" />
+                <div className="p-3 bg-primary/15 rounded-lg">
+                  <TrendingUp className="w-6 h-6 text-primary" />
                 </div>
               </div>
             </CardContent>
@@ -316,11 +316,11 @@ export default function RelatoriosEstoquePage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">Saídas ({periodo}d)</p>
-                  <p className="text-2xl font-bold text-red-600">{metrics.totalExits}</p>
+                  <p className="text-2xl font-bold text-destructive">{metrics.totalExits}</p>
                   <p className="text-xs text-gray-500">{formatCurrency(metrics.exitsValue)}</p>
                 </div>
-                <div className="p-3 bg-red-100 rounded-lg">
-                  <TrendingDown className="w-6 h-6 text-red-600" />
+                <div className="p-3 bg-destructive/15 rounded-lg">
+                  <TrendingDown className="w-6 h-6 text-destructive" />
                 </div>
               </div>
             </CardContent>
@@ -331,11 +331,11 @@ export default function RelatoriosEstoquePage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">Lucro Faturado</p>
-                  <p className="text-2xl font-bold text-purple-600">{formatCurrency(billingSummary?.totalProfit || 0)}</p>
+                  <p className="text-2xl font-bold text-primary">{formatCurrency(billingSummary?.totalProfit || 0)}</p>
                   <p className="text-xs text-gray-500">Margem: {billingSummary?.profitMargin?.toFixed(1) || 0}%</p>
                 </div>
-                <div className="p-3 bg-purple-100 rounded-lg">
-                  <DollarSign className="w-6 h-6 text-purple-600" />
+                <div className="p-3 bg-primary/15 rounded-lg">
+                  <DollarSign className="w-6 h-6 text-primary" />
                 </div>
               </div>
             </CardContent>
@@ -396,7 +396,7 @@ export default function RelatoriosEstoquePage() {
                       </div>
                       <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
                         <div
-                          className="h-full rounded-full bg-purple-500 transition-all"
+                          className="h-full rounded-full bg-primary/100 transition-all"
                           style={{ width: `${(item.value / maxCategoryValue) * 100}%` }}
                         />
                       </div>
@@ -446,7 +446,7 @@ export default function RelatoriosEstoquePage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-red-500" />
+                <AlertTriangle className="w-5 h-5 text-destructive" />
                 Alertas Ativos ({alerts.length})
               </CardTitle>
             </CardHeader>
@@ -457,10 +457,10 @@ export default function RelatoriosEstoquePage() {
                     key={alert.id}
                     className={`p-3 rounded-lg ${
                       alert.severity === 'critical'
-                        ? 'bg-red-50 border border-red-200'
+                        ? 'bg-destructive/10 border border-destructive/30'
                         : alert.severity === 'warning'
                         ? 'bg-yellow-50 border border-yellow-200'
-                        : 'bg-blue-50 border border-blue-200'
+                        : 'bg-primary/10 border border-primary/30'
                     }`}
                   >
                     <p className="font-medium text-sm">{alert.title}</p>
@@ -497,19 +497,19 @@ export default function RelatoriosEstoquePage() {
               </div>
               <div className="p-4 bg-gray-50 rounded-lg text-center">
                 <p className="text-sm text-gray-500">Faturado (Recebido)</p>
-                <p className="text-xl font-bold text-green-600">
+                <p className="text-xl font-bold text-primary">
                   {formatCurrency(billingSummary?.paidAmount || 0)}
                 </p>
               </div>
               <div className="p-4 bg-gray-50 rounded-lg text-center">
                 <p className="text-sm text-gray-500">Custo Total</p>
-                <p className="text-xl font-bold text-red-600">
+                <p className="text-xl font-bold text-destructive">
                   {formatCurrency(billingSummary?.totalCost || 0)}
                 </p>
               </div>
               <div className="p-4 bg-gray-50 rounded-lg text-center">
                 <p className="text-sm text-gray-500">Lucro Líquido</p>
-                <p className="text-xl font-bold text-purple-600">
+                <p className="text-xl font-bold text-primary">
                   {formatCurrency(billingSummary?.totalProfit || 0)}
                 </p>
               </div>
@@ -521,9 +521,9 @@ export default function RelatoriosEstoquePage() {
                 <p className="text-sm font-medium mb-3">Recebimentos por Forma de Pagamento</p>
                 <div className="flex flex-wrap gap-3">
                   {billingSummary.byPaymentMethod.map((pm) => (
-                    <div key={pm.method} className="px-4 py-2 bg-green-50 rounded-lg">
+                    <div key={pm.method} className="px-4 py-2 bg-primary/10 rounded-lg">
                       <p className="text-xs text-gray-500 capitalize">{pm.method}</p>
-                      <p className="font-bold text-green-700">{formatCurrency(pm.amount)}</p>
+                      <p className="font-bold text-primary">{formatCurrency(pm.amount)}</p>
                       <p className="text-xs text-gray-400">{pm.count} pagamentos</p>
                     </div>
                   ))}

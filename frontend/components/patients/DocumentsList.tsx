@@ -95,7 +95,7 @@ export function DocumentsList({ patientId }: DocumentsListProps) {
                     <Button
                         onClick={() => fileInputRef.current?.click()}
                         disabled={uploading}
-                        className="bg-teal-600 hover:bg-teal-700"
+                        className="bg-primary hover:bg-teal-700"
                     >
                         <Upload className="w-4 h-4 mr-2" />
                         {uploading ? 'Enviando...' : 'Upload'}
@@ -114,9 +114,9 @@ export function DocumentsList({ patientId }: DocumentsListProps) {
                     {documents.map((doc: Document) => (
                         <div
                             key={doc.id}
-                            className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg"
+                            className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg"
                         >
-                            <div className="p-2 bg-teal-100 rounded text-teal-600">
+                            <div className="p-2 bg-teal-100 rounded text-primary">
                                 {getIcon(doc.type)}
                             </div>
                             <div className="flex-1 min-w-0">
@@ -137,7 +137,7 @@ export function DocumentsList({ patientId }: DocumentsListProps) {
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => handleDelete(doc)}
-                                    className="text-red-500"
+                                    className="text-destructive"
                                 >
                                     <Trash2 className="w-4 h-4" />
                                 </Button>

@@ -199,7 +199,7 @@ export default function UnidadesPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredUnidades.map((unidade) => (
-              <Card key={unidade.id} className="hover:shadow-md transition-shadow">
+              <Card key={unidade.id} className="hover: transition-shadow">
                 <CardContent className="pt-6">
                   <div className="flex justify-between items-start mb-3">
                     <div>
@@ -225,7 +225,7 @@ export default function UnidadesPage() {
                           Editar
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          className="text-red-600"
+                          className="text-destructive"
                           onClick={() => handleDelete(unidade.id)}
                         >
                           <Trash2 className="w-4 h-4 mr-2" />

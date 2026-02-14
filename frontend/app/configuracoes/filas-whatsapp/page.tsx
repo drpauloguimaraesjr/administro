@@ -56,7 +56,7 @@ export default function QueuesPage() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">Filas de Atendimento</h1>
-                    <p className="text-slate-500">Organize os tipos de atendimento do WhatsApp.</p>
+                    <p className="text-muted-foreground">Organize os tipos de atendimento do WhatsApp.</p>
                 </div>
                 <div className="flex gap-2">
                     {queues.length === 0 && (
@@ -64,7 +64,7 @@ export default function QueuesPage() {
                             <Wand2 className="w-4 h-4 mr-2" /> Gerar Padrões
                         </Button>
                     )}
-                    <Button onClick={handleNew} className="bg-teal-600 hover:bg-teal-700">
+                    <Button onClick={handleNew} className="bg-primary hover:bg-teal-700">
                         <Plus className="w-4 h-4 mr-2" /> Nova Fila
                     </Button>
                 </div>
@@ -74,7 +74,7 @@ export default function QueuesPage() {
                 {isLoading ? (
                     <p>Carregando...</p>
                 ) : queues.map((queue) => (
-                    <Card key={queue.id} className="hover:shadow-md transition-shadow relative overflow-hidden group">
+                    <Card key={queue.id} className="hover: transition-shadow relative overflow-hidden group">
                         <div className="absolute top-0 left-0 w-1 h-full" style={{ backgroundColor: queue.color }}></div>
                         <CardHeader className="pl-6 pb-2">
                             <div className="flex justify-between items-start">
@@ -89,7 +89,7 @@ export default function QueuesPage() {
                             </div>
                         </CardHeader>
                         <CardContent className="pl-6 pt-2 space-y-4">
-                            <div className="flex items-center gap-4 text-sm text-slate-500">
+                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
                                 <div className="flex items-center gap-1">
                                     <UsersIcon className="w-4 h-4" />
                                     <span>{queue.assignedUsers?.length || 0} Atendentes</span>
@@ -100,7 +100,7 @@ export default function QueuesPage() {
                             </div>
 
                             {queue.aiConfig?.enabled && (
-                                <Badge className="bg-purple-100 text-purple-700 border-purple-200">
+                                <Badge className="bg-primary/15 text-primary border-primary/30">
                                     <Wand2 className="w-3 h-3 mr-1" /> IA Ativa
                                 </Badge>
                             )}
@@ -109,7 +109,7 @@ export default function QueuesPage() {
                                 <Button variant="ghost" size="sm" onClick={() => handleEdit(queue)}>
                                     <Edit className="w-4 h-4 mr-2" /> Editar
                                 </Button>
-                                <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => handleDelete(queue.id)}>
+                                <Button variant="ghost" size="sm" className="text-destructive hover:text-red-700 hover:bg-destructive/10" onClick={() => handleDelete(queue.id)}>
                                     <Trash2 className="w-4 h-4" />
                                 </Button>
                             </div>

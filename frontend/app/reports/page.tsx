@@ -216,7 +216,7 @@ export default function ReportsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Saldo</p>
-                  <p className={`text-2xl font-bold ${stats.balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  <p className={`text-2xl font-bold ${stats.balance >= 0 ? 'text-primary' : 'text-destructive'}`}>
                     R$ {stats.balance.toFixed(2)}
                   </p>
                 </div>
@@ -229,9 +229,9 @@ export default function ReportsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Receitas</p>
-                  <p className="text-2xl font-bold text-green-600">R$ {stats.income.toFixed(2)}</p>
+                  <p className="text-2xl font-bold text-primary">R$ {stats.income.toFixed(2)}</p>
                 </div>
-                <TrendingUp className="w-8 h-8 text-green-600" />
+                <TrendingUp className="w-8 h-8 text-primary" />
               </div>
             </CardContent>
           </Card>
@@ -240,9 +240,9 @@ export default function ReportsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Despesas</p>
-                  <p className="text-2xl font-bold text-red-600">R$ {stats.expenses.toFixed(2)}</p>
+                  <p className="text-2xl font-bold text-destructive">R$ {stats.expenses.toFixed(2)}</p>
                 </div>
-                <TrendingUp className="w-8 h-8 text-red-600" />
+                <TrendingUp className="w-8 h-8 text-destructive" />
               </div>
             </CardContent>
           </Card>

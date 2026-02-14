@@ -26,14 +26,14 @@ export default function PlaybooksConfigPage() {
             <div className="flex items-center gap-4 mb-8">
                 <Link href="/configuracoes">
                     <Button variant="ghost" size="icon">
-                        <ArrowLeft className="w-5 h-5 text-slate-500" />
+                        <ArrowLeft className="w-5 h-5 text-muted-foreground" />
                     </Button>
                 </Link>
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-800">Playbooks de Atendimento</h1>
-                    <p className="text-slate-500">Crie roteiros guiados para padronizar o atendimento da sua equipe.</p>
+                    <h1 className="text-2xl font-bold text-foreground">Playbooks de Atendimento</h1>
+                    <p className="text-muted-foreground">Crie roteiros guiados para padronizar o atendimento da sua equipe.</p>
                 </div>
-                <Button onClick={() => setIsCreating(true)} className="ml-auto bg-teal-600 hover:bg-teal-700">
+                <Button onClick={() => setIsCreating(true)} className="ml-auto bg-primary hover:bg-teal-700">
                     <Plus className="w-4 h-4 mr-2" />
                     Novo Playbook
                 </Button>
@@ -41,34 +41,34 @@ export default function PlaybooksConfigPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {MOCK_PLAYBOOKS.map((pb) => (
-                    <Card key={pb.id} className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-slate-200 hover:border-teal-200 hover:-translate-y-1">
+                    <Card key={pb.id} className="group hover: transition-all duration-300 cursor-pointer border-border hover:border-teal-200 hover:-translate-y-1">
                         <CardContent className="p-5">
                             <div className="flex justify-between items-start mb-4">
-                                <div className="p-2.5 bg-teal-50 rounded-xl group-hover:bg-teal-100 transition-colors">
-                                    <CheckSquare className="w-6 h-6 text-teal-600" />
+                                <div className="p-2.5 bg-primary/10  group-hover:bg-teal-100 transition-colors">
+                                    <CheckSquare className="w-6 h-6 text-primary" />
                                 </div>
                                 <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground/70 hover:text-primary hover:bg-primary/10 rounded-lg">
                                         <Edit2 className="w-4 h-4" />
                                     </Button>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg">
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground/70 hover:text-destructive hover:bg-destructive/10 rounded-lg">
                                         <Trash2 className="w-4 h-4" />
                                     </Button>
                                 </div>
                             </div>
 
-                            <h3 className="text-lg font-bold text-slate-800 mb-2 leading-tight group-hover:text-teal-700 transition-colors">
+                            <h3 className="text-lg font-bold text-foreground mb-2 leading-tight group-hover:text-teal-700 transition-colors">
                                 {pb.name}
                             </h3>
 
                             <div className="flex flex-wrap gap-2 mb-4">
-                                <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100 uppercase tracking-wide">
+                                <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary border border-blue-100 uppercase tracking-wide">
                                     {pb.department}
                                 </span>
                             </div>
 
-                            <div className="flex items-center gap-2 text-xs font-medium text-slate-500 pt-3 border-t border-slate-100">
-                                <MessageSquare className="w-3.5 h-3.5 text-slate-400" />
+                            <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground pt-3 border-t border-slate-100">
+                                <MessageSquare className="w-3.5 h-3.5 text-muted-foreground/70" />
                                 {pb.steps} passos configurados
                             </div>
                         </CardContent>
@@ -91,11 +91,11 @@ function PlaybookEditor({ onCancel }: { onCancel: () => void }) {
                     <Button variant="ghost" size="icon" onClick={onCancel}>
                         <ArrowLeft className="w-5 h-5" />
                     </Button>
-                    <h1 className="text-2xl font-bold text-slate-800">Novo Playbook</h1>
+                    <h1 className="text-2xl font-bold text-foreground">Novo Playbook</h1>
                 </div>
                 <div className="flex gap-2">
                     <Button variant="outline" onClick={onCancel}>Cancelar</Button>
-                    <Button className="bg-teal-600 hover:bg-teal-700">
+                    <Button className="bg-primary hover:bg-teal-700">
                         <Save className="w-4 h-4 mr-2" />
                         Salvar Playbook
                     </Button>
@@ -111,12 +111,12 @@ function PlaybookEditor({ onCancel }: { onCancel: () => void }) {
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div>
-                                <label className="text-sm font-medium text-slate-700 mb-1 block">Nome do Playbook</label>
+                                <label className="text-sm font-medium text-foreground/80 mb-1 block">Nome do Playbook</label>
                                 <Input placeholder="Ex: Triagem Inicial" />
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-slate-700 mb-1 block">Departamento</label>
-                                <select className="w-full h-10 px-3 rounded-md border border-slate-200 bg-white text-sm">
+                                <label className="text-sm font-medium text-foreground/80 mb-1 block">Departamento</label>
+                                <select className="w-full h-10 px-3 rounded-md border border-border bg-white text-sm">
                                     <option>Recepção</option>
                                     <option>Comercial</option>
                                     <option>Médico</option>
@@ -132,7 +132,7 @@ function PlaybookEditor({ onCancel }: { onCancel: () => void }) {
                         <Card key={step.id} className="relative group border-l-4 border-l-teal-500">
                             <CardContent className="pt-6">
                                 <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-red-400 hover:text-red-600">
+                                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-red-400 hover:text-destructive">
                                         <Trash2 className="w-4 h-4" />
                                     </Button>
                                 </div>
@@ -143,13 +143,13 @@ function PlaybookEditor({ onCancel }: { onCancel: () => void }) {
                                         </div>
                                     </div>
                                     <div className="flex-1 space-y-3">
-                                        <select className="h-8 text-xs border-none bg-slate-50 rounded px-2 font-medium text-slate-600 w-fit">
+                                        <select className="h-8 text-xs border-none bg-muted/50 rounded px-2 font-medium text-muted-foreground w-fit">
                                             <option value="message">Enviar Mensagem</option>
                                             <option value="capture">Capturar Dado</option>
                                             <option value="note">Nota Interna</option>
                                         </select>
                                         <textarea
-                                            className="w-full text-sm p-3 rounded-md border border-slate-200 focus:ring-1 focus:ring-teal-500 min-h-[80px]"
+                                            className="w-full text-sm p-3 rounded-md border border-border focus:ring-1 focus:ring-teal-500 min-h-[80px]"
                                             placeholder="Digite o texto da mensagem ou instrução..."
                                         />
                                     </div>
@@ -158,7 +158,7 @@ function PlaybookEditor({ onCancel }: { onCancel: () => void }) {
                         </Card>
                     ))}
 
-                    <Button variant="outline" className="w-full border-dashed border-slate-300 text-slate-500 hover:bg-slate-50 hover:text-teal-600" onClick={addStep}>
+                    <Button variant="outline" className="w-full border-dashed border-border text-muted-foreground hover:bg-muted/50 hover:text-primary" onClick={addStep}>
                         <Plus className="w-4 h-4 mr-2" />
                         Adicionar Passo
                     </Button>

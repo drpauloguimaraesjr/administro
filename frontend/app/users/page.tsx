@@ -98,9 +98,9 @@ export default function UsersPage() {
 
     const getRoleBadge = (role: string) => {
         switch (role) {
-            case 'master': return <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"><Shield className="w-3 h-3" /> Master</span>;
-            case 'doctor': return <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"><Stethoscope className="w-3 h-3" /> Médico</span>;
-            case 'nurse': return <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"><UserPlus className="w-3 h-3" /> Enfermagem</span>;
+            case 'master': return <span className="bg-primary/15 text-primary px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"><Shield className="w-3 h-3" /> Master</span>;
+            case 'doctor': return <span className="bg-primary/15 text-primary px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"><Stethoscope className="w-3 h-3" /> Médico</span>;
+            case 'nurse': return <span className="bg-primary/15 text-primary px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"><UserPlus className="w-3 h-3" /> Enfermagem</span>;
             default: return <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1"><Users className="w-3 h-3" /> Equipe</span>;
         }
     };
@@ -110,12 +110,12 @@ export default function UsersPage() {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                    <h1 className="text-3xl font-bold bg-primary bg-clip-text text-transparent">
                         Gestão de Equipe
                     </h1>
                     <p className="text-muted-foreground">Gerencie quem tem acesso ao sistema Calyx.</p>
                 </div>
-                <Button onClick={() => handleOpenDialog()} className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all">
+                <Button onClick={() => handleOpenDialog()} className="bg-primary hover:bg-primary/90 text-white  hover: transition-all">
                     <UserPlus className="w-4 h-4 mr-2" />
                     Novo Membro
                 </Button>
@@ -134,10 +134,10 @@ export default function UsersPage() {
                         />
                     </CardContent>
                 </Card>
-                <Card className="border-none shadow-sm bg-blue-50/50">
+                <Card className="border-none shadow-sm bg-primary/10/50">
                     <CardContent className="p-4 flex flex-col justify-center items-center text-center">
-                        <span className="text-sm text-blue-600 font-medium">Total de Membros</span>
-                        <span className="text-4xl font-bold text-blue-700">{users.length}</span>
+                        <span className="text-sm text-primary font-medium">Total de Membros</span>
+                        <span className="text-4xl font-bold text-primary">{users.length}</span>
                     </CardContent>
                 </Card>
             </div>
@@ -153,8 +153,8 @@ export default function UsersPage() {
                             exit={{ opacity: 0, scale: 0.95 }}
                             transition={{ delay: index * 0.05 }}
                         >
-                            <Card className="group hover:shadow-md transition-all duration-300 border-none bg-white shadow-sm overflow-hidden relative">
-                                <div className={`absolute top-0 left-0 w-1 h-full ${user.isActive ? 'bg-green-500' : 'bg-gray-300'}`} />
+                            <Card className="group hover: transition-all duration-300 border-none bg-white shadow-sm overflow-hidden relative">
+                                <div className={`absolute top-0 left-0 w-1 h-full ${user.isActive ? 'bg-primary/100' : 'bg-gray-300'}`} />
                                 <CardHeader className="flex flex-row items-center gap-4 pb-2">
                                     <div className="h-12 w-12 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center text-indigo-700 font-bold text-lg">
                                         {user.name.charAt(0).toUpperCase()}
@@ -183,7 +183,7 @@ export default function UsersPage() {
                                         <Button variant="outline" size="sm" className="flex-1" onClick={() => handleOpenDialog(user)}>
                                             <Edit2 className="w-3 h-3 mr-2" /> Editar
                                         </Button>
-                                        <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700" onClick={() => handleDelete(user.id)}>
+                                        <Button variant="ghost" size="sm" className="text-destructive hover:text-red-700" onClick={() => handleDelete(user.id)}>
                                             <Trash2 className="w-4 h-4" />
                                         </Button>
                                     </div>
@@ -271,7 +271,7 @@ export default function UsersPage() {
 
                         <DialogFooter className="mt-6">
                             <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
-                            <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                            <Button type="submit" className="bg-primary hover:bg-primary/90">
                                 {editingUser ? 'Salvar Alterações' : 'Criar Acesso'}
                             </Button>
                         </DialogFooter>

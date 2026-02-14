@@ -257,7 +257,7 @@ export default function ProcedimentosPage() {
                       <TableCell>
                         <Badge variant="secondary">{proc.categoria}</Badge>
                       </TableCell>
-                      <TableCell className="text-right font-medium text-green-600">
+                      <TableCell className="text-right font-medium text-primary">
                         {formatCurrency(proc.precoParticular)}
                       </TableCell>
                       <TableCell className="text-right">
@@ -284,7 +284,7 @@ export default function ProcedimentosPage() {
                               Editar
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              className="text-red-600"
+                              className="text-destructive"
                               onClick={() => handleDelete(proc.id)}
                             >
                               <Trash2 className="w-4 h-4 mr-2" />
@@ -368,7 +368,7 @@ export default function ProcedimentosPage() {
 
             <div className="border-t pt-4">
               <h3 className="font-medium mb-3 flex items-center gap-2">
-                <DollarSign className="w-4 h-4 text-green-600" />
+                <DollarSign className="w-4 h-4 text-primary" />
                 Precificação
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

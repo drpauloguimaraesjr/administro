@@ -109,7 +109,7 @@ export default function IndicacoesPage() {
 
     const sourceColors: { [key: string]: string } = {
         indication: 'bg-emerald-500',
-        google: 'bg-blue-500',
+        google: 'bg-primary/100',
         instagram: 'bg-pink-500',
         facebook: 'bg-indigo-500',
         friend: 'bg-yellow-500',
@@ -138,7 +138,7 @@ export default function IndicacoesPage() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <motion.div
                             whileHover={{ y: -2 }}
-                            className="bg-white rounded-xl shadow-sm border border-border p-6"
+                            className="bg-white  shadow-sm border border-border p-6"
                         >
                             <div className="flex items-center gap-4">
                                 <div className="p-3 bg-emerald-50 rounded-lg">
@@ -153,7 +153,7 @@ export default function IndicacoesPage() {
 
                         <motion.div
                             whileHover={{ y: -2 }}
-                            className="bg-white rounded-xl shadow-sm border border-border p-6"
+                            className="bg-white  shadow-sm border border-border p-6"
                         >
                             <div className="flex items-center gap-4">
                                 <div className="p-3 bg-emerald-100 rounded-lg">
@@ -168,11 +168,11 @@ export default function IndicacoesPage() {
 
                         <motion.div
                             whileHover={{ y: -2 }}
-                            className="bg-white rounded-xl shadow-sm border border-border p-6"
+                            className="bg-white  shadow-sm border border-border p-6"
                         >
                             <div className="flex items-center gap-4">
-                                <div className="p-3 bg-blue-50 rounded-lg">
-                                    <TrendingUp className="w-6 h-6 text-blue-600" />
+                                <div className="p-3 bg-primary/10 rounded-lg">
+                                    <TrendingUp className="w-6 h-6 text-primary" />
                                 </div>
                                 <div>
                                     <p className="text-3xl font-bold text-gray-900">{stats.conversionRate}%</p>
@@ -184,7 +184,7 @@ export default function IndicacoesPage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Canais de Aquisição */}
-                        <div className="bg-white rounded-xl shadow-sm border border-border p-6">
+                        <div className="bg-white  shadow-sm border border-border p-6">
                             <h2 className="text-lg font-semibold mb-4 text-gray-900">Canais de Aquisição</h2>
                             <div className="space-y-3">
                                 {Object.entries(stats.bySource)
@@ -210,7 +210,7 @@ export default function IndicacoesPage() {
                         </div>
 
                         {/* Top Indicadores */}
-                        <div className="bg-white rounded-xl shadow-sm border border-border p-6">
+                        <div className="bg-white  shadow-sm border border-border p-6">
                             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-900">
                                 <Award className="w-5 h-5 text-yellow-500" />
                                 Top Indicadores
@@ -253,7 +253,7 @@ export default function IndicacoesPage() {
                     </div>
 
                     {/* Recent Referrals */}
-                    <div className="bg-white rounded-xl shadow-sm border border-border p-6">
+                    <div className="bg-white  shadow-sm border border-border p-6">
                         <h2 className="text-lg font-semibold mb-4 text-gray-900">Últimas Indicações</h2>
                         <div className="space-y-3">
                             {patients

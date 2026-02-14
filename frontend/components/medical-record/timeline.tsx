@@ -14,8 +14,8 @@ const timelineEvents = [
         summary: '2 Medicamentos: Dipirona, Loratadina',
         content: '1. Dipirona 500mg - 1cp 6/6h se dor\n2. Loratadina 10mg - 1cp dia por 5 dias',
         icon: Pill,
-        color: 'text-blue-600',
-        bgColor: 'bg-blue-50'
+        color: 'text-primary',
+        bgColor: 'bg-primary/10'
     },
     {
         id: '2',
@@ -26,8 +26,8 @@ const timelineEvents = [
         summary: 'Queixa: Dor de cabeça frontal',
         content: 'Paciente refere cefaleia tensional há 3 dias. Nega náuseas. PA 120/80.',
         icon: Edit3,
-        color: 'text-teal-600',
-        bgColor: 'bg-teal-50'
+        color: 'text-primary',
+        bgColor: 'bg-primary/10'
     },
     {
         id: '3',
@@ -94,9 +94,9 @@ export function Timeline() {
 
                             {/* Quick Actions (Hover) */}
                             <div className="mt-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button className="text-[10px] font-bold text-blue-600 hover:underline">Ver Detalhes</button>
+                                <button className="text-[10px] font-bold text-primary hover:underline">Ver Detalhes</button>
                                 {evt.type === 'prescription' && (
-                                    <button className="text-[10px] font-bold text-teal-600 hover:underline ml-auto">Repetir Receita</button>
+                                    <button className="text-[10px] font-bold text-primary hover:underline ml-auto">Repetir Receita</button>
                                 )}
                             </div>
                         </div>

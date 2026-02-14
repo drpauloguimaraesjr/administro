@@ -100,7 +100,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
         <Dialog.Root open={open} onOpenChange={setOpen}>
             <Dialog.Trigger asChild>
                 <button
-                    className="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 transition"
+                    className="px-4 py-2 bg-primary text-white rounded hover:bg-teal-700 transition"
                 >
                     {appointmentId ? 'Editar Consulta' : 'Nova Consulta'}
                 </button>
@@ -108,7 +108,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
             <Dialog.Portal>
                 <Dialog.Overlay className="fixed inset-0 bg-black/30" />
                 <Dialog.Content
-                    className="fixed top-1/2 left-1/2 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-lg p-6 focus:outline-none max-h-[90vh] overflow-y-auto"
+                    className="fixed top-1/2 left-1/2 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 bg-white   p-6 focus:outline-none max-h-[90vh] overflow-y-auto"
                 >
                     <Dialog.Title className="text-xl font-semibold mb-4">
                         {appointmentId ? 'Editar Consulta' : 'Nova Consulta'}
@@ -126,13 +126,13 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
                                     className="w-full border rounded px-3 py-2"
                                 />
                                 {searchTerm && filteredPatients.length > 0 && (
-                                    <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-40 overflow-y-auto">
+                                    <div className="absolute z-10 w-full mt-1 bg-white border rounded-md  max-h-40 overflow-y-auto">
                                         {filteredPatients.map((patient: Patient) => (
                                             <button
                                                 key={patient.id}
                                                 type="button"
                                                 onClick={() => handlePatientSelect(patient)}
-                                                className="w-full text-left px-3 py-2 hover:bg-slate-100"
+                                                className="w-full text-left px-3 py-2 hover:bg-muted"
                                             >
                                                 <span className="font-medium">{patient.name}</span>
                                                 <span className="text-sm text-muted-foreground ml-2">{patient.phone}</span>
@@ -147,12 +147,12 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
 
                             {/* Show selected patient */}
                             {selectedPatientId && (
-                                <p className="mt-2 text-sm text-teal-600">
+                                <p className="mt-2 text-sm text-primary">
                                     ✓ Paciente selecionado: {watch('patientName')}
                                 </p>
                             )}
                             {errors.patientId && (
-                                <p className="text-red-600 text-sm mt-1">{errors.patientId.message}</p>
+                                <p className="text-destructive text-sm mt-1">{errors.patientId.message}</p>
                             )}
                         </div>
 
@@ -166,7 +166,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
                                     className="w-full border rounded px-3 py-2"
                                 />
                                 {errors.date && (
-                                    <p className="text-red-600 text-sm">{errors.date.message}</p>
+                                    <p className="text-destructive text-sm">{errors.date.message}</p>
                                 )}
                             </div>
                             <div>
@@ -177,7 +177,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
                                     className="w-full border rounded px-3 py-2"
                                 />
                                 {errors.startTime && (
-                                    <p className="text-red-600 text-sm">{errors.startTime.message}</p>
+                                    <p className="text-destructive text-sm">{errors.startTime.message}</p>
                                 )}
                             </div>
                         </div>
@@ -248,7 +248,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 transition"
+                                className="px-4 py-2 bg-primary text-white rounded hover:bg-teal-700 transition"
                             >
                                 {isSubmitting ? 'Salvando...' : 'Salvar'}
                             </button>

@@ -129,9 +129,9 @@ export default function InstanciasPage() {
   const getStatusBadge = (status: ZAPIInstance['status']) => {
     switch (status) {
       case 'connected':
-        return <Badge className="bg-green-100 text-green-700"><CheckCircle2 className="w-3 h-3 mr-1" />Conectado</Badge>;
+        return <Badge className="bg-primary/15 text-primary"><CheckCircle2 className="w-3 h-3 mr-1" />Conectado</Badge>;
       case 'disconnected':
-        return <Badge className="bg-red-100 text-red-700"><XCircle className="w-3 h-3 mr-1" />Desconectado</Badge>;
+        return <Badge className="bg-destructive/15 text-red-700"><XCircle className="w-3 h-3 mr-1" />Desconectado</Badge>;
       case 'connecting':
         return <Badge className="bg-yellow-100 text-yellow-700"><Loader2 className="w-3 h-3 mr-1 animate-spin" />Conectando</Badge>;
       case 'qr_required':
@@ -167,7 +167,7 @@ export default function InstanciasPage() {
             </Link>
             <div>
               <h1 className="text-3xl font-bold flex items-center gap-3">
-                <Smartphone className="w-8 h-8 text-green-600" />
+                <Smartphone className="w-8 h-8 text-primary" />
                 Instâncias Z-API
               </h1>
               <p className="text-muted-foreground">
@@ -246,7 +246,7 @@ export default function InstanciasPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="bg-blue-50 p-3 rounded-lg text-sm text-blue-700">
+                <div className="bg-primary/10 p-3 rounded-lg text-sm text-primary">
                   <p className="font-medium">Como obter credenciais Z-API:</p>
                   <ol className="list-decimal ml-4 mt-1 space-y-1">
                     <li>Acesse <a href="https://z-api.io" target="_blank" className="underline">z-api.io</a></li>
@@ -393,7 +393,7 @@ export default function InstanciasPage() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="text-red-600 hover:text-red-700"
+                              className="text-destructive hover:text-red-700"
                               onClick={() => {
                                 if (confirm('Tem certeza que deseja remover esta instância?')) {
                                   deleteMutation.mutate(instance.id);
@@ -414,11 +414,11 @@ export default function InstanciasPage() {
         </Card>
 
         {/* Help Section */}
-        <Card className="bg-gradient-to-r from-green-50 to-blue-50">
+        <Card className="bg-primary
           <CardContent className="py-6">
             <div className="flex items-start gap-4">
               <div className="p-3 bg-white rounded-lg shadow-sm">
-                <Smartphone className="w-8 h-8 text-green-600" />
+                <Smartphone className="w-8 h-8 text-primary" />
               </div>
               <div>
                 <h3 className="font-semibold text-lg">Como funciona a integração Z-API?</h3>

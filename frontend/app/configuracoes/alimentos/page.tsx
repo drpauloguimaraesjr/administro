@@ -162,7 +162,7 @@ export default function AlimentosPage() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
-              <Apple className="w-8 h-8 text-green-600" />
+              <Apple className="w-8 h-8 text-primary" />
               Cadastro de Alimentos
             </h1>
             <p className="text-muted-foreground">
@@ -268,7 +268,7 @@ export default function AlimentosPage() {
                               Editar
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              className="text-red-600"
+                              className="text-destructive"
                               onClick={() => handleDelete(alimento.id)}
                             >
                               <Trash2 className="w-4 h-4 mr-2" />

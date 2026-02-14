@@ -96,7 +96,7 @@ export function ShareButton({ text, imageUrl, transactionId }: ShareButtonProps)
           {text && (
             <div>
               <label className="text-sm font-medium mb-2 block">Mensagem</label>
-              <div className="p-3 bg-slate-100 rounded-lg text-sm">
+              <div className="p-3 bg-muted rounded-lg text-sm">
                 {text}
               </div>
             </div>

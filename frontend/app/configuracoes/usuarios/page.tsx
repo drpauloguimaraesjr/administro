@@ -14,13 +14,13 @@ import { NewUserDialog } from '@/components/users/new-user-dialog';
 
 const ROLE_BADGES: Record<UserRole, { label: string; className: string }> = {
     owner: { label: 'Proprietário', className: 'bg-yellow-100 text-yellow-800 border-yellow-200' },
-    doctor: { label: 'Médico', className: 'bg-blue-100 text-blue-800 border-blue-200' },
-    nurse: { label: 'Enfermeiro', className: 'bg-green-100 text-green-800 border-green-200' },
+    doctor: { label: 'Médico', className: 'bg-primary/15 text-blue-800 border-primary/30' },
+    nurse: { label: 'Enfermeiro', className: 'bg-primary/15 text-green-800 border-primary/30' },
     nursing_tech: { label: 'Téc. Enfermagem', className: 'bg-cyan-100 text-cyan-800 border-cyan-200' },
     receptionist: { label: 'Recepcionista', className: 'bg-pink-100 text-pink-800 border-pink-200' },
-    spouse: { label: 'Cônjuge', className: 'bg-purple-100 text-purple-800 border-purple-200' },
+    spouse: { label: 'Cônjuge', className: 'bg-primary/15 text-purple-800 border-primary/30' },
     secretary: { label: 'Secretária', className: 'bg-gray-100 text-gray-800 border-gray-200' },
-    custom: { label: 'Personalizado', className: 'bg-slate-100 text-slate-800 border-slate-200' },
+    custom: { label: 'Personalizado', className: 'bg-muted text-foreground border-border' },
 };
 
 export default function UsersPage() {
@@ -70,16 +70,16 @@ export default function UsersPage() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">Usuários e Permissões</h1>
-                    <p className="text-slate-500">Gerencie o acesso e funções da equipe.</p>
+                    <p className="text-muted-foreground">Gerencie o acesso e funções da equipe.</p>
                 </div>
-                <Button onClick={handleNewUser} className="bg-teal-600 hover:bg-teal-700">
+                <Button onClick={handleNewUser} className="bg-primary hover:bg-teal-700">
                     <Plus className="w-4 h-4 mr-2" /> Novo Usuário
                 </Button>
             </div>
 
             <div className="flex items-center gap-2">
                 <div className="relative flex-1 max-w-sm">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground/70" />
                     <Input
                         placeholder="Buscar por nome ou email..."
                         className="pl-9"
@@ -96,11 +96,11 @@ export default function UsersPage() {
                 {isLoading ? (
                     <p>Carregando...</p>
                 ) : filteredUsers.map((user) => (
-                    <Card key={user.id} className="hover:shadow-md transition-shadow">
+                    <Card key={user.id} className="hover: transition-shadow">
                         <CardHeader className="flex flex-row items-center gap-4 pb-2">
                             <Avatar className="h-12 w-12">
                                 <AvatarImage src={user.avatar} />
-                                <AvatarFallback className="bg-slate-100 text-slate-700">
+                                <AvatarFallback className="bg-muted text-foreground/80">
                                     {user.name.substring(0, 2).toUpperCase()}
                                 </AvatarFallback>
                             </Avatar>
@@ -114,7 +114,7 @@ export default function UsersPage() {
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4 pt-2">
-                                <div className="flex items-center justify-between text-sm text-slate-500">
+                                <div className="flex items-center justify-between text-sm text-muted-foreground">
                                     <div className="flex items-center gap-2" title="Especialidade">
                                         <Shield className="w-4 h-4" />
                                         <span>{user.specialty || '-'}</span>
@@ -122,7 +122,7 @@ export default function UsersPage() {
                                     <div className="flex gap-2">
                                         {user.hasAgenda && (
                                             <div title="Possui Agenda">
-                                                <Calendar className="w-4 h-4 text-blue-500" />
+                                                <Calendar className="w-4 h-4 text-primary" />
                                             </div>
                                         )}
                                         {user.canAnswerWhatsApp && (
@@ -137,7 +137,7 @@ export default function UsersPage() {
                                     <Button variant="ghost" size="sm" onClick={() => handleEdit(user)}>
                                         <Edit className="w-4 h-4 mr-2" /> Editar
                                     </Button>
-                                    <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => handleDelete(user.id)}>
+                                    <Button variant="ghost" size="sm" className="text-destructive hover:text-red-700 hover:bg-destructive/10" onClick={() => handleDelete(user.id)}>
                                         <Trash2 className="w-4 h-4" />
                                     </Button>
                                 </div>

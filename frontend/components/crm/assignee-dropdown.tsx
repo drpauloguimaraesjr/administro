@@ -14,9 +14,9 @@ import { User } from 'lucide-react';
 // Equipe da clínica - depois virá do banco de dados
 export const TEAM_MEMBERS = [
     { id: 'helenita', name: 'Helenita', role: 'Téc. Enfermagem', color: 'bg-pink-500' },
-    { id: 'sandra', name: 'Sandra', role: 'Enfermeira', color: 'bg-purple-500' },
-    { id: 'iraciele', name: 'Iraciele', role: 'Enfermeira', color: 'bg-blue-500' },
-    { id: 'edilene', name: 'Edilene', role: 'Téc. Enfermagem', color: 'bg-green-500' },
+    { id: 'sandra', name: 'Sandra', role: 'Enfermeira', color: 'bg-primary/100' },
+    { id: 'iraciele', name: 'Iraciele', role: 'Enfermeira', color: 'bg-primary/100' },
+    { id: 'edilene', name: 'Edilene', role: 'Téc. Enfermagem', color: 'bg-primary/100' },
     { id: 'jeniffer', name: 'Jeniffer', role: 'Enfermagem', color: 'bg-orange-500' },
 ] as const;
 
@@ -49,7 +49,7 @@ export function AssigneeDropdown({ value, onChange, disabled, compact }: Assigne
             <SelectTrigger
                 className={`
                     ${compact ? 'h-6 text-[10px] px-1.5 py-0' : 'h-8 text-xs px-2'}
-                    w-auto min-w-0 border-dashed bg-transparent hover:bg-slate-100 transition-colors
+                    w-auto min-w-0 border-dashed bg-transparent hover:bg-muted transition-colors
                 `}
                 onClick={(e) => e.stopPropagation()}
             >
@@ -60,7 +60,7 @@ export function AssigneeDropdown({ value, onChange, disabled, compact }: Assigne
                             <span className="truncate max-w-[60px]">{currentMember.name}</span>
                         </div>
                     ) : (
-                        <div className="flex items-center gap-1 text-slate-400">
+                        <div className="flex items-center gap-1 text-muted-foreground/70">
                             <User className="w-3 h-3" />
                             <span>Atribuir</span>
                         </div>
@@ -69,8 +69,8 @@ export function AssigneeDropdown({ value, onChange, disabled, compact }: Assigne
             </SelectTrigger>
             <SelectContent onClick={(e) => e.stopPropagation()}>
                 <SelectItem value="none">
-                    <div className="flex items-center gap-2 text-slate-500">
-                        <div className="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                        <div className="w-5 h-5 rounded-full bg-muted flex items-center justify-center">
                             <User className="w-3 h-3" />
                         </div>
                         <span>Ninguém</span>
@@ -86,7 +86,7 @@ export function AssigneeDropdown({ value, onChange, disabled, compact }: Assigne
                             </Avatar>
                             <div className="flex flex-col">
                                 <span className="font-medium text-sm">{member.name}</span>
-                                <span className="text-[10px] text-slate-400">{member.role}</span>
+                                <span className="text-[10px] text-muted-foreground/70">{member.role}</span>
                             </div>
                         </div>
                     </SelectItem>
@@ -100,7 +100,7 @@ export function AssigneeDropdown({ value, onChange, disabled, compact }: Assigne
 export function AssigneeBadge({ memberId }: { memberId: string | null | undefined }) {
     if (!memberId) {
         return (
-            <span className="text-[10px] text-slate-400 italic">
+            <span className="text-[10px] text-muted-foreground/70 italic">
                 Sem responsável
             </span>
         );
@@ -112,7 +112,7 @@ export function AssigneeBadge({ memberId }: { memberId: string | null | undefine
     return (
         <div className="flex items-center gap-1">
             <div className={`w-2 h-2 rounded-full ${member.color}`} />
-            <span className="text-[10px] font-medium text-slate-600">
+            <span className="text-[10px] font-medium text-muted-foreground">
                 {member.name}
             </span>
         </div>

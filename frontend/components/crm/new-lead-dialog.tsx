@@ -73,19 +73,19 @@ export function NewLeadDialog() {
                     <div className="grid gap-2">
                         <Label htmlFor="name">Nome Completo</Label>
                         <Input id="name" {...register('name')} placeholder="Ex: Maria Silva" />
-                        {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
+                        {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
                     </div>
 
                     <div className="grid gap-2">
                         <Label htmlFor="phone">Telefone (WhatsApp)</Label>
                         <Input id="phone" {...register('phone')} placeholder="Ex: 11999999999" />
-                        {errors.phone && <p className="text-xs text-red-500">{errors.phone.message}</p>}
+                        {errors.phone && <p className="text-xs text-destructive">{errors.phone.message}</p>}
                     </div>
 
                     <div className="grid gap-2">
                         <Label htmlFor="email">Email (Opcional)</Label>
                         <Input id="email" {...register('email')} placeholder="Ex: maria@email.com" />
-                        {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
+                        {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
                     </div>
 
                     <DialogFooter>

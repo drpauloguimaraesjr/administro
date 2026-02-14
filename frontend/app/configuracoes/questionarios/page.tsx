@@ -224,14 +224,14 @@ export default function QuestionariosPage() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
-              <FileQuestion className="w-8 h-8 text-blue-600" />
+              <FileQuestion className="w-8 h-8 text-primary" />
               Questionários de Avaliação
             </h1>
             <p className="text-muted-foreground">
               Crie questionários para enviar aos pacientes
             </p>
           </div>
-          <Button onClick={() => handleOpenForm()} className="bg-blue-600 hover:bg-blue-700">
+          <Button onClick={() => handleOpenForm()} className="bg-primary hover:bg-primary/90">
             <Plus className="w-4 h-4 mr-2" />
             Novo Questionário
           </Button>
@@ -290,7 +290,7 @@ export default function QuestionariosPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredQuestionarios.map((q) => (
-              <Card key={q.id} className="hover:shadow-md transition-shadow">
+              <Card key={q.id} className="hover: transition-shadow">
                 <CardContent className="pt-6">
                   <div className="flex justify-between items-start mb-3">
                     <div>
@@ -319,7 +319,7 @@ export default function QuestionariosPage() {
                           Duplicar
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          className="text-red-600"
+                          className="text-destructive"
                           onClick={() => handleDelete(q.id)}
                         >
                           <Trash2 className="w-4 h-4 mr-2" />
@@ -427,7 +427,7 @@ export default function QuestionariosPage() {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleRemoveQuestao(questao.id)}
-                        className="text-red-500 hover:text-red-700"
+                        className="text-destructive hover:text-red-700"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -528,7 +528,7 @@ export default function QuestionariosPage() {
             <Button variant="outline" onClick={handleCloseForm}>
               Cancelar
             </Button>
-            <Button onClick={handleSubmit} className="bg-blue-600 hover:bg-blue-700">
+            <Button onClick={handleSubmit} className="bg-primary hover:bg-primary/90">
               Salvar
             </Button>
           </DialogFooter>

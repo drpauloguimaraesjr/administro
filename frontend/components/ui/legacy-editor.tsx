@@ -569,7 +569,7 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                             type="button"
                             variant="outline"
                             size="sm"
-                            className="h-8 px-3 gap-2 bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-200 text-purple-700 hover:from-purple-100 hover:to-indigo-100 hover:border-purple-300 font-medium shadow-sm"
+                            className="h-8 px-3 gap-2 bg-gradient-to-r from-purple-50 to-indigo-50 border-primary/30 text-primary hover:from-purple-100 hover:to-indigo-100 hover:border-purple-300 font-medium shadow-sm"
                         >
                             <LayoutTemplate className="w-4 h-4" />
                             Templates
@@ -773,7 +773,7 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                         {/* Cabeçalhos */}
                         <DropdownMenuSub>
                             <DropdownMenuSubTrigger className="gap-2">
-                                <FileText className="w-4 h-4 text-blue-500" />
+                                <FileText className="w-4 h-4 text-primary" />
                                 <span>Cabeçalhos de Via</span>
                             </DropdownMenuSubTrigger>
                             <DropdownMenuSubContent className="w-56">
@@ -865,22 +865,22 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-64 p-2">
-                        <DropdownMenuLabel className="text-xs text-slate-500 uppercase tracking-wider">
+                        <DropdownMenuLabel className="text-xs text-muted-foreground uppercase tracking-wider">
                             📐 Ferramentas de Layout
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
 
                         {/* Page Margins (Blue) */}
-                        <div className="flex items-center justify-between gap-2 px-2 py-2 rounded bg-blue-50 border border-blue-100 mb-2">
+                        <div className="flex items-center justify-between gap-2 px-2 py-2 rounded bg-primary/10 border border-blue-100 mb-2">
                             <div className="flex items-center gap-2">
                                 <div className="w-3 h-3 bg-blue-400 rounded-sm"></div>
-                                <span className="text-xs text-blue-700 font-medium">Margens da Página</span>
+                                <span className="text-xs text-primary font-medium">Margens da Página</span>
                             </div>
                             <Button
                                 type="button"
                                 variant={showMargins ? "default" : "outline"}
                                 size="sm"
-                                className={`h-6 px-3 text-xs ${showMargins ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
+                                className={`h-6 px-3 text-xs ${showMargins ? 'bg-primary/100 hover:bg-primary' : ''}`}
                                 onClick={() => setShowMargins(!showMargins)}
                             >
                                 {showMargins ? 'ON' : 'OFF'}
@@ -952,13 +952,13 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                         </div>
 
                         {/* Alignment Lines Tool */}
-                        <div className="flex flex-col gap-1 px-2 py-2 rounded bg-purple-50 border border-purple-100">
+                        <div className="flex flex-col gap-1 px-2 py-2 rounded bg-primary/10 border border-purple-100">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <div className="w-0.5 h-4 bg-purple-500"></div>
-                                    <span className="text-xs text-purple-700 font-medium">Linha de Alinhamento</span>
+                                    <div className="w-0.5 h-4 bg-primary/100"></div>
+                                    <span className="text-xs text-primary font-medium">Linha de Alinhamento</span>
                                     {alignmentLines.length > 0 && (
-                                        <span className="text-[10px] bg-purple-200 text-purple-700 px-1.5 rounded-full">{alignmentLines.length}</span>
+                                        <span className="text-[10px] bg-purple-200 text-primary px-1.5 rounded-full">{alignmentLines.length}</span>
                                     )}
                                 </div>
                                 <div className="flex gap-1">
@@ -966,7 +966,7 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                                         type="button"
                                         variant={isCreatingAlignmentLine ? "default" : "outline"}
                                         size="sm"
-                                        className={`h-6 px-3 text-xs ${isCreatingAlignmentLine ? 'bg-purple-500 hover:bg-purple-600 text-white' : ''}`}
+                                        className={`h-6 px-3 text-xs ${isCreatingAlignmentLine ? 'bg-primary/100 hover:bg-primary text-white' : ''}`}
                                         onClick={() => {
                                             setIsCreatingAlignmentLine(!isCreatingAlignmentLine);
                                             setAlignmentLinePreviewX(null);
@@ -980,7 +980,7 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                                             type="button"
                                             variant="ghost"
                                             size="sm"
-                                            className="h-6 px-1 text-xs text-red-500 hover:text-red-700"
+                                            className="h-6 px-1 text-xs text-destructive hover:text-red-700"
                                             onClick={() => setAlignmentLines([])}
                                             title="Limpar todas"
                                         >
@@ -990,7 +990,7 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                                 </div>
                             </div>
                             {isCreatingAlignmentLine && (
-                                <p className="text-[10px] text-purple-600 mt-1">
+                                <p className="text-[10px] text-primary mt-1">
                                     💡 Clique na área de texto • Ctrl+Click para alinhar
                                 </p>
                             )}
@@ -1005,7 +1005,7 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                 {/* Paper Simulation */}
                 <div
                     ref={paperRef}
-                    className={`bg-white shadow-lg relative transition-all duration-75 ease-linear ${isDrawingTextBox ? 'cursor-crosshair' : ''} ${isCreatingAlignmentLine ? 'cursor-col-resize' : ''}`}
+                    className={`bg-white  relative transition-all duration-75 ease-linear ${isDrawingTextBox ? 'cursor-crosshair' : ''} ${isCreatingAlignmentLine ? 'cursor-col-resize' : ''}`}
                     style={{
                         width: '210mm', // A4 width
                         minHeight: '297mm', // A4 height
@@ -1028,7 +1028,7 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                     {/* Content Area with Inner Margins */}
                     <div
                         ref={editorRef}
-                        className="w-full h-full outline-none prose max-w-none text-slate-900"
+                        className="w-full h-full outline-none prose max-w-none text-foreground"
                         contentEditable={editable}
                         onInput={handleInput}
                         suppressContentEditableWarning={true}
@@ -1051,7 +1051,7 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                                 style={{ left: margins.left }}
                                 onMouseDown={(e) => handleMouseDown(e, 'left')}
                             >
-                                <div className="absolute top-1/2 -left-8 bg-blue-500 text-white text-[9px] px-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
+                                <div className="absolute top-1/2 -left-8 bg-primary/100 text-white text-[9px] px-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
                                     {margins.left}px
                                 </div>
                             </div>
@@ -1064,7 +1064,7 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                                 style={{ right: margins.right }}
                                 onMouseDown={(e) => handleMouseDown(e, 'right')}
                             >
-                                <div className="absolute top-1/2 -right-8 bg-blue-500 text-white text-[9px] px-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
+                                <div className="absolute top-1/2 -right-8 bg-primary/100 text-white text-[9px] px-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
                                     {margins.right}px
                                 </div>
                             </div>
@@ -1077,7 +1077,7 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                                 style={{ top: margins.top }}
                                 onMouseDown={(e) => handleMouseDown(e, 'top')}
                             >
-                                <div className="absolute left-1/2 -top-5 bg-blue-500 text-white text-[9px] px-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
+                                <div className="absolute left-1/2 -top-5 bg-primary/100 text-white text-[9px] px-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
                                     {margins.top}px
                                 </div>
                             </div>
@@ -1090,7 +1090,7 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                                 style={{ bottom: margins.bottom }}
                                 onMouseDown={(e) => handleMouseDown(e, 'bottom')}
                             >
-                                <div className="absolute left-1/2 -bottom-5 bg-blue-500 text-white text-[9px] px-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
+                                <div className="absolute left-1/2 -bottom-5 bg-primary/100 text-white text-[9px] px-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
                                     {margins.bottom}px
                                 </div>
                             </div>
@@ -1226,7 +1226,7 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                     {textBoxes.map((box) => (
                         <div
                             key={box.id}
-                            className={`absolute border-2 ${selectedTextBox === box.id ? 'border-amber-500 shadow-lg' : 'border-amber-300'} ${isDraggingTextBox === box.id ? 'opacity-80' : ''} bg-white rounded z-30 group`}
+                            className={`absolute border-2 ${selectedTextBox === box.id ? 'border-amber-500 ' : 'border-amber-300'} ${isDraggingTextBox === box.id ? 'opacity-80' : ''} bg-white rounded z-30 group`}
                             style={{
                                 left: box.x,
                                 top: box.y,
@@ -1255,7 +1255,7 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                                     type="button"
                                     variant="ghost"
                                     size="sm"
-                                    className="h-5 w-5 p-0 bg-red-500 hover:bg-red-600 text-white rounded"
+                                    className="h-5 w-5 p-0 bg-destructive/100 hover:bg-red-600 text-white rounded"
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         deleteTextBox(box.id);
@@ -1289,7 +1289,7 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                         >
                             {/* The actual line */}
                             <div
-                                className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-purple-500 hover:bg-purple-600 cursor-pointer"
+                                className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-primary/100 hover:bg-primary cursor-pointer"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     alignSelectedTextToLine(line.x);
@@ -1299,7 +1299,7 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
 
                             {/* Delete button - appears on hover */}
                             <button
-                                className="absolute -top-6 left-1/2 -translate-x-1/2 bg-red-500 hover:bg-red-600 text-white text-[9px] w-5 h-5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                                className="absolute -top-6 left-1/2 -translate-x-1/2 bg-destructive/100 hover:bg-red-600 text-white text-[9px] w-5 h-5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     deleteAlignmentLine(line.id);
@@ -1310,7 +1310,7 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                             </button>
 
                             {/* Position indicator */}
-                            <div className="absolute top-1 left-1/2 -translate-x-1/2 bg-purple-500 text-white text-[8px] px-1 rounded whitespace-nowrap pointer-events-none">
+                            <div className="absolute top-1 left-1/2 -translate-x-1/2 bg-primary/100 text-white text-[8px] px-1 rounded whitespace-nowrap pointer-events-none">
                                 {Math.round(line.x - margins.left)}px
                             </div>
                         </div>
@@ -1327,7 +1327,7 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                                 width: 2
                             }}
                         >
-                            <div className="absolute top-1 left-1/2 -translate-x-1/2 bg-purple-500 text-white text-[8px] px-1 rounded whitespace-nowrap">
+                            <div className="absolute top-1 left-1/2 -translate-x-1/2 bg-primary/100 text-white text-[8px] px-1 rounded whitespace-nowrap">
                                 {Math.round(alignmentLinePreviewX - margins.left)}px
                             </div>
                         </div>
@@ -1359,7 +1359,7 @@ const ToolbarBtn = ({ icon, onClick, title }: { icon: React.ReactNode, onClick: 
         type="button"
         variant="ghost"
         size="sm"
-        className="w-7 h-7 p-0 text-gray-600 hover:text-purple-600 hover:bg-purple-50"
+        className="w-7 h-7 p-0 text-gray-600 hover:text-primary hover:bg-primary/10"
         onClick={onClick}
         title={title}
     >

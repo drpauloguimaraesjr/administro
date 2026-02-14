@@ -87,9 +87,9 @@ export function PaymentsList({ patientId, patientName }: PaymentsListProps) {
         <div>
             {/* Summary Cards */}
             <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="bg-green-50 p-4 rounded-lg">
-                    <p className="text-sm text-green-600">Recebido</p>
-                    <p className="text-2xl font-bold text-green-700">
+                <div className="bg-primary/10 p-4 rounded-lg">
+                    <p className="text-sm text-primary">Recebido</p>
+                    <p className="text-2xl font-bold text-primary">
                         R$ {totalPaid.toFixed(2)}
                     </p>
                 </div>
@@ -104,7 +104,7 @@ export function PaymentsList({ patientId, patientName }: PaymentsListProps) {
             {/* Header */}
             <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">Pagamentos</h3>
-                <Button onClick={() => setIsModalOpen(true)} className="bg-teal-600 hover:bg-teal-700">
+                <Button onClick={() => setIsModalOpen(true)} className="bg-primary hover:bg-teal-700">
                     <Plus className="w-4 h-4 mr-2" />
                     Novo Pagamento
                 </Button>
@@ -122,10 +122,10 @@ export function PaymentsList({ patientId, patientName }: PaymentsListProps) {
                         <div
                             key={payment.id}
                             className={`p-4 rounded-lg border-l-4 ${payment.status === 'paid'
-                                    ? 'bg-green-50 border-green-500'
+                                    ? 'bg-primary/10 border-primary'
                                     : payment.status === 'pending'
                                         ? 'bg-yellow-50 border-yellow-500'
-                                        : 'bg-red-50 border-red-500'
+                                        : 'bg-destructive/10 border-destructive'
                                 }`}
                         >
                             <div className="flex justify-between items-start">
@@ -148,7 +148,7 @@ export function PaymentsList({ patientId, patientName }: PaymentsListProps) {
                                             variant="ghost"
                                             size="sm"
                                             onClick={() => markAsPaidMutation.mutate(payment.id!)}
-                                            className="text-green-600"
+                                            className="text-primary"
                                             title="Marcar como pago"
                                         >
                                             <Check className="w-4 h-4" />
@@ -173,7 +173,7 @@ export function PaymentsList({ patientId, patientName }: PaymentsListProps) {
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => handleDelete(payment.id!)}
-                                        className="text-red-500"
+                                        className="text-destructive"
                                     >
                                         <Trash2 className="w-4 h-4" />
                                     </Button>
@@ -315,7 +315,7 @@ function PaymentModal({
                         <Button
                             type="submit"
                             disabled={isLoading}
-                            className="bg-teal-600 hover:bg-teal-700"
+                            className="bg-primary hover:bg-teal-700"
                         >
                             {isLoading ? 'Salvando...' : 'Salvar'}
                         </Button>

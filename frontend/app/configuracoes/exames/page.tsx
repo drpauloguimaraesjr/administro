@@ -151,14 +151,14 @@ export default function ExamesPage() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
-              <FlaskConical className="w-8 h-8 text-teal-600" />
+              <FlaskConical className="w-8 h-8 text-primary" />
               Planilha de Exames
             </h1>
             <p className="text-muted-foreground">
               Cadastro de tipos de exames médicos e laboratoriais
             </p>
           </div>
-          <Button onClick={() => handleOpenForm()} className="bg-teal-600 hover:bg-teal-700">
+          <Button onClick={() => handleOpenForm()} className="bg-primary hover:bg-teal-700">
             <Plus className="w-4 h-4 mr-2" />
             Novo Exame
           </Button>
@@ -271,7 +271,7 @@ export default function ExamesPage() {
                               Editar
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              className="text-red-600"
+                              className="text-destructive"
                               onClick={() => handleDelete(exame.id)}
                             >
                               <Trash2 className="w-4 h-4 mr-2" />
@@ -390,7 +390,7 @@ export default function ExamesPage() {
             <Button variant="outline" onClick={handleCloseForm}>
               Cancelar
             </Button>
-            <Button onClick={handleSubmit} className="bg-teal-600 hover:bg-teal-700">
+            <Button onClick={handleSubmit} className="bg-primary hover:bg-teal-700">
               Salvar
             </Button>
           </DialogFooter>

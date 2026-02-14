@@ -51,7 +51,7 @@ function InvestmentCard({ investment }: { investment: Investment }) {
     : 0;
 
   return (
-    <Card className="hover:shadow-lg transition-shadow">
+    <Card className="hover: transition-shadow">
       <CardContent className="p-6">
         <div className="space-y-4">
           {/* Header */}
@@ -62,7 +62,7 @@ function InvestmentCard({ investment }: { investment: Investment }) {
                 {investment.type.replace('_', ' ')}
               </p>
             </div>
-            <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-600 text-xs">
+            <span className="px-2 py-1 rounded-full bg-primary/15 text-primary text-xs">
               {investment.contextId === 'HOME' ? 'Casa' : 'Clínica'}
             </span>
           </div>
@@ -79,7 +79,7 @@ function InvestmentCard({ investment }: { investment: Investment }) {
             </div>
             <div className="flex justify-between">
               <span className="text-sm text-muted-foreground">Lucro/Prejuízo</span>
-              <span className={`font-semibold ${profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              <span className={`font-semibold ${profit >= 0 ? 'text-primary' : 'text-destructive'}`}>
                 {profit >= 0 ? '+' : ''}R$ {profit.toFixed(2)} ({profitPercentage >= 0 ? '+' : ''}{profitPercentage.toFixed(2)}%)
               </span>
             </div>
@@ -91,9 +91,9 @@ function InvestmentCard({ investment }: { investment: Investment }) {
               <span className="text-muted-foreground">Progresso</span>
               <span className="font-medium">{progress.toFixed(1)}%</span>
             </div>
-            <div className="w-full bg-slate-200 rounded-full h-2">
+            <div className="w-full bg-muted rounded-full h-2">
               <div
-                className="bg-blue-600 h-2 rounded-full transition-all"
+                className="bg-primary h-2 rounded-full transition-all"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -108,7 +108,7 @@ function InvestmentCard({ investment }: { investment: Investment }) {
                 </span>
                 <span className="font-medium">{installmentProgress.toFixed(1)}%</span>
               </div>
-              <div className="w-full bg-slate-200 rounded-full h-2">
+              <div className="w-full bg-muted rounded-full h-2">
                 <div
                   className="bg-green-600 h-2 rounded-full transition-all"
                   style={{ width: `${installmentProgress}%` }}

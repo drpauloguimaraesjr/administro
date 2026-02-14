@@ -76,7 +76,7 @@ export function EvolutionsList({ patientId }: EvolutionsListProps) {
         <div>
             <div className="flex justify-between items-center mb-6">
                 <h3 className="text-lg font-semibold">Evoluções</h3>
-                <Button onClick={() => setIsModalOpen(true)} className="bg-teal-600 hover:bg-teal-700">
+                <Button onClick={() => setIsModalOpen(true)} className="bg-primary hover:bg-teal-700">
                     <Plus className="w-4 h-4 mr-2" />
                     Nova Evolução
                 </Button>
@@ -93,7 +93,7 @@ export function EvolutionsList({ patientId }: EvolutionsListProps) {
                         <div
                             key={evolution.id}
                             onClick={() => handleView(evolution)}
-                            className="bg-slate-50 rounded-lg p-4 border-l-4 border-teal-600 cursor-pointer hover:shadow-md transition-shadow relative group"
+                            className="bg-muted/50 rounded-lg p-4 border-l-4 border-teal-600 cursor-pointer hover: transition-shadow relative group"
                         >
                             <div className="flex justify-between items-start mb-3">
                                 <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
@@ -101,7 +101,7 @@ export function EvolutionsList({ patientId }: EvolutionsListProps) {
                                     {new Date(evolution.date).toLocaleDateString('pt-BR')}
                                     <span className="text-xs font-normal opacity-70 ml-2">(Clique para ver detalhes)</span>
                                 </div>
-                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity absolute right-4 top-4 bg-slate-50 p-1 rounded-md shadow-sm">
+                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity absolute right-4 top-4 bg-muted/50 p-1 rounded-md shadow-sm">
                                     <Button variant="ghost" size="sm" onClick={(e) => handleEdit(e, evolution)}>
                                         <Edit className="w-4 h-4" />
                                     </Button>
@@ -109,7 +109,7 @@ export function EvolutionsList({ patientId }: EvolutionsListProps) {
                                         variant="ghost"
                                         size="sm"
                                         onClick={(e) => handleDelete(e, evolution.id!)}
-                                        className="text-red-500"
+                                        className="text-destructive"
                                     >
                                         <Trash2 className="w-4 h-4" />
                                     </Button>
@@ -118,12 +118,12 @@ export function EvolutionsList({ patientId }: EvolutionsListProps) {
 
                             <div className="grid grid-cols-1 gap-2 text-sm">
                                 <div>
-                                    <p className="font-semibold text-slate-700">Queixa:</p>
-                                    <p className="text-slate-600 line-clamp-2">{evolution.complaint || '-'}</p>
+                                    <p className="font-semibold text-foreground/80">Queixa:</p>
+                                    <p className="text-muted-foreground line-clamp-2">{evolution.complaint || '-'}</p>
                                 </div>
                                 <div>
-                                    <p className="font-semibold text-slate-700">Diagnóstico:</p>
-                                    <p className="text-slate-600 line-clamp-1">{evolution.diagnosis || '-'}</p>
+                                    <p className="font-semibold text-foreground/80">Diagnóstico:</p>
+                                    <p className="text-muted-foreground line-clamp-1">{evolution.diagnosis || '-'}</p>
                                 </div>
                             </div>
                         </div>
@@ -192,11 +192,11 @@ function EvolutionViewModal({
 function SectionView({ title, content }: { title: string; content: string }) {
     if (!content) return null;
     return (
-        <div className="space-y-1 bg-slate-50 p-4 rounded-lg border border-slate-100">
-            <h4 className="font-semibold text-slate-900 flex items-center gap-2">
+        <div className="space-y-1 bg-muted/50 p-4 rounded-lg border border-slate-100">
+            <h4 className="font-semibold text-foreground flex items-center gap-2">
                 {title}
             </h4>
-            <p className="text-slate-700 whitespace-pre-wrap">{content}</p>
+            <p className="text-foreground/80 whitespace-pre-wrap">{content}</p>
         </div>
     );
 }
@@ -341,7 +341,7 @@ function EvolutionModal({
                         <Button
                             type="submit"
                             disabled={isLoading}
-                            className="bg-teal-600 hover:bg-teal-700"
+                            className="bg-primary hover:bg-teal-700"
                         >
                             {isLoading ? 'Salvando...' : 'Salvar'}
                         </Button>

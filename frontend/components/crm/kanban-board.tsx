@@ -91,7 +91,7 @@ export function KanbanBoard() {
     if (isLoading) {
         return (
             <div className="flex items-center justify-center p-20 w-full h-full">
-                <div className="text-slate-500 animate-pulse">Carregando pipeline...</div>
+                <div className="text-muted-foreground animate-pulse">Carregando pipeline...</div>
             </div>
         );
     }

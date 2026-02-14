@@ -70,9 +70,9 @@ const PAYMENT_METHODS = [
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   pending: { label: 'Pendente', color: 'bg-yellow-100 text-yellow-700' },
-  paid: { label: 'Pago', color: 'bg-green-100 text-green-700' },
+  paid: { label: 'Pago', color: 'bg-primary/15 text-primary' },
   cancelled: { label: 'Cancelado', color: 'bg-gray-100 text-gray-700' },
-  invoiced: { label: 'Faturado', color: 'bg-blue-100 text-blue-700' },
+  invoiced: { label: 'Faturado', color: 'bg-primary/15 text-primary' },
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -279,10 +279,10 @@ export default function FaturamentoPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Recebido</CardTitle>
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <CheckCircle2 className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">
+              <div className="text-2xl font-bold text-primary">
                 {loadingSummary ? '...' : formatCurrency(summary?.paidAmount || 0)}
               </div>
               <p className="text-xs text-muted-foreground">
@@ -294,10 +294,10 @@ export default function FaturamentoPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Lucro</CardTitle>
-              <TrendingUp className="h-4 w-4 text-purple-600" />
+              <TrendingUp className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-purple-600">
+              <div className="text-2xl font-bold text-primary">
                 {loadingSummary ? '...' : formatCurrency(summary?.totalProfit || 0)}
               </div>
               <p className="text-xs text-muted-foreground">
@@ -309,10 +309,10 @@ export default function FaturamentoPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Pacientes</CardTitle>
-              <Users className="h-4 w-4 text-blue-600" />
+              <Users className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">
+              <div className="text-2xl font-bold text-primary">
                 {patientsWithPending.length}
               </div>
               <p className="text-xs text-muted-foreground">
@@ -386,11 +386,11 @@ export default function FaturamentoPage() {
 
             {/* Bulk Actions */}
             {selectedItems.size > 0 && (
-              <div className="flex items-center gap-4 mt-4 p-3 bg-purple-50 rounded-lg">
+              <div className="flex items-center gap-4 mt-4 p-3 bg-primary/10 rounded-lg">
                 <span className="text-sm font-medium">
                   {selectedItems.size} selecionado(s)
                 </span>
-                <span className="text-sm text-purple-700 font-bold">
+                <span className="text-sm text-primary font-bold">
                   Total: {formatCurrency(selectedTotal)}
                 </span>
                 <div className="flex-1" />
@@ -492,11 +492,11 @@ export default function FaturamentoPage() {
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem onClick={() => openPayDialog(item.id)}>
-                                  <Check className="w-4 h-4 mr-2 text-green-600" />
+                                  <Check className="w-4 h-4 mr-2 text-primary" />
                                   Receber
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                  className="text-red-600"
+                                  className="text-destructive"
                                   onClick={() => {
                                     if (confirm('Cancelar este item?')) {
                                       cancelMutation.mutate(item.id);
@@ -534,7 +534,7 @@ export default function FaturamentoPage() {
 
           <div className="space-y-4 py-4">
             <div className="text-center">
-              <p className="text-3xl font-bold text-green-600">
+              <p className="text-3xl font-bold text-primary">
                 {payingItemId
                   ? formatCurrency(items.find(i => i.id === payingItemId)?.totalPrice || 0)
                   : formatCurrency(selectedTotal)

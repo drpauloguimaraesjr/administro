@@ -393,8 +393,8 @@ export default function ProdutosPage() {
                         {product.costPrice && product.sellPrice && product.sellPrice > 0 ? (
                           <Badge className={
                             product.sellPrice > product.costPrice 
-                              ? 'bg-green-100 text-green-700' 
-                              : 'bg-red-100 text-red-700'
+                              ? 'bg-primary/15 text-primary' 
+                              : 'bg-destructive/15 text-red-700'
                           }>
                             {(((product.sellPrice - product.costPrice) / product.sellPrice) * 100).toFixed(0)}%
                           </Badge>
@@ -415,7 +415,7 @@ export default function ProdutosPage() {
                               Editar
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              className="text-red-600"
+                              className="text-destructive"
                               onClick={() => {
                                 if (confirm('Tem certeza que deseja remover este produto?')) {
                                   deleteMutation.mutate(product.id);
@@ -606,9 +606,9 @@ export default function ProdutosPage() {
                   <Label>Margem de Lucro</Label>
                   <div className={`h-10 flex items-center justify-center rounded-md border text-lg font-bold ${
                     formData.costPrice && formData.sellPrice && formData.sellPrice > formData.costPrice
-                      ? 'bg-green-50 border-green-200 text-green-700'
+                      ? 'bg-primary/10 border-primary/30 text-primary'
                       : formData.costPrice && formData.sellPrice && formData.sellPrice < formData.costPrice
-                      ? 'bg-red-50 border-red-200 text-red-700'
+                      ? 'bg-destructive/10 border-destructive/30 text-red-700'
                       : 'bg-gray-50 border-gray-200 text-gray-500'
                   }`}>
                     {formData.costPrice && formData.sellPrice && formData.sellPrice > 0

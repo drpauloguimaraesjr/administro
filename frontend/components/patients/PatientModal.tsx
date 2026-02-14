@@ -226,38 +226,38 @@ export function PatientModal({ open, onClose, patient }: PatientModalProps) {
         <Dialog open={open} onOpenChange={onClose}>
             <DialogContent className="max-w-4xl h-[90vh] flex flex-col p-0 gap-0 overflow-hidden bg-white">
                 <DialogHeader className="px-6 py-4 border-b shrink-0 bg-white z-10">
-                    <DialogTitle className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-                        {isEditing ? <User className="h-6 w-6 text-purple-600" /> : <User className="h-6 w-6 text-green-600" />}
+                    <DialogTitle className="text-2xl font-bold text-foreground flex items-center gap-2">
+                        {isEditing ? <User className="h-6 w-6 text-primary" /> : <User className="h-6 w-6 text-primary" />}
                         {isEditing ? 'Editar Perfil do Paciente' : 'Novo Cadastro de Paciente'}
                     </DialogTitle>
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col flex-1 overflow-hidden">
                     <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
-                        <div className="px-6 pt-2 bg-slate-50 border-b shrink-0 overflow-x-auto">
+                        <div className="px-6 pt-2 bg-muted/50 border-b shrink-0 overflow-x-auto">
                             <TabsList className="bg-transparent space-x-1 h-12">
-                                <TabsTrigger value="personal" className="gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border-b-2 data-[state=active]:border-purple-600 rounded-none h-full px-4">
+                                <TabsTrigger value="personal" className="gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none h-full px-4">
                                     <User className="h-4 w-4" /> Pessoal
                                 </TabsTrigger>
-                                <TabsTrigger value="crm" className="gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border-b-2 data-[state=active]:border-purple-600 rounded-none h-full px-4 text-purple-700 font-medium">
+                                <TabsTrigger value="crm" className="gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none h-full px-4 text-primary font-medium">
                                     <TrendingUp className="h-4 w-4" /> CRM & Funil
                                 </TabsTrigger>
-                                <TabsTrigger value="address" className="gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border-b-2 data-[state=active]:border-purple-600 rounded-none h-full px-4">
+                                <TabsTrigger value="address" className="gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none h-full px-4">
                                     <MapPin className="h-4 w-4" /> Endereço
                                 </TabsTrigger>
-                                <TabsTrigger value="insurance" className="gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border-b-2 data-[state=active]:border-purple-600 rounded-none h-full px-4">
+                                <TabsTrigger value="insurance" className="gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none h-full px-4">
                                     <HeartPulse className="h-4 w-4" /> Convênio
                                 </TabsTrigger>
-                                <TabsTrigger value="complementary" className="gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border-b-2 data-[state=active]:border-purple-600 rounded-none h-full px-4">
+                                <TabsTrigger value="complementary" className="gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none h-full px-4">
                                     <FileText className="h-4 w-4" /> Complementar
                                 </TabsTrigger>
-                                <TabsTrigger value="family" className="gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border-b-2 data-[state=active]:border-purple-600 rounded-none h-full px-4">
+                                <TabsTrigger value="family" className="gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none h-full px-4">
                                     <Users className="h-4 w-4" /> Família
                                 </TabsTrigger>
                             </TabsList>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto p-6 bg-slate-50/30">
+                        <div className="flex-1 overflow-y-auto p-6 bg-muted/50/30">
                             {/* --- TAB: CRM & FUNIL (NEW) --- */}
                             <TabsContent value="crm" className="mt-0 space-y-6">
                                 <div className="bg-white p-6 rounded-lg border border-purple-100 shadow-sm">
@@ -286,7 +286,7 @@ export function PatientModal({ open, onClose, patient }: PatientModalProps) {
                                             <div className="flex gap-4 mt-2">
                                                 <label className="flex items-center gap-2 cursor-pointer group">
                                                     <input type="radio" value="COLD" {...register('crmTemperature')} className="hidden peer" />
-                                                    <div className="px-4 py-2 rounded-full border border-blue-200 bg-blue-50 text-blue-700 peer-checked:bg-blue-500 peer-checked:text-white transition-all flex items-center gap-1">
+                                                    <div className="px-4 py-2 rounded-full border border-primary/30 bg-primary/10 text-primary peer-checked:bg-primary/100 peer-checked:text-white transition-all flex items-center gap-1">
                                                         ❄️ Frio
                                                     </div>
                                                 </label>
@@ -298,7 +298,7 @@ export function PatientModal({ open, onClose, patient }: PatientModalProps) {
                                                 </label>
                                                 <label className="flex items-center gap-2 cursor-pointer group">
                                                     <input type="radio" value="HOT" {...register('crmTemperature')} className="hidden peer" />
-                                                    <div className="px-4 py-2 rounded-full border border-red-200 bg-red-50 text-red-700 peer-checked:bg-red-500 peer-checked:text-white transition-all flex items-center gap-1">
+                                                    <div className="px-4 py-2 rounded-full border border-destructive/30 bg-destructive/10 text-red-700 peer-checked:bg-destructive/100 peer-checked:text-white transition-all flex items-center gap-1">
                                                         🔥 Quente
                                                     </div>
                                                 </label>
@@ -340,12 +340,12 @@ export function PatientModal({ open, onClose, patient }: PatientModalProps) {
                                             </select>
                                         </div>
                                         {referralSource === 'indication' && (
-                                            <div className="col-span-2 bg-teal-50 p-4 rounded-md border border-teal-100">
+                                            <div className="col-span-2 bg-primary/10 p-4 rounded-md border border-teal-100">
                                                 <Label className="text-teal-800">Quem indicou esse paciente?</Label>
                                                 {selectedReferrer ? (
                                                     <div className="flex items-center justify-between p-2 mt-2 bg-white border rounded-md shadow-sm">
                                                         <span className="font-medium text-teal-900">{selectedReferrer.name}</span>
-                                                        <Button type="button" variant="ghost" size="sm" onClick={() => setSelectedReferrer(null)} className="text-red-500 hover:text-red-700">Remover</Button>
+                                                        <Button type="button" variant="ghost" size="sm" onClick={() => setSelectedReferrer(null)} className="text-destructive hover:text-red-700">Remover</Button>
                                                     </div>
                                                 ) : (
                                                     <div className="relative mt-2">
@@ -356,7 +356,7 @@ export function PatientModal({ open, onClose, patient }: PatientModalProps) {
                                                             className="bg-white"
                                                         />
                                                         {referrerOptions.length > 0 && (
-                                                            <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-40 overflow-y-auto">
+                                                            <div className="absolute z-10 w-full mt-1 bg-white border rounded-md  max-h-40 overflow-y-auto">
                                                                 {referrerOptions.map((p: Patient) => (
                                                                     <button
                                                                         key={p.id}
@@ -365,7 +365,7 @@ export function PatientModal({ open, onClose, patient }: PatientModalProps) {
                                                                             setSelectedReferrer({ id: p.id!, name: p.name });
                                                                             setReferrerSearch('');
                                                                         }}
-                                                                        className="w-full text-left px-3 py-2 hover:bg-slate-100 text-sm"
+                                                                        className="w-full text-left px-3 py-2 hover:bg-muted text-sm"
                                                                     >
                                                                         {p.name}
                                                                     </button>
@@ -385,7 +385,7 @@ export function PatientModal({ open, onClose, patient }: PatientModalProps) {
                                     <div className="col-span-2">
                                         <Label htmlFor="name">Nome Completo *</Label>
                                         <Input id="name" {...register('name', { required: 'Nome é obrigatório' })} className="border-gray-300" />
-                                        {errors.name && <span className="text-red-500 text-xs">{errors.name.message}</span>}
+                                        {errors.name && <span className="text-destructive text-xs">{errors.name.message}</span>}
                                     </div>
                                     <div className="col-span-2">
                                         <Label htmlFor="socialName">Nome Social</Label>
@@ -564,7 +564,7 @@ export function PatientModal({ open, onClose, patient }: PatientModalProps) {
                         <Button type="button" variant="outline" onClick={onClose} className="border-gray-300">
                             Cancelar
                         </Button>
-                        <Button type="submit" disabled={isLoading} className="bg-purple-600 hover:bg-purple-700 text-white shadow-md">
+                        <Button type="submit" disabled={isLoading} className="bg-primary hover:bg-purple-700 text-white ">
                             {isLoading ? 'Salvando...' : isEditing ? 'Salvar Edição' : 'Concluir Cadastro'}
                         </Button>
                     </div>

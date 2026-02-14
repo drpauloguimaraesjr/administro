@@ -87,7 +87,7 @@ export function AnamnesisForm({ patientId }: AnamnesisFormProps) {
             {!anamnesis && !isEditing ? (
                 <div className="text-center py-8 text-muted-foreground">
                     <p>Nenhuma anamnese registrada</p>
-                    <Button onClick={() => setIsEditing(true)} className="mt-4 bg-teal-600 hover:bg-teal-700">
+                    <Button onClick={() => setIsEditing(true)} className="mt-4 bg-primary hover:bg-teal-700">
                         Registrar Anamnese
                     </Button>
                 </div>
@@ -104,7 +104,7 @@ export function AnamnesisForm({ patientId }: AnamnesisFormProps) {
                                     placeholder={field.placeholder}
                                 />
                             ) : (
-                                <p className="mt-1 p-3 bg-slate-50 rounded-lg min-h-[60px]">
+                                <p className="mt-1 p-3 bg-muted/50 rounded-lg min-h-[60px]">
                                     {(anamnesis as any)?.[field.name] || '-'}
                                 </p>
                             )}
@@ -124,7 +124,7 @@ export function AnamnesisForm({ patientId }: AnamnesisFormProps) {
                             <Button
                                 type="submit"
                                 disabled={saveMutation.isPending}
-                                className="bg-teal-600 hover:bg-teal-700"
+                                className="bg-primary hover:bg-teal-700"
                             >
                                 <Save className="w-4 h-4 mr-2" />
                                 {saveMutation.isPending ? 'Salvando...' : 'Salvar Anamnese'}

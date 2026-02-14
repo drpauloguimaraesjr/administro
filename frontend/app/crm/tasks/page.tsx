@@ -78,13 +78,13 @@ export default function TasksPage() {
     const overdueTasks = tasks.filter(t => t.status === 'pending' && new Date(t.dueDate) < new Date());
 
     return (
-        <div className="flex flex-col h-[calc(100vh-4rem)] bg-slate-50">
+        <div className="flex flex-col h-[calc(100vh-4rem)] bg-muted/50">
             {/* Header */}
             <div className="flex-none p-6 pb-0">
                 <div className="flex items-center justify-between mb-6">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-slate-900">Minhas Tarefas</h1>
-                        <p className="text-sm text-slate-500">
+                        <h1 className="text-2xl font-bold tracking-tight text-foreground">Minhas Tarefas</h1>
+                        <p className="text-sm text-muted-foreground">
                             Gerencie suas atividades diárias e follow-ups.
                         </p>
                     </div>
@@ -98,7 +98,7 @@ export default function TasksPage() {
                     <TabsList className="bg-white border mb-4">
                         <TabsTrigger value="all" className="px-6">Todas</TabsTrigger>
                         <TabsTrigger value="today">Hoje</TabsTrigger>
-                        <TabsTrigger value="overdue" className="text-red-600 data-[state=active]:text-red-700">
+                        <TabsTrigger value="overdue" className="text-destructive data-[state=active]:text-red-700">
                             Atrasadas ({overdueTasks.length})
                         </TabsTrigger>
                         <TabsTrigger value="completed">Concluídas</TabsTrigger>
@@ -111,7 +111,7 @@ export default function TasksPage() {
                                 {pendingTasks.map(task => (
                                     <TaskCard key={task.id} task={task} onToggle={toggleTask} />
                                 ))}
-                                {pendingTasks.length === 0 && <p className="text-slate-500 text-center py-10">Nenhuma tarefa pendente!</p>}
+                                {pendingTasks.length === 0 && <p className="text-muted-foreground text-center py-10">Nenhuma tarefa pendente!</p>}
                             </TabsContent>
 
                             <TabsContent value="overdue" className="mt-0 space-y-3">
@@ -134,7 +134,7 @@ export default function TasksPage() {
                                     <CardTitle className="text-base">Resumo</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
-                                    <div className="flex items-center justify-between p-3 bg-blue-50 text-blue-700 rounded-lg">
+                                    <div className="flex items-center justify-between p-3 bg-primary/10 text-primary rounded-lg">
                                         <div className="flex items-center gap-3">
                                             <ListTodo className="w-5 h-5" />
                                             <span className="font-medium">Pendentes</span>
@@ -142,7 +142,7 @@ export default function TasksPage() {
                                         <span className="text-xl font-bold">{pendingTasks.length}</span>
                                     </div>
 
-                                    <div className="flex items-center justify-between p-3 bg-red-50 text-red-700 rounded-lg">
+                                    <div className="flex items-center justify-between p-3 bg-destructive/10 text-red-700 rounded-lg">
                                         <div className="flex items-center gap-3">
                                             <Clock className="w-5 h-5" />
                                             <span className="font-medium">Atrasadas</span>
@@ -150,7 +150,7 @@ export default function TasksPage() {
                                         <span className="text-xl font-bold">{overdueTasks.length}</span>
                                     </div>
 
-                                    <div className="flex items-center justify-between p-3 bg-green-50 text-green-700 rounded-lg">
+                                    <div className="flex items-center justify-between p-3 bg-primary/10 text-primary rounded-lg">
                                         <div className="flex items-center gap-3">
                                             <CalendarCheck className="w-5 h-5" />
                                             <span className="font-medium">Concluídas</span>

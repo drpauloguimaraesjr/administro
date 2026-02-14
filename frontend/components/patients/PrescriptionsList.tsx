@@ -50,7 +50,7 @@ export function PrescriptionsList({ patientId, patientName }: PrescriptionsListP
         <div>
             <div className="flex justify-between items-center mb-6">
                 <h3 className="text-lg font-semibold">Prescrições</h3>
-                <Button onClick={() => setIsModalOpen(true)} className="bg-teal-600 hover:bg-teal-700">
+                <Button onClick={() => setIsModalOpen(true)} className="bg-primary hover:bg-teal-700">
                     <Plus className="w-4 h-4 mr-2" />
                     Nova Prescrição
                 </Button>
@@ -66,7 +66,7 @@ export function PrescriptionsList({ patientId, patientName }: PrescriptionsListP
                     {prescriptions.map((prescription: Prescription) => (
                         <div
                             key={prescription.id}
-                            className="bg-slate-50 rounded-lg p-4"
+                            className="bg-muted/50 rounded-lg p-4"
                         >
                             <div className="flex justify-between items-start mb-3">
                                 <div>
@@ -193,7 +193,7 @@ function PrescriptionModal({
                                             type="button"
                                             variant="ghost"
                                             size="sm"
-                                            className="absolute top-2 right-2 text-red-500"
+                                            className="absolute top-2 right-2 text-destructive"
                                             onClick={() => remove(index)}
                                         >
                                             <Trash2 className="w-4 h-4" />
@@ -259,7 +259,7 @@ function PrescriptionModal({
                         <Button
                             type="submit"
                             disabled={createMutation.isPending}
-                            className="bg-teal-600 hover:bg-teal-700"
+                            className="bg-primary hover:bg-teal-700"
                         >
                             <FileText className="w-4 h-4 mr-2" />
                             {createMutation.isPending ? 'Gerando...' : 'Gerar Prescrição'}

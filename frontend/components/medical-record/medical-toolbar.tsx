@@ -40,21 +40,21 @@ export function MedicalToolbar() {
 
     return (
         <div className="fixed bottom-0 left-0 right-0 h-20 bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-40 flex items-center justify-center px-4 overflow-x-auto gap-2 md:pl-[240px]">
-            <ToolbarItem icon={Flag} label="Finalizar Consulta" color="text-purple-600" />
+            <ToolbarItem icon={Flag} label="Finalizar Consulta" color="text-primary" />
             <ToolbarItem
                 icon={FileEdit}
                 label="Receituário"
-                color="text-blue-600"
+                color="text-primary"
                 onClick={() => params.id && router.push(`/patients/${params.id}/prescription`)}
             />
-            <ToolbarItem icon={FlaskConical} label="Exames" color="text-purple-600" />
-            <ToolbarItem icon={ImageIcon} label="Imagens" color="text-purple-600" />
-            <ToolbarItem icon={BarChart3} label="Percentis" color="text-purple-600" />
+            <ToolbarItem icon={FlaskConical} label="Exames" color="text-primary" />
+            <ToolbarItem icon={ImageIcon} label="Imagens" color="text-primary" />
+            <ToolbarItem icon={BarChart3} label="Percentis" color="text-primary" />
 
             <div className="w-px h-10 bg-gray-200 mx-2" />
 
-            <ToolbarItem icon={LayoutGrid} label="Todos Módulos" color="text-purple-600" />
-            <ToolbarItem icon={Video} label="Telemedicina" color="text-purple-600" />
+            <ToolbarItem icon={LayoutGrid} label="Todos Módulos" color="text-primary" />
+            <ToolbarItem icon={Video} label="Telemedicina" color="text-primary" />
             <ToolbarItem icon={Sparkles} label="Evolução Inteligente" color="text-indigo-600" />
             <ToolbarItem icon={Bot} label="R1 I.A." color="text-purple-500" />
         </div>

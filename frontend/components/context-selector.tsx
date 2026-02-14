@@ -17,14 +17,14 @@ export function ContextSelector({ selectedContext, onContextChange }: ContextSel
   ];
 
   return (
-    <div className="flex gap-2 p-1 bg-slate-100 rounded-lg">
+    <div className="flex gap-2 p-1 bg-muted rounded-lg">
       {contexts.map((context) => (
         <motion.button
           key={context.value}
           onClick={() => onContextChange(context.value)}
           className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-all ${selectedContext === context.value
-            ? 'bg-white text-blue-600 shadow-md'
-            : 'text-slate-600 hover:text-slate-900'
+            ? 'bg-white text-primary '
+            : 'text-muted-foreground hover:text-foreground'
             }`}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}

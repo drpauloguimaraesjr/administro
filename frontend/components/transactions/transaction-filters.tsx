@@ -66,7 +66,7 @@ export function TransactionFilters({ filters, onFiltersChange }: TransactionFilt
               placeholder="Buscar por descrição..."
               value={filters.search}
               onChange={(e) => updateFilter('search', e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-ring"
             />
           </div>
 

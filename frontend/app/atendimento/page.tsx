@@ -68,8 +68,8 @@ export default function AtendimentoPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'connected': return 'bg-green-500';
-      case 'disconnected': return 'bg-red-500';
+      case 'connected': return 'bg-primary/100';
+      case 'disconnected': return 'bg-destructive/100';
       case 'connecting': return 'bg-yellow-500';
       case 'qr_required': return 'bg-orange-500';
       default: return 'bg-gray-500';
@@ -78,18 +78,18 @@ export default function AtendimentoPage() {
 
   const getModeIcon = (mode: string) => {
     switch (mode) {
-      case 'autopilot': return <Zap className="w-4 h-4 text-green-600" />;
-      case 'copilot': return <Brain className="w-4 h-4 text-blue-600" />;
+      case 'autopilot': return <Zap className="w-4 h-4 text-primary" />;
+      case 'copilot': return <Brain className="w-4 h-4 text-primary" />;
       default: return <XCircle className="w-4 h-4 text-gray-400" />;
     }
   };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'bg-red-100 text-red-700 border-red-200';
+      case 'critical': return 'bg-destructive/15 text-red-700 border-destructive/30';
       case 'high': return 'bg-orange-100 text-orange-700 border-orange-200';
       case 'medium': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-      default: return 'bg-blue-100 text-blue-700 border-blue-200';
+      default: return 'bg-primary/15 text-primary border-primary/30';
     }
   };
 
@@ -100,7 +100,7 @@ export default function AtendimentoPage() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-3">
-              <Brain className="w-8 h-8 text-purple-600" />
+              <Brain className="w-8 h-8 text-primary" />
               Central de Atendimento IA
             </h1>
             <p className="text-muted-foreground">
@@ -150,7 +150,7 @@ export default function AtendimentoPage() {
               <Smartphone className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">
+              <div className="text-2xl font-bold text-primary">
                 {isLoading ? '...' : dashboard?.instances.connected || 0}
                 <span className="text-gray-400 text-lg">/{dashboard?.instances.total || 0}</span>
               </div>
@@ -172,17 +172,17 @@ export default function AtendimentoPage() {
                 {isLoading ? '...' : dashboard?.agents.total || 0}
               </div>
               <div className="flex gap-2 mt-1">
-                <Badge className="bg-green-100 text-green-700 text-xs">
+                <Badge className="bg-primary/15 text-primary text-xs">
                   {dashboard?.agents.autopilot || 0} autopilot
                 </Badge>
-                <Badge className="bg-blue-100 text-blue-700 text-xs">
+                <Badge className="bg-primary/15 text-primary text-xs">
                   {dashboard?.agents.copilot || 0} copilot
                 </Badge>
               </div>
             </CardContent>
           </Card>
 
-          <Card className={alerts.filter(a => a.severity === 'critical').length > 0 ? 'border-red-300 bg-red-50/50' : ''}>
+          <Card className={alerts.filter(a => a.severity === 'critical').length > 0 ? 'border-red-300 bg-destructive/10/50' : ''}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 Alertas Sentinela
@@ -358,7 +358,7 @@ export default function AtendimentoPage() {
                   <div>
                     <div className="flex justify-between text-sm mb-1">
                       <span>Taxa de precisão</span>
-                      <span className="font-medium text-green-600">
+                      <span className="font-medium text-primary">
                         {dashboard?.performance.aiAccuracyRate || 0}%
                       </span>
                     </div>
@@ -369,13 +369,13 @@ export default function AtendimentoPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-blue-600">
+                      <p className="text-2xl font-bold text-primary">
                         {dashboard?.overview.avgResponseTime || 0}s
                       </p>
                       <p className="text-xs text-gray-500">Tempo médio de resposta</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-green-600">
+                      <p className="text-2xl font-bold text-primary">
                         {dashboard?.sentinel.resolvedToday || 0}
                       </p>
                       <p className="text-xs text-gray-500">Alertas resolvidos hoje</p>
@@ -410,7 +410,7 @@ export default function AtendimentoPage() {
                 {alerts.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     <CheckCircle2 className="w-12 h-12 mx-auto mb-4 text-green-300" />
-                    <p className="text-green-600 font-medium">Tudo tranquilo!</p>
+                    <p className="text-primary font-medium">Tudo tranquilo!</p>
                     <p className="text-sm">Nenhum alerta no momento</p>
                   </div>
                 ) : (

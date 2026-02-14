@@ -76,18 +76,18 @@ export default function AlertasPage() {
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'bg-red-500/20 text-red-400 border-red-500/50';
+      case 'critical': return 'bg-destructive/100/20 text-red-400 border-destructive/50';
       case 'warning': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50';
-      case 'info': return 'bg-blue-500/20 text-blue-400 border-blue-500/50';
-      default: return 'bg-slate-500/20 text-slate-400 border-slate-500/50';
+      case 'info': return 'bg-primary/100/20 text-blue-400 border-primary/50';
+      default: return 'bg-muted/500/20 text-muted-foreground/70 border-slate-500/50';
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'active': return <Badge className="bg-red-500">Ativo</Badge>;
+      case 'active': return <Badge className="bg-destructive/100">Ativo</Badge>;
       case 'acknowledged': return <Badge className="bg-yellow-500">Visto</Badge>;
-      case 'resolved': return <Badge className="bg-green-500">Resolvido</Badge>;
+      case 'resolved': return <Badge className="bg-primary/100">Resolvido</Badge>;
       default: return null;
     }
   };
@@ -103,7 +103,7 @@ export default function AlertasPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+    <div className="min-h-screen bg-background text-white">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -114,10 +114,10 @@ export default function AlertasPage() {
               </Button>
             </Link>
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-red-400 to-orange-500 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold bg-primary bg-clip-text text-transparent">
                 Alertas de Estoque
               </h1>
-              <p className="text-slate-400 mt-1">Monitore problemas e tome ação</p>
+              <p className="text-muted-foreground/70 mt-1">Monitore problemas e tome ação</p>
             </div>
           </div>
         </div>
@@ -127,7 +127,7 @@ export default function AlertasPage() {
           <Button
             variant={filter === 'active' ? 'default' : 'outline'}
             onClick={() => setFilter('active')}
-            className={filter === 'active' ? 'bg-red-500 hover:bg-red-600' : 'border-slate-600'}
+            className={filter === 'active' ? 'bg-destructive/100 hover:bg-red-600' : 'border-slate-600'}
           >
             Ativos
           </Button>
@@ -153,11 +153,11 @@ export default function AlertasPage() {
             <RefreshCw className="w-8 h-8 animate-spin text-cyan-400" />
           </div>
         ) : alerts?.length === 0 ? (
-          <Card className="bg-slate-800/50 border-slate-700">
+          <Card className="bg-foreground/90/50 border-border">
             <CardContent className="flex flex-col items-center justify-center py-12">
-              <Bell className="w-12 h-12 text-slate-500 mb-4" />
-              <p className="text-slate-400 text-lg">Nenhum alerta encontrado</p>
-              <p className="text-slate-500 text-sm">Tudo certo com seu estoque!</p>
+              <Bell className="w-12 h-12 text-muted-foreground mb-4" />
+              <p className="text-muted-foreground/70 text-lg">Nenhum alerta encontrado</p>
+              <p className="text-muted-foreground text-sm">Tudo certo com seu estoque!</p>
             </CardContent>
           </Card>
         ) : (
@@ -168,7 +168,7 @@ export default function AlertasPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
               >
-                <Card className={`border ${getSeverityColor(alert.severity)} bg-slate-800/50`}>
+                <Card className={`border ${getSeverityColor(alert.severity)} bg-foreground/90/50`}>
                   <CardContent className="p-6">
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-4">
@@ -180,14 +180,14 @@ export default function AlertasPage() {
                             <h3 className="text-lg font-semibold text-white">{alert.message}</h3>
                             {getStatusBadge(alert.status)}
                           </div>
-                          <p className="text-slate-400 text-sm mt-1">
+                          <p className="text-muted-foreground/70 text-sm mt-1">
                             Produto: <span className="text-white">{alert.itemName}</span>
                           </p>
-                          <p className="text-slate-500 text-xs mt-2">
+                          <p className="text-muted-foreground text-xs mt-2">
                             Criado em: {formatDate(alert.createdAt)}
                           </p>
                           {alert.acknowledgedAt && (
-                            <p className="text-slate-500 text-xs">
+                            <p className="text-muted-foreground text-xs">
                               Visto em: {formatDate(alert.acknowledgedAt)}
                             </p>
                           )}
@@ -195,7 +195,7 @@ export default function AlertasPage() {
                           {alert.details && Object.keys(alert.details).length > 0 && (
                             <div className="mt-3 p-3 rounded-lg bg-slate-700/50 text-sm">
                               {Object.entries(alert.details).map(([key, value]) => (
-                                <div key={key} className="flex justify-between text-slate-300">
+                                <div key={key} className="flex justify-between text-muted-foreground/50">
                                   <span className="capitalize">{key.replace(/([A-Z])/g, ' $1')}:</span>
                                   <span className="text-white">{String(value)}</span>
                                 </div>

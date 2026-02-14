@@ -52,15 +52,15 @@ import { toast } from 'sonner';
 const ALERT_TYPE_LABELS: Record<SentinelAlertType, { label: string; icon: string; color: string }> = {
   insecurity: { label: 'Insegurança', icon: '😟', color: 'bg-yellow-100 text-yellow-700' },
   distrust: { label: 'Desconfiança', icon: '🤨', color: 'bg-orange-100 text-orange-700' },
-  complaint: { label: 'Reclamação', icon: '😤', color: 'bg-red-100 text-red-700' },
+  complaint: { label: 'Reclamação', icon: '😤', color: 'bg-destructive/15 text-red-700' },
   price_concern: { label: 'Preocupação com Preço', icon: '💰', color: 'bg-amber-100 text-amber-700' },
-  competitor_mention: { label: 'Mencionou Concorrente', icon: '🏢', color: 'bg-purple-100 text-purple-700' },
-  aggression: { label: 'Tom Agressivo', icon: '😠', color: 'bg-red-100 text-red-700' },
+  competitor_mention: { label: 'Mencionou Concorrente', icon: '🏢', color: 'bg-primary/15 text-primary' },
+  aggression: { label: 'Tom Agressivo', icon: '😠', color: 'bg-destructive/15 text-red-700' },
   frustration: { label: 'Frustração', icon: '😩', color: 'bg-orange-100 text-orange-700' },
-  unresolved_question: { label: 'Dúvida Não Respondida', icon: '❓', color: 'bg-blue-100 text-blue-700' },
+  unresolved_question: { label: 'Dúvida Não Respondida', icon: '❓', color: 'bg-primary/15 text-primary' },
   delayed_response: { label: 'Demora na Resposta', icon: '⏰', color: 'bg-gray-100 text-gray-700' },
-  cancellation_intent: { label: 'Intenção de Cancelar', icon: '🚫', color: 'bg-red-100 text-red-700' },
-  urgent_medical: { label: 'Urgência Médica', icon: '🏥', color: 'bg-red-100 text-red-700' },
+  cancellation_intent: { label: 'Intenção de Cancelar', icon: '🚫', color: 'bg-destructive/15 text-red-700' },
+  urgent_medical: { label: 'Urgência Médica', icon: '🏥', color: 'bg-destructive/15 text-red-700' },
   custom: { label: 'Personalizado', icon: '⚙️', color: 'bg-gray-100 text-gray-700' },
 };
 
@@ -144,7 +144,7 @@ export default function SentinelaPage() {
       case 'medium':
         return <Badge className="bg-yellow-500 text-white">🟡 Médio</Badge>;
       default:
-        return <Badge className="bg-blue-500 text-white">🔵 Baixo</Badge>;
+        return <Badge className="bg-primary/100 text-white">🔵 Baixo</Badge>;
     }
   };
 
@@ -269,10 +269,10 @@ export default function SentinelaPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <Card className={alertStats.critical > 0 ? 'border-red-300 bg-red-50' : ''}>
+          <Card className={alertStats.critical > 0 ? 'border-red-300 bg-destructive/10' : ''}>
             <CardContent className="pt-4 pb-3">
               <div className="text-center">
-                <p className="text-3xl font-bold text-red-600">{alertStats.critical}</p>
+                <p className="text-3xl font-bold text-destructive">{alertStats.critical}</p>
                 <p className="text-xs text-gray-500">Críticos</p>
               </div>
             </CardContent>
@@ -296,7 +296,7 @@ export default function SentinelaPage() {
           <Card>
             <CardContent className="pt-4 pb-3">
               <div className="text-center">
-                <p className="text-3xl font-bold text-blue-600">{alertStats.low}</p>
+                <p className="text-3xl font-bold text-primary">{alertStats.low}</p>
                 <p className="text-xs text-gray-500">Baixos</p>
               </div>
             </CardContent>
@@ -371,7 +371,7 @@ export default function SentinelaPage() {
             <CardContent className="py-12">
               <div className="text-center text-gray-500">
                 <CheckCircle2 className="w-16 h-16 mx-auto mb-4 text-green-300" />
-                <p className="text-lg font-medium text-green-600">Tudo tranquilo!</p>
+                <p className="text-lg font-medium text-primary">Tudo tranquilo!</p>
                 <p className="text-sm">
                   {statusFilter === 'new' 
                     ? 'Nenhum alerta novo no momento' 
@@ -388,7 +388,7 @@ export default function SentinelaPage() {
                 <Card 
                   key={alert.id} 
                   className={`
-                    ${alert.severity === 'critical' ? 'border-red-300 bg-red-50/50' : ''}
+                    ${alert.severity === 'critical' ? 'border-red-300 bg-destructive/10/50' : ''}
                     ${alert.severity === 'high' ? 'border-orange-300 bg-orange-50/50' : ''}
                     ${alert.status === 'new' ? 'border-l-4 border-l-orange-500' : ''}
                   `}
@@ -423,8 +423,8 @@ export default function SentinelaPage() {
 
                         {/* Suggested Action */}
                         {alert.suggestedAction && (
-                          <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
-                            <p className="text-xs text-blue-600 mb-1">💡 Ação sugerida:</p>
+                          <div className="bg-primary/10 p-3 rounded-lg border border-primary/30">
+                            <p className="text-xs text-primary mb-1">💡 Ação sugerida:</p>
                             <p className="text-sm text-blue-800">{alert.suggestedAction}</p>
                           </div>
                         )}
@@ -460,7 +460,7 @@ export default function SentinelaPage() {
                         )}
                         {alert.status === 'resolved' && (
                           <Badge variant="outline" className="justify-center py-2">
-                            <CheckCircle2 className="w-4 h-4 mr-1 text-green-600" />
+                            <CheckCircle2 className="w-4 h-4 mr-1 text-primary" />
                             Resolvido
                           </Badge>
                         )}
@@ -474,7 +474,7 @@ export default function SentinelaPage() {
         )}
 
         {/* How it works */}
-        <Card className="bg-gradient-to-r from-orange-50 to-yellow-50 border-orange-200">
+        <Card className="bg-primary border-orange-200">
           <CardContent className="py-6">
             <div className="flex items-start gap-4">
               <div className="p-3 bg-white rounded-lg shadow-sm">

@@ -140,7 +140,7 @@ export function NewQueueDialog({ open, onOpenChange, queueToEdit }: NewQueueDial
                             <div className="grid gap-2">
                                 <Label htmlFor="name">Nome da Fila *</Label>
                                 <Input id="name" {...register('name')} placeholder="Ex: Financeiro" />
-                                {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
+                                {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
                             </div>
 
                             <div className="grid gap-2">
@@ -188,7 +188,7 @@ export function NewQueueDialog({ open, onOpenChange, queueToEdit }: NewQueueDial
                             <div className="flex items-center justify-between border p-4 rounded-lg">
                                 <div className="space-y-0.5">
                                     <Label className="text-base">Resposta Automática</Label>
-                                    <p className="text-sm text-slate-500">Enviar mensagem ao entrar na fila</p>
+                                    <p className="text-sm text-muted-foreground">Enviar mensagem ao entrar na fila</p>
                                 </div>
                                 <Controller
                                     name="autoReplyEnabled"
@@ -215,7 +215,7 @@ export function NewQueueDialog({ open, onOpenChange, queueToEdit }: NewQueueDial
                             <div className="flex items-center justify-between border p-4 rounded-lg">
                                 <div className="space-y-0.5">
                                     <Label className="text-base">Habilitar IA (GPT-4)</Label>
-                                    <p className="text-sm text-slate-500">Permitir que a IA analise e sugira respostas</p>
+                                    <p className="text-sm text-muted-foreground">Permitir que a IA analise e sugira respostas</p>
                                 </div>
                                 <Controller
                                     name="aiEnabled"
@@ -234,7 +234,7 @@ export function NewQueueDialog({ open, onOpenChange, queueToEdit }: NewQueueDial
                                         placeholder="Você é um assistente útil..."
                                         className="h-40 font-mono text-sm"
                                     />
-                                    <p className="text-xs text-slate-500">Defina a personalidade e regras da IA para esta fila.</p>
+                                    <p className="text-xs text-muted-foreground">Defina a personalidade e regras da IA para esta fila.</p>
                                 </div>
                             )}
                         </TabsContent>

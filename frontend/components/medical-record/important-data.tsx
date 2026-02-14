@@ -57,7 +57,7 @@ export function ImportantData() {
                     </div>
 
                     <div className="flex justify-end pt-2">
-                        <Button size="sm" className="bg-purple-600 hover:bg-purple-700 h-8 text-xs">
+                        <Button size="sm" className="bg-primary hover:bg-purple-700 h-8 text-xs">
                             <Save className="w-3 h-3 mr-2" />
                             Salvar Dados
                         </Button>

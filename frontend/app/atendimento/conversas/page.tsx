@@ -68,11 +68,11 @@ export default function ConversasPage() {
   const getStatusBadge = (status: Conversation['status']) => {
     switch (status) {
       case 'active':
-        return <Badge className="bg-green-100 text-green-700">Ativa</Badge>;
+        return <Badge className="bg-primary/15 text-primary">Ativa</Badge>;
       case 'waiting_response':
         return <Badge className="bg-yellow-100 text-yellow-700">Aguardando</Badge>;
       case 'escalated':
-        return <Badge className="bg-red-100 text-red-700">Escalada</Badge>;
+        return <Badge className="bg-destructive/15 text-red-700">Escalada</Badge>;
       case 'resolved':
         return <Badge variant="outline">Resolvida</Badge>;
       default:
@@ -108,7 +108,7 @@ export default function ConversasPage() {
             </Link>
             <div>
               <h1 className="text-3xl font-bold flex items-center gap-3">
-                <MessageSquare className="w-8 h-8 text-blue-600" />
+                <MessageSquare className="w-8 h-8 text-primary" />
                 Conversas
               </h1>
               <p className="text-muted-foreground">
@@ -181,7 +181,7 @@ export default function ConversasPage() {
               filteredConversations.map((conv) => (
                 <Card
                   key={conv.id}
-                  className={`cursor-pointer transition-all hover:shadow-md ${
+                  className={`cursor-pointer transition-all hover: ${
                     selectedConversation?.id === conv.id ? 'ring-2 ring-blue-500' : ''
                   } ${conv.sentinelFlags.length > 0 ? 'border-l-4 border-l-orange-500' : ''}`}
                   onClick={() => setSelectedConversation(conv)}
@@ -206,7 +206,7 @@ export default function ConversasPage() {
                           {formatTime(conv.lastMessageAt)}
                         </p>
                         {conv.unreadCount > 0 && (
-                          <Badge className="bg-blue-600 text-white mt-1">
+                          <Badge className="bg-primary text-white mt-1">
                             {conv.unreadCount}
                           </Badge>
                         )}
@@ -281,7 +281,7 @@ export default function ConversasPage() {
                       <div
                         className={`max-w-[70%] rounded-lg p-3 ${
                           msg.direction === 'outbound'
-                            ? 'bg-blue-600 text-white'
+                            ? 'bg-primary text-white'
                             : 'bg-gray-100 text-gray-800'
                         }`}
                       >

@@ -340,7 +340,7 @@ export default function BancosPage() {
                               Editar
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              className="text-red-600"
+                              className="text-destructive"
                               onClick={() => handleDelete(conta.id)}
                             >
                               <Trash2 className="w-4 h-4 mr-2" />

@@ -134,12 +134,12 @@ export function NewUserDialog({ open, onOpenChange, userToEdit }: NewUserDialogP
                             <div className="grid gap-2">
                                 <Label htmlFor="name">Nome Completo *</Label>
                                 <Input id="name" {...register('name')} placeholder="Ex: Dr. João Silva" />
-                                {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
+                                {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
                             </div>
                             <div className="grid gap-2">
                                 <Label htmlFor="email">Email *</Label>
                                 <Input id="email" type="email" {...register('email')} placeholder="joao@clinica.com" />
-                                {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
+                                {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
                             </div>
                             <div className="grid gap-2">
                                 <Label htmlFor="phone">Telefone / WhatsApp</Label>
@@ -212,7 +212,7 @@ export function NewUserDialog({ open, onOpenChange, userToEdit }: NewUserDialogP
                             </div>
 
                             {hasAgenda && (
-                                <div className="pl-6 border-l-2 border-slate-200 space-y-4">
+                                <div className="pl-6 border-l-2 border-border space-y-4">
                                     <p className="text-sm text-muted-foreground">Configurações de horário e dias virão aqui (implementar componente de dias).</p>
                                     {/* TODO: Implementar seletor de dias da semana e horários */}
                                 </div>
@@ -237,7 +237,7 @@ export function NewUserDialog({ open, onOpenChange, userToEdit }: NewUserDialogP
                             </div>
 
                             {canAnswerWhatsApp && (
-                                <div className="pl-6 border-l-2 border-slate-200 space-y-4">
+                                <div className="pl-6 border-l-2 border-border space-y-4">
                                     <Label>Filas de Atendimento</Label>
                                     <p className="text-sm text-muted-foreground">As filas serão carregadas aqui.</p>
                                 </div>

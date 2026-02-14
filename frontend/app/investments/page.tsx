@@ -97,11 +97,11 @@ export default function InvestmentsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Lucro/Prejuízo</p>
-                  <p className={`text-2xl font-bold ${profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  <p className={`text-2xl font-bold ${profit >= 0 ? 'text-primary' : 'text-destructive'}`}>
                     {profit >= 0 ? '+' : ''}R$ {profit.toFixed(2)}
                   </p>
                 </div>
-                <TrendingUp className={`w-8 h-8 ${profit >= 0 ? 'text-green-600' : 'text-red-600'}`} />
+                <TrendingUp className={`w-8 h-8 ${profit >= 0 ? 'text-primary' : 'text-destructive'}`} />
               </div>
             </CardContent>
           </Card>
@@ -110,7 +110,7 @@ export default function InvestmentsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Rentabilidade</p>
-                  <p className={`text-2xl font-bold ${profitPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  <p className={`text-2xl font-bold ${profitPercentage >= 0 ? 'text-primary' : 'text-destructive'}`}>
                     {profitPercentage >= 0 ? '+' : ''}{profitPercentage.toFixed(2)}%
                   </p>
                 </div>

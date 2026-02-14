@@ -125,9 +125,9 @@ export default function AgentesPage() {
   const getModeIcon = (mode: AgentMode) => {
     switch (mode) {
       case 'autopilot':
-        return <Zap className="w-5 h-5 text-green-600" />;
+        return <Zap className="w-5 h-5 text-primary" />;
       case 'copilot':
-        return <Brain className="w-5 h-5 text-blue-600" />;
+        return <Brain className="w-5 h-5 text-primary" />;
       default:
         return <XCircle className="w-5 h-5 text-gray-400" />;
     }
@@ -136,9 +136,9 @@ export default function AgentesPage() {
   const getModeBadge = (mode: AgentMode) => {
     switch (mode) {
       case 'autopilot':
-        return <Badge className="bg-green-100 text-green-700"><Zap className="w-3 h-3 mr-1" />Autopilot</Badge>;
+        return <Badge className="bg-primary/15 text-primary"><Zap className="w-3 h-3 mr-1" />Autopilot</Badge>;
       case 'copilot':
-        return <Badge className="bg-blue-100 text-blue-700"><Brain className="w-3 h-3 mr-1" />Copilot</Badge>;
+        return <Badge className="bg-primary/15 text-primary"><Brain className="w-3 h-3 mr-1" />Copilot</Badge>;
       default:
         return <Badge variant="outline"><XCircle className="w-3 h-3 mr-1" />Desativado</Badge>;
     }
@@ -157,7 +157,7 @@ export default function AgentesPage() {
             </Link>
             <div>
               <h1 className="text-3xl font-bold flex items-center gap-3">
-                <Bot className="w-8 h-8 text-purple-600" />
+                <Bot className="w-8 h-8 text-primary" />
                 Agentes de IA
               </h1>
               <p className="text-muted-foreground">
@@ -199,21 +199,21 @@ export default function AgentesPage() {
                     <div className="grid grid-cols-3 gap-3">
                       <div
                         className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                          newAgent.mode === 'autopilot' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'
+                          newAgent.mode === 'autopilot' ? 'border-primary bg-primary/10' : 'border-gray-200 hover:border-gray-300'
                         }`}
                         onClick={() => setNewAgent({ ...newAgent, mode: 'autopilot' })}
                       >
-                        <Zap className="w-6 h-6 text-green-600 mb-2" />
+                        <Zap className="w-6 h-6 text-primary mb-2" />
                         <p className="font-medium">Autopilot</p>
                         <p className="text-xs text-gray-500">Responde automaticamente</p>
                       </div>
                       <div
                         className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                          newAgent.mode === 'copilot' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
+                          newAgent.mode === 'copilot' ? 'border-primary bg-primary/10' : 'border-gray-200 hover:border-gray-300'
                         }`}
                         onClick={() => setNewAgent({ ...newAgent, mode: 'copilot' })}
                       >
-                        <Brain className="w-6 h-6 text-blue-600 mb-2" />
+                        <Brain className="w-6 h-6 text-primary mb-2" />
                         <p className="font-medium">Copilot</p>
                         <p className="text-xs text-gray-500">Sugere respostas</p>
                       </div>
@@ -361,7 +361,7 @@ export default function AgentesPage() {
 
         {/* Mode Explanation */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-primary/30">
             <CardContent className="pt-6">
               <div className="flex items-center gap-3 mb-3">
                 <div className="p-2 bg-green-600 rounded-lg">
@@ -369,35 +369,35 @@ export default function AgentesPage() {
                 </div>
                 <h3 className="font-semibold text-green-800">Modo Autopilot</h3>
               </div>
-              <p className="text-sm text-green-700">
+              <p className="text-sm text-primary">
                 O agente responde automaticamente às mensagens. Ideal para fora do expediente 
                 ou perguntas frequentes.
               </p>
             </CardContent>
           </Card>
-          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-primary/30">
             <CardContent className="pt-6">
               <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 bg-blue-600 rounded-lg">
+                <div className="p-2 bg-primary rounded-lg">
                   <Brain className="w-5 h-5 text-white" />
                 </div>
                 <h3 className="font-semibold text-blue-800">Modo Copilot</h3>
               </div>
-              <p className="text-sm text-blue-700">
+              <p className="text-sm text-primary">
                 O agente sugere respostas que o funcionário pode aprovar, editar ou rejeitar. 
                 Aprende com cada interação.
               </p>
             </CardContent>
           </Card>
-          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-primary/30">
             <CardContent className="pt-6">
               <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 bg-purple-600 rounded-lg">
+                <div className="p-2 bg-primary rounded-lg">
                   <Sparkles className="w-5 h-5 text-white" />
                 </div>
                 <h3 className="font-semibold text-purple-800">Aprendizado</h3>
               </div>
-              <p className="text-sm text-purple-700">
+              <p className="text-sm text-primary">
                 Quando ativado, o agente aprende o estilo de cada funcionário através 
                 das edições e correções feitas.
               </p>
@@ -427,7 +427,7 @@ export default function AgentesPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {agents.map((agent) => (
-              <Card key={agent.id} className="hover:shadow-lg transition-shadow">
+              <Card key={agent.id} className="hover: transition-shadow">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
@@ -459,15 +459,15 @@ export default function AgentesPage() {
                     </div>
                   </div>
                   {agent.mode === 'copilot' && (
-                    <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+                    <div className="mb-4 p-3 bg-primary/10 rounded-lg">
                       <div className="flex justify-between text-sm mb-1">
-                        <span className="text-blue-700">Taxa de aceitação</span>
+                        <span className="text-primary">Taxa de aceitação</span>
                         <span className="font-medium text-blue-800">
                           {Math.round((agent.stats.suggestionsAccepted / 
                             Math.max(1, agent.stats.suggestionsAccepted + agent.stats.suggestionsEdited + agent.stats.suggestionsRejected)) * 100)}%
                         </span>
                       </div>
-                      <div className="text-xs text-blue-600">
+                      <div className="text-xs text-primary">
                         {agent.stats.suggestionsAccepted} aceitas • {agent.stats.suggestionsEdited} editadas • {agent.stats.suggestionsRejected} rejeitadas
                       </div>
                     </div>
@@ -494,7 +494,7 @@ export default function AgentesPage() {
                     <Button
                       variant="outline"
                       size="icon"
-                      className="text-red-600 hover:text-red-700"
+                      className="text-destructive hover:text-red-700"
                       onClick={() => {
                         if (confirm('Tem certeza que deseja remover este agente?')) {
                           deleteMutation.mutate(agent.id);

@@ -44,7 +44,7 @@ const MOCK_DATA = {
 
 export default function CRMAnalyticsPage() {
     return (
-        <div className="flex flex-col h-[calc(100vh-4rem)] bg-slate-50 overflow-y-auto">
+        <div className="flex flex-col h-[calc(100vh-4rem)] bg-muted/50 overflow-y-auto">
             <div className="container mx-auto p-6 space-y-8">
                 {/* Header */}
                 <div className="flex items-center gap-4">
@@ -55,7 +55,7 @@ export default function CRMAnalyticsPage() {
                     </Link>
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>
-                        <p className="text-slate-500">Visão geral da performance do seu pipeline.</p>
+                        <p className="text-muted-foreground">Visão geral da performance do seu pipeline.</p>
                     </div>
                 </div>
 
@@ -77,9 +77,9 @@ export default function CRMAnalyticsPage() {
                                         {stat.trend === 'up' ? (
                                             <ArrowUpRight className="text-green-500 w-4 h-4 mr-1" />
                                         ) : (
-                                            <ArrowDownRight className="text-red-500 w-4 h-4 mr-1" />
+                                            <ArrowDownRight className="text-destructive w-4 h-4 mr-1" />
                                         )}
-                                        <span className={stat.trend === 'up' ? 'text-green-500' : 'text-red-500'}>
+                                        <span className={stat.trend === 'up' ? 'text-green-500' : 'text-destructive'}>
                                             {stat.change}
                                         </span>
                                         <span className="ml-1">vs mês passado</span>

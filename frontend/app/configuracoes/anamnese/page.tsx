@@ -208,14 +208,14 @@ export default function AnamnesePage() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
-              <ClipboardList className="w-8 h-8 text-purple-600" />
+              <ClipboardList className="w-8 h-8 text-primary" />
               Formulários de Anamnese
             </h1>
             <p className="text-muted-foreground">
               Templates de perguntas para consultas médicas
             </p>
           </div>
-          <Button onClick={() => handleOpenForm()} className="bg-purple-600 hover:bg-purple-700">
+          <Button onClick={() => handleOpenForm()} className="bg-primary hover:bg-purple-700">
             <Plus className="w-4 h-4 mr-2" />
             Novo Formulário
           </Button>
@@ -274,7 +274,7 @@ export default function AnamnesePage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredFormularios.map((form) => (
-              <Card key={form.id} className="hover:shadow-md transition-shadow">
+              <Card key={form.id} className="hover: transition-shadow">
                 <CardContent className="pt-6">
                   <div className="flex justify-between items-start mb-3">
                     <div>
@@ -299,7 +299,7 @@ export default function AnamnesePage() {
                           Duplicar
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          className="text-red-600"
+                          className="text-destructive"
                           onClick={() => handleDelete(form.id)}
                         >
                           <Trash2 className="w-4 h-4 mr-2" />
@@ -400,7 +400,7 @@ export default function AnamnesePage() {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleRemovePergunta(pergunta.id)}
-                        className="text-red-500 hover:text-red-700"
+                        className="text-destructive hover:text-red-700"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -481,7 +481,7 @@ export default function AnamnesePage() {
             <Button variant="outline" onClick={handleCloseForm}>
               Cancelar
             </Button>
-            <Button onClick={handleSubmit} className="bg-purple-600 hover:bg-purple-700">
+            <Button onClick={handleSubmit} className="bg-primary hover:bg-purple-700">
               Salvar
             </Button>
           </DialogFooter>

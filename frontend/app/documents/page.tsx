@@ -34,7 +34,7 @@ function SignatureQueueBadge({ count, onClick }: { count: number; onClick: () =>
             onClick={onClick}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="relative flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all"
+            className="relative flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-full  hover: transition-all"
         >
             <PenTool className="h-4 w-4" />
             <span className="font-medium">Assinar</span>
@@ -42,7 +42,7 @@ function SignatureQueueBadge({ count, onClick }: { count: number; onClick: () =>
                 <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center shadow-md"
+                    className="absolute -top-2 -right-2 bg-destructive/100 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center "
                 >
                     {count}
                 </motion.span>
@@ -65,10 +65,10 @@ const typeLabels: Record<DocumentType, string> = {
 };
 
 const statusLabels: Record<string, { label: string; color: string }> = {
-    draft: { label: 'Rascunho', color: 'bg-slate-100 text-slate-600' },
+    draft: { label: 'Rascunho', color: 'bg-muted text-muted-foreground' },
     pending_signature: { label: 'Aguardando Assinatura', color: 'bg-amber-100 text-amber-700' },
-    signed: { label: 'Assinado', color: 'bg-green-100 text-green-700' },
-    sent: { label: 'Enviado', color: 'bg-blue-100 text-blue-700' },
+    signed: { label: 'Assinado', color: 'bg-primary/15 text-primary' },
+    sent: { label: 'Enviado', color: 'bg-primary/15 text-primary' },
 };
 
 // Default doctor/clinic data (should come from settings later)
@@ -315,10 +315,10 @@ export default function DocumentsPage() {
                 <div className="flex justify-between items-start mb-4">
                     <div>
                         <h1 className="text-3xl font-bold flex items-center gap-2 mb-2">
-                            <FileText className="h-8 w-8 text-purple-600" />
+                            <FileText className="h-8 w-8 text-primary" />
                             Documentos Médicos
                         </h1>
-                        <p className="text-slate-500">Receitas, Atestados e Prontuários com Typst + ICP-Brasil</p>
+                        <p className="text-muted-foreground">Receitas, Atestados e Prontuários com Typst + ICP-Brasil</p>
                     </div>
                     <SignatureQueueBadge
                         count={signatureQueue.length}
@@ -327,12 +327,12 @@ export default function DocumentsPage() {
                 </div>
 
                 {/* Tabs */}
-                <div className="flex gap-2 border-b border-slate-200">
+                <div className="flex gap-2 border-b border-border">
                     <button
                         onClick={() => setActiveTab('new')}
                         className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'new'
-                            ? 'border-purple-600 text-purple-600'
-                            : 'border-transparent text-slate-500 hover:text-slate-700'
+                            ? 'border-primary text-primary'
+                            : 'border-transparent text-muted-foreground hover:text-foreground/80'
                             }`}
                     >
                         <Plus className="inline-block h-4 w-4 mr-2" />Novo Documento
@@ -340,8 +340,8 @@ export default function DocumentsPage() {
                     <button
                         onClick={() => setActiveTab('history')}
                         className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'history'
-                            ? 'border-purple-600 text-purple-600'
-                            : 'border-transparent text-slate-500 hover:text-slate-700'
+                            ? 'border-primary text-primary'
+                            : 'border-transparent text-muted-foreground hover:text-foreground/80'
                             }`}
                     >
                         <Clock className="inline-block h-4 w-4 mr-2" />Histórico
@@ -353,7 +353,7 @@ export default function DocumentsPage() {
             {activeTab === 'new' && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Form */}
-                    <Card className="border-slate-200">
+                    <Card className="border-border">
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <Plus className="h-5 w-5" />
@@ -371,8 +371,8 @@ export default function DocumentsPage() {
                                             key={type}
                                             onClick={() => setDocumentType(type)}
                                             className={`p-3 rounded-lg border-2 transition-all flex flex-col items-center gap-2 ${documentType === type
-                                                ? 'border-purple-500 bg-purple-50 text-purple-700'
-                                                : 'border-slate-200 hover:border-slate-300'
+                                                ? 'border-primary bg-primary/10 text-primary'
+                                                : 'border-border hover:border-border'
                                                 }`}
                                         >
                                             <Icon className="h-6 w-6" />
@@ -430,7 +430,7 @@ export default function DocumentsPage() {
                                                     variant="ghost"
                                                     size="icon"
                                                     onClick={() => handleRemoveMedicamento(index)}
-                                                    className="text-red-500 hover:text-red-700"
+                                                    className="text-destructive hover:text-red-700"
                                                 >
                                                     <Trash2 className="h-4 w-4" />
                                                 </Button>
@@ -524,7 +524,7 @@ export default function DocumentsPage() {
                                 <Button
                                     onClick={() => handleCreateDocument(true)}
                                     disabled={isCreating}
-                                    className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600"
+                                    className="flex-1 bg-primary
                                 >
                                     {isCreating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <PenTool className="h-4 w-4 mr-2" />}
                                     Criar & Adicionar à Fila
@@ -541,7 +541,7 @@ export default function DocumentsPage() {
                     </Card>
 
                     {/* Preview */}
-                    <Card className="border-slate-200">
+                    <Card className="border-border">
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <Eye className="h-5 w-5" />
@@ -566,8 +566,8 @@ export default function DocumentsPage() {
                                     </div>
                                 </div>
                             ) : (
-                                <div className="h-[500px] flex items-center justify-center bg-slate-50 rounded-lg border-2 border-dashed border-slate-200">
-                                    <div className="text-center text-slate-400">
+                                <div className="h-[500px] flex items-center justify-center bg-muted/50 rounded-lg border-2 border-dashed border-border">
+                                    <div className="text-center text-muted-foreground/70">
                                         <FileText className="h-12 w-12 mx-auto mb-2" />
                                         <p>O preview aparecerá aqui após criar o documento</p>
                                     </div>
@@ -585,7 +585,7 @@ export default function DocumentsPage() {
                     <div className="flex gap-4 flex-wrap">
                         <div className="flex-1 min-w-[200px]">
                             <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/70" />
                                 <Input
                                     placeholder="Buscar por paciente ou descrição..."
                                     value={searchTerm}
@@ -611,13 +611,13 @@ export default function DocumentsPage() {
                     {/* Documents Grid */}
                     {isLoading ? (
                         <div className="flex items-center justify-center py-12">
-                            <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
                         </div>
                     ) : filteredDocuments.length === 0 ? (
                         <div className="text-center py-12">
-                            <FileText className="h-12 w-12 mx-auto text-slate-300 mb-4" />
-                            <h3 className="text-lg font-medium text-slate-600">Nenhum documento encontrado</h3>
-                            <p className="text-slate-400 mt-1">Crie seu primeiro documento na aba &quot;Novo Documento&quot;</p>
+                            <FileText className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+                            <h3 className="text-lg font-medium text-muted-foreground">Nenhum documento encontrado</h3>
+                            <p className="text-muted-foreground/70 mt-1">Crie seu primeiro documento na aba &quot;Novo Documento&quot;</p>
                         </div>
                     ) : (
                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -626,11 +626,11 @@ export default function DocumentsPage() {
                                 const status = statusLabels[doc.status] || statusLabels.draft;
 
                                 return (
-                                    <Card key={doc.id} className="border-l-4 border-l-purple-500 hover:shadow-md transition-shadow">
+                                    <Card key={doc.id} className="border-l-4 border-l-purple-500 hover: transition-shadow">
                                         <CardHeader className="pb-2">
                                             <div className="flex justify-between items-start">
                                                 <div className="flex items-center gap-2">
-                                                    <Icon className="h-5 w-5 text-purple-600" />
+                                                    <Icon className="h-5 w-5 text-primary" />
                                                     <CardTitle className="text-base">{doc.patientName}</CardTitle>
                                                 </div>
                                                 <Badge className={status.color}>{status.label}</Badge>
@@ -666,7 +666,7 @@ export default function DocumentsPage() {
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    className="h-8 px-2 text-red-500 hover:text-red-700"
+                                                    className="h-8 px-2 text-destructive hover:text-red-700"
                                                     onClick={() => handleDeleteDocument(doc.id)}
                                                 >
                                                     <Trash2 className="h-3 w-3" />
@@ -711,19 +711,19 @@ export default function DocumentsPage() {
                                             }
                                         }}
                                         className={`p-3 rounded-lg border cursor-pointer transition-all ${isSelected
-                                            ? 'border-purple-500 bg-purple-50'
-                                            : 'border-slate-200 hover:border-slate-300'
+                                            ? 'border-primary bg-primary/10'
+                                            : 'border-border hover:border-border'
                                             }`}
                                     >
                                         <div className="flex items-center gap-3">
-                                            <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${isSelected ? 'border-purple-500 bg-purple-500' : 'border-slate-300'
+                                            <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${isSelected ? 'border-primary bg-primary/100' : 'border-border'
                                                 }`}>
                                                 {isSelected && <Check className="h-3 w-3 text-white" />}
                                             </div>
-                                            <Icon className="h-4 w-4 text-purple-600" />
+                                            <Icon className="h-4 w-4 text-primary" />
                                             <div className="flex-1">
                                                 <p className="font-medium text-sm">{doc.patientName}</p>
-                                                <p className="text-xs text-slate-500">{doc.description}</p>
+                                                <p className="text-xs text-muted-foreground">{doc.description}</p>
                                             </div>
                                             <Badge variant="outline">{typeLabels[doc.type as DocumentType]}</Badge>
                                         </div>
@@ -767,7 +767,7 @@ export default function DocumentsPage() {
                         <Button
                             onClick={handleSignBatch}
                             disabled={isSigning || selectedDocs.length === 0 || !birdIdCode}
-                            className="bg-gradient-to-r from-amber-500 to-orange-500"
+                            className="bg-primary
                         >
                             {isSigning ? (
                                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
