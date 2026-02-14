@@ -102,9 +102,9 @@ export function TransactionForm({ onClose, initialData }: TransactionFormProps) 
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, type: 'income' })}
-                className={`flex-1 p-3 rounded-lg border-2 transition-all ${formData.type === 'income'
-                  ? 'border-green-500 bg-green-50
-                  : 'border-slate-200
+                className={`flex-1 p-3 border-2 transition-colors duration-150 ${formData.type === 'income'
+                  ? 'border-primary bg-primary/10'
+                  : 'border-border'
                   }`}
               >
                 Receita
@@ -112,9 +112,9 @@ export function TransactionForm({ onClose, initialData }: TransactionFormProps) 
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, type: 'expense' })}
-                className={`flex-1 p-3 rounded-lg border-2 transition-all ${formData.type === 'expense'
-                  ? 'border-red-500 bg-red-50
-                  : 'border-slate-200
+                className={`flex-1 p-3 border-2 transition-colors duration-150 ${formData.type === 'expense'
+                  ? 'border-destructive bg-destructive/10'
+                  : 'border-border'
                   }`}
               >
                 Despesa
@@ -131,7 +131,7 @@ export function TransactionForm({ onClose, initialData }: TransactionFormProps) 
               min="0"
               value={formData.amount}
               onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-input bg-background focus:ring-1 focus:ring-ring"
               required
             />
           </div>
@@ -143,7 +143,7 @@ export function TransactionForm({ onClose, initialData }: TransactionFormProps) 
               type="date"
               value={formData.date}
               onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-input bg-background focus:ring-1 focus:ring-ring"
               required
             />
           </div>
@@ -155,7 +155,7 @@ export function TransactionForm({ onClose, initialData }: TransactionFormProps) 
               type="text"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-input bg-background focus:ring-1 focus:ring-ring"
               placeholder="Ex: Pagamento de conta de luz"
               required
             />
@@ -169,7 +169,7 @@ export function TransactionForm({ onClose, initialData }: TransactionFormProps) 
                 type="text"
                 value={formData.supplier}
                 onChange={(e) => setFormData({ ...formData, supplier: e.target.value })}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-input bg-background focus:ring-1 focus:ring-ring"
                 placeholder="Ex: CEMIG"
               />
             </div>
@@ -179,7 +179,7 @@ export function TransactionForm({ onClose, initialData }: TransactionFormProps) 
                 type="text"
                 value={formData.invoiceNumber}
                 onChange={(e) => setFormData({ ...formData, invoiceNumber: e.target.value })}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-input bg-background focus:ring-1 focus:ring-ring"
                 placeholder="Ex: 123456"
               />
             </div>
@@ -191,7 +191,7 @@ export function TransactionForm({ onClose, initialData }: TransactionFormProps) 
             <select
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-input bg-background focus:ring-1 focus:ring-ring"
               required
             >
               {categories.map((cat) => (
@@ -207,9 +207,9 @@ export function TransactionForm({ onClose, initialData }: TransactionFormProps) 
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, contextId: 'HOME' })}
-                className={`flex-1 p-3 rounded-lg border-2 transition-all ${formData.contextId === 'HOME'
-                  ? 'border-blue-500 bg-blue-50
-                  : 'border-slate-200
+                className={`flex-1 p-3 border-2 transition-colors duration-150 ${formData.contextId === 'HOME'
+                  ? 'border-primary bg-primary/10'
+                  : 'border-border'
                   }`}
               >
                 🏠 Casa
@@ -217,9 +217,9 @@ export function TransactionForm({ onClose, initialData }: TransactionFormProps) 
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, contextId: 'CLINIC' })}
-                className={`flex-1 p-3 rounded-lg border-2 transition-all ${formData.contextId === 'CLINIC'
-                  ? 'border-blue-500 bg-blue-50
-                  : 'border-slate-200
+                className={`flex-1 p-3 border-2 transition-colors duration-150 ${formData.contextId === 'CLINIC'
+                  ? 'border-primary bg-primary/10'
+                  : 'border-border'
                   }`}
               >
                 🏥 Clínica
@@ -234,9 +234,9 @@ export function TransactionForm({ onClose, initialData }: TransactionFormProps) 
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, status: 'paid' })}
-                className={`flex-1 p-3 rounded-lg border-2 transition-all ${formData.status === 'paid'
-                  ? 'border-green-500 bg-green-50
-                  : 'border-slate-200
+                className={`flex-1 p-3 border-2 transition-colors duration-150 ${formData.status === 'paid'
+                  ? 'border-primary bg-primary/10'
+                  : 'border-border'
                   }`}
               >
                 Pago
@@ -244,9 +244,9 @@ export function TransactionForm({ onClose, initialData }: TransactionFormProps) 
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, status: 'pending' })}
-                className={`flex-1 p-3 rounded-lg border-2 transition-all ${formData.status === 'pending'
-                  ? 'border-yellow-500 bg-yellow-50
-                  : 'border-slate-200
+                className={`flex-1 p-3 border-2 transition-colors duration-150 ${formData.status === 'pending'
+                  ? 'border-foreground/50 bg-muted'
+                  : 'border-border'
                   }`}
               >
                 Pendente
@@ -261,7 +261,7 @@ export function TransactionForm({ onClose, initialData }: TransactionFormProps) 
               type="url"
               value={formData.attachmentUrl}
               onChange={(e) => setFormData({ ...formData, attachmentUrl: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-input bg-background focus:ring-1 focus:ring-ring"
               placeholder="https://..."
             />
           </div>
