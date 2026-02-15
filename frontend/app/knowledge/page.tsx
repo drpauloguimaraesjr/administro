@@ -383,7 +383,7 @@ export default function KnowledgePage() {
                                             initial={{ opacity: 0, height: 0 }}
                                             animate={{ opacity: 1, height: 'auto' }}
                                             exit={{ opacity: 0, height: 0 }}
-                                            className="border-t border-border bg-primary
+                                            className="border-t border-border bg-primary/5"
                                         >
                                             <div className="p-4 space-y-3">
                                                 {/* Status Header */}

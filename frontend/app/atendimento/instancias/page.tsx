@@ -414,7 +414,7 @@ export default function InstanciasPage() {
         </Card>
 
         {/* Help Section */}
-        <Card className="bg-primary
+        <Card className="bg-primary/5">
           <CardContent className="py-6">
             <div className="flex items-start gap-4">
               <div className="p-3 bg-white rounded-lg shadow-sm">

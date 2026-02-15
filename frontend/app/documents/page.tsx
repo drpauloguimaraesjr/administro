@@ -524,7 +524,7 @@ export default function DocumentsPage() {
                                 <Button
                                     onClick={() => handleCreateDocument(true)}
                                     disabled={isCreating}
-                                    className="flex-1 bg-primary
+                                    className="flex-1 bg-primary"
                                 >
                                     {isCreating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <PenTool className="h-4 w-4 mr-2" />}
                                     Criar & Adicionar à Fila
@@ -767,7 +767,7 @@ export default function DocumentsPage() {
                         <Button
                             onClick={handleSignBatch}
                             disabled={isSigning || selectedDocs.length === 0 || !birdIdCode}
-                            className="bg-primary
+                            className="bg-primary"
                         >
                             {isSigning ? (
                                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
