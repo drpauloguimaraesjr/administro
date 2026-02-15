@@ -330,11 +330,54 @@ export default function PrescriptionPage() {
                 quantity: data.quantity,
             });
 
-            toast.success(`${pendingFormula.name} adicionado e registrado no estoque!`, {
-                description: data.generateBilling 
-                    ? `Cobrança de R$ ${(data.quantity * data.unitPrice).toFixed(2)} gerada`
-                    : undefined,
-            });
+            // Detect if injectable and create nursing order
+            const injectableRoutes = ['im', 'ev', 'sc', 'id', 'intramuscular', 'endovenosa', 'subcutânea', 'intradérmica', 'intravenosa'];
+            const usageLower = (pendingFormula.usage || '').toLowerCase();
+            const isInjectable = injectableRoutes.some(r => usageLower.includes(r));
+
+            if (isInjectable) {
+                try {
+                    // Extract administration route from usage
+                    const routeMatch = usageLower.match(/\b(im|ev|sc|id|iv)\b/i);
+                    const adminRoute = routeMatch ? routeMatch[1].toUpperCase() : 'IM';
+
+                    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://administro-production.up.railway.app';
+                    await fetch(`${API_URL}/api/nursing-orders`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            prescriptionId: currentPrescriptionId,
+                            patientId,
+                            patientName: patient.name,
+                            productId: data.productId,
+                            productName: stockMatchResult?.product?.name || pendingFormula.name,
+                            batchId: data.batchId,
+                            batchNumber: stockMatchResult?.suggestedBatch?.batchNumber,
+                            quantity: data.quantity,
+                            unit: stockMatchResult?.product?.unit || 'amp',
+                            route: adminRoute,
+                            instructions: `${pendingFormula.name} - ${pendingFormula.usage || ''} - ${pendingFormula.dosage || ''}`.trim(),
+                            priority: 'routine',
+                            prescribedBy: 'Médico',
+                        }),
+                    });
+
+                    toast.success(`${pendingFormula.name} adicionado e registrado no estoque!`, {
+                        description: `💉 Pedido de administração ${adminRoute} gerado para a enfermagem`,
+                    });
+                } catch (nursingError) {
+                    console.error('Error creating nursing order:', nursingError);
+                    toast.success(`${pendingFormula.name} adicionado e registrado no estoque!`, {
+                        description: '⚠️ Pedido de enfermagem não foi gerado (erro de conexão)',
+                    });
+                }
+            } else {
+                toast.success(`${pendingFormula.name} adicionado e registrado no estoque!`, {
+                    description: data.generateBilling 
+                        ? `Cobrança de R$ ${(data.quantity * data.unitPrice).toFixed(2)} gerada`
+                        : undefined,
+                });
+            }
 
             // TODO: If generateBilling is true, create billing item
             if (data.generateBilling) {

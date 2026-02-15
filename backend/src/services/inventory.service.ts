@@ -160,6 +160,203 @@ export async function createMovement(data: CreateMovementInput): Promise<Invento
 }
 
 // =====================
+// Match de Produto (Fuzzy Search)
+// =====================
+
+export interface StockMatchResult {
+    found: boolean;
+    product: InventoryItem | null;
+    hasStock: boolean;
+    availableQuantity: number;
+    suggestedBatch: {
+        id: string;
+        batchNumber: string;
+        expirationDate: string;
+        availableQuantity: number;
+    } | null;
+}
+
+function normalizeText(text: string): string {
+    return text
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')  // Remove acentos
+        .replace(/[^a-z0-9\s]/g, '')       // Remove caracteres especiais
+        .trim();
+}
+
+export async function matchProduct(searchName: string): Promise<StockMatchResult> {
+    const noMatch: StockMatchResult = {
+        found: false,
+        product: null,
+        hasStock: false,
+        availableQuantity: 0,
+        suggestedBatch: null,
+    };
+
+    if (!searchName || searchName.length < 2) return noMatch;
+
+    const normalizedSearch = normalizeText(searchName);
+    const searchTokens = normalizedSearch.split(/\s+/).filter(t => t.length >= 2);
+
+    const allItems = await getAllItems();
+
+    // Scoring: find best match
+    let bestMatch: InventoryItem | null = null;
+    let bestScore = 0;
+
+    for (const item of allItems) {
+        let score = 0;
+
+        const normalizedName = normalizeText(item.name);
+        const normalizedGeneric = item.genericName ? normalizeText(item.genericName) : '';
+        const normalizedAliases = (item.aliases || []).map(normalizeText);
+
+        // Exact match (highest priority)
+        if (normalizedName === normalizedSearch) {
+            score = 100;
+        } else if (normalizedGeneric === normalizedSearch) {
+            score = 95;
+        } else if (normalizedAliases.some(a => a === normalizedSearch)) {
+            score = 90;
+        }
+        // Contains match
+        else if (normalizedName.includes(normalizedSearch) || normalizedSearch.includes(normalizedName)) {
+            score = 80;
+        } else if (normalizedGeneric && (normalizedGeneric.includes(normalizedSearch) || normalizedSearch.includes(normalizedGeneric))) {
+            score = 75;
+        } else if (normalizedAliases.some(a => a.includes(normalizedSearch) || normalizedSearch.includes(a))) {
+            score = 70;
+        }
+        // Token matching (partial — ex: "VITAMINA B12" vs "CIANOCOBALAMINA VITAMINA B12 5000MCG")
+        else {
+            const allTexts = [normalizedName, normalizedGeneric, ...normalizedAliases].filter(Boolean);
+            let tokenScore = 0;
+            for (const token of searchTokens) {
+                if (allTexts.some(text => text.includes(token))) {
+                    tokenScore += 1;
+                }
+            }
+            if (tokenScore > 0 && searchTokens.length > 0) {
+                score = Math.round((tokenScore / searchTokens.length) * 60);
+            }
+        }
+
+        if (score > bestScore) {
+            bestScore = score;
+            bestMatch = item;
+        }
+    }
+
+    // Minimum threshold
+    if (!bestMatch || bestScore < 30) return noMatch;
+
+    // Find best batch (FIFO — oldest valid expiration date)
+    const now = new Date();
+    const batchesSnapshot = await db.collection('inventory_batches')
+        .where('itemId', '==', bestMatch.id)
+        .orderBy('expirationDate', 'asc')
+        .get();
+
+    const validBatches = batchesSnapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as InventoryBatch))
+        .filter(b => {
+            const expDate = new Date(b.expirationDate);
+            return expDate > now && b.quantity > 0;
+        });
+
+    const suggestedBatch = validBatches.length > 0 ? validBatches[0] : null;
+    const totalAvailable = validBatches.reduce((sum, b) => sum + b.quantity, 0);
+
+    return {
+        found: true,
+        product: bestMatch,
+        hasStock: totalAvailable > 0,
+        availableQuantity: totalAvailable,
+        suggestedBatch: suggestedBatch ? {
+            id: suggestedBatch.id,
+            batchNumber: suggestedBatch.lotNumber,
+            expirationDate: suggestedBatch.expirationDate,
+            availableQuantity: suggestedBatch.quantity,
+        } : null,
+    };
+}
+
+// =====================
+// Prescription Movement (registro dedicado)
+// =====================
+
+interface PrescriptionMovementInput {
+    productId: string;
+    quantity: number;
+    patientId: string;
+    patientName: string;
+    prescriptionId: string;
+}
+
+export async function createPrescriptionMovement(data: PrescriptionMovementInput): Promise<InventoryMovement> {
+    const item = await getItemById(data.productId);
+    if (!item) {
+        throw new Error('Produto não encontrado no estoque');
+    }
+
+    if (item.currentQuantity < data.quantity) {
+        throw new Error(`Estoque insuficiente. Disponível: ${item.currentQuantity} ${item.unit}`);
+    }
+
+    // Find best batch (FIFO) and decrement
+    const now = new Date();
+    const batchesSnapshot = await db.collection('inventory_batches')
+        .where('itemId', '==', data.productId)
+        .orderBy('expirationDate', 'asc')
+        .get();
+
+    const validBatches = batchesSnapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as InventoryBatch))
+        .filter(b => new Date(b.expirationDate) > now && b.quantity > 0);
+
+    let remainingQty = data.quantity;
+    const batchUpdates: { batchId: string; deducted: number }[] = [];
+
+    for (const batch of validBatches) {
+        if (remainingQty <= 0) break;
+
+        const deduct = Math.min(batch.quantity, remainingQty);
+        batchUpdates.push({ batchId: batch.id, deducted: deduct });
+        remainingQty -= deduct;
+    }
+
+    if (remainingQty > 0) {
+        throw new Error('Estoque insuficiente nos lotes disponíveis');
+    }
+
+    // Apply batch decrements
+    for (const update of batchUpdates) {
+        await db.collection('inventory_batches').doc(update.batchId).update({
+            quantity: FieldValue.increment(-update.deducted),
+        });
+    }
+
+    // Create the movement record
+    const movement = await createMovement({
+        itemId: data.productId,
+        itemName: item.name,
+        batchId: batchUpdates[0]?.batchId,
+        type: 'saída',
+        reason: 'prescrição',
+        quantity: -data.quantity, // negative for output
+        patientId: data.patientId,
+        patientName: data.patientName,
+        prescriptionId: data.prescriptionId,
+        performedBy: 'Médico',
+        notes: `Saída por prescrição - Paciente: ${data.patientName}`,
+    });
+
+    return movement;
+}
+
+
+// =====================
 // Alertas
 // =====================
 

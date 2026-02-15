@@ -22,6 +22,8 @@ import knowledgeRoutes from './routes/knowledgeRoutes.js';
 import documentRoutes from './routes/documentRoutes.js';
 import inventoryRoutes from './routes/inventory.routes.js';
 import billingRoutes from './routes/billing.routes.js';
+import nursingOrdersRoutes from './routes/nursing-orders.routes.js';
+import partnersRoutes from './routes/partners.routes.js';
 
 const app = express();
 
@@ -74,6 +76,8 @@ app.use('/api/knowledge', knowledgeRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/billing', billingRoutes);
+app.use('/api/nursing-orders', nursingOrdersRoutes);
+app.use('/api/partners', partnersRoutes);
 
 // Inicia servidor
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
@@ -94,6 +98,8 @@ app.listen(PORT, async () => {
   console.log(`   - /api/documents (📄 Receitas, Atestados, Prontuários)`);
   console.log(`   - /api/inventory (📦 Estoque)`);
   console.log(`   - /api/billing (💰 Faturamento)`);
+  console.log(`   - /api/nursing-orders (💉 Pedidos de Enfermagem)`);
+  console.log(`   - /api/partners (🤝 Parceiros e Encaminhamentos)`);
 
   // Inicializa WhatsApp se configurado
   if (process.env.WHATSAPP_AUTO_START === 'true') {

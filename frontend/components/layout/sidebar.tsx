@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import {
     Home, DollarSign, Smartphone, Calendar, Users, 
     Share2, ClipboardList, Target, Settings, Brain, Activity,
-    Pin, PinOff
+    Pin, PinOff, Syringe, Building2
 } from 'lucide-react';
 import { useAuth } from '@/components/auth/auth-provider';
 import { cn } from '@/lib/utils';
@@ -28,6 +28,8 @@ export function Sidebar() {
         { href: '/indicacoes', label: 'Indicações', icon: Share2 },
         { href: '/questionarios', label: 'Questionários', icon: ClipboardList },
         { href: '/transactions', label: 'Financeiro', icon: DollarSign },
+        { href: '/enfermagem', label: 'Enfermagem', icon: Syringe },
+        { href: '/parceiros', label: 'Parceiros', icon: Building2 },
         { href: '/whatsapp', label: 'WhatsApp', icon: Smartphone },
         { href: '/configuracoes', label: 'Configurações', icon: Settings },
         { href: '/crm', label: 'CRM', icon: Target },

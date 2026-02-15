@@ -3,6 +3,8 @@
 export interface InventoryItem {
     id: string;
     name: string;
+    genericName?: string;        // Nome genérico (ex: "Cianocobalamina")
+    aliases?: string[];           // Nomes alternativos (ex: ["B12", "VITAMINA B12"])
     category: 'medicamento' | 'material' | 'cosmético' | 'equipamento' | 'outro';
     unit: string; // unidade, ml, mg, cx, etc.
     currentQuantity: number;
@@ -12,6 +14,8 @@ export interface InventoryItem {
     sellPrice?: number;
     location?: string; // sala, gaveta, etc.
     supplier?: string;
+    requiresPrescription?: boolean;
+    controlled?: boolean;
     createdAt: string;
     updatedAt: string;
 }

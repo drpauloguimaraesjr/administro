@@ -30,6 +30,21 @@ router.get('/summary', async (req: Request, res: Response) => {
     }
 });
 
+// GET /api/inventory/match?name=VITAMINA+B12 - Fuzzy match de produto
+router.get('/match', async (req: Request, res: Response) => {
+    try {
+        const name = req.query.name as string;
+        if (!name || name.length < 2) {
+            return res.status(400).json({ error: 'Parâmetro "name" é obrigatório (mín. 2 caracteres)' });
+        }
+        const result = await inventoryService.matchProduct(name);
+        res.json(result);
+    } catch (error: any) {
+        console.error('Erro ao buscar match de produto:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // GET /api/inventory/:id - Buscar item por ID
 router.get('/:id', async (req: Request, res: Response) => {
     try {
@@ -135,6 +150,33 @@ router.post('/movements', async (req: Request, res: Response) => {
     } catch (error: any) {
         console.error('Erro ao registrar movimentação:', error);
         res.status(500).json({ error: error.message });
+    }
+});
+
+// POST /api/inventory/movements/prescription - Registrar saída por prescrição
+router.post('/movements/prescription', async (req: Request, res: Response) => {
+    try {
+        const { productId, quantity, patientId, patientName, prescriptionId } = req.body;
+
+        if (!productId || !quantity || !patientId || !patientName || !prescriptionId) {
+            return res.status(400).json({
+                error: 'Campos obrigatórios: productId, quantity, patientId, patientName, prescriptionId'
+            });
+        }
+
+        const movement = await inventoryService.createPrescriptionMovement({
+            productId,
+            quantity: parseInt(quantity) || 1,
+            patientId,
+            patientName,
+            prescriptionId,
+        });
+
+        res.status(201).json(movement);
+    } catch (error: any) {
+        console.error('Erro ao registrar saída por prescrição:', error);
+        const status = error.message.includes('insuficiente') || error.message.includes('não encontrado') ? 400 : 500;
+        res.status(status).json({ error: error.message });
     }
 });
 
