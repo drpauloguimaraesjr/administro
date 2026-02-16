@@ -21,7 +21,7 @@ import api from '@/lib/api';
 import { PatientHeader } from '@/components/medical-record/patient-header';
 import { LegacyEditor, LegacyEditorRef } from '@/components/ui/legacy-editor';
 import { PrintParameters, PrintParametersModal } from '@/components/prescription/PrintParametersModal';
-import { PrescriptionPreviewModal } from '@/components/prescription/PrescriptionPreviewModal';
+import { PrescriptionPreviewModal, ForwardingInfo } from '@/components/prescription/PrescriptionPreviewModal';
 import { FormulasPanel } from '@/components/prescription/FormulasPanel';
 import { StockConfirmDialog, StockConfirmData } from '@/components/prescription/StockConfirmDialog';
 import { PrescriptionFormula } from '@/types/prescription';
@@ -86,6 +86,9 @@ export default function PrescriptionPage() {
     const [pendingFormula, setPendingFormula] = useState<PrescriptionFormula | null>(null);
     const [isCheckingStock, setIsCheckingStock] = useState(false);
     const { checkMatch, registerUsage, isLoading: isStockLoading } = useStockMatch();
+
+    // Forwarding tracking for print extension
+    const [forwardingStatus, setForwardingStatus] = useState<ForwardingInfo>({});
 
     // Fetch patient data
     const { data: patient } = useQuery({
@@ -184,10 +187,10 @@ export default function PrescriptionPage() {
         }
     };
 
-    // Auto-save functionality (every 30 seconds)
+    // Auto-save functionality (every 30 seconds) — skip when already saving
     useEffect(() => {
         const autoSaveInterval = setInterval(() => {
-            if (editorRef.current) {
+            if (editorRef.current && !isSaving) {
                 const content = editorRef.current.getHTML();
                 if (content && content.length > 10) {
                     handleAutoSave(content);
@@ -196,7 +199,7 @@ export default function PrescriptionPage() {
         }, 30000); // 30 seconds
 
         return () => clearInterval(autoSaveInterval);
-    }, [currentPrescriptionId, prescriptionTitle]);
+    }, [currentPrescriptionId, prescriptionTitle, isSaving]);
 
     const handleAutoSave = async (content: string) => {
         if (!content || content.length < 10) return;
@@ -365,6 +368,17 @@ export default function PrescriptionPage() {
                     toast.success(`${pendingFormula.name} adicionado e registrado no estoque!`, {
                         description: `💉 Pedido de administração ${adminRoute} gerado para a enfermagem`,
                     });
+
+                    // Track for print forwarding extension
+                    setForwardingStatus(prev => ({
+                        ...prev,
+                        nursing: {
+                            sent: true,
+                            sentAt: new Date().toISOString(),
+                            orderCount: (prev.nursing?.orderCount || 0) + 1,
+                            routes: [...(prev.nursing?.routes || []), adminRoute],
+                        }
+                    }));
                 } catch (nursingError) {
                     console.error('Error creating nursing order:', nursingError);
                     toast.success(`${pendingFormula.name} adicionado e registrado no estoque!`, {
@@ -464,6 +478,33 @@ export default function PrescriptionPage() {
             toast.success('Receita salva com sucesso!');
         } catch (error) {
             toast.error('Erro ao salvar receita');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    // Save first, then open print modal — prevents freeze from fire-and-forget async
+    const handleSaveAndFinalize = async () => {
+        if (!editorRef.current) return;
+
+        const content = editorRef.current.getHTML();
+        if (!content || content.length < 10) {
+            toast.error('Digite algo antes de salvar');
+            return;
+        }
+
+        setIsSaving(true);
+        try {
+            await savePrescription.mutateAsync({
+                title: prescriptionTitle || 'Receita sem título',
+                content,
+                type: prescriptionType,
+            });
+            toast.success('Receita salva!');
+            // Only open print after save succeeds
+            handleOpenPrintParams('simples');
+        } catch (error) {
+            toast.error('Erro ao salvar receita. Tente novamente.');
         } finally {
             setIsSaving(false);
         }
@@ -915,12 +956,15 @@ export default function PrescriptionPage() {
                             </Button>
                             <Button
                                 className="bg-purple-600 hover:bg-purple-700"
-                                onClick={() => {
-                                    handleManualSave();
-                                    handleOpenPrintParams('simples');
-                                }}
+                                onClick={handleSaveAndFinalize}
+                                disabled={isSaving}
                             >
-                                <Copy className="w-4 h-4 mr-2" /> Salvar e Finalizar
+                                {isSaving ? (
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                ) : (
+                                    <Copy className="w-4 h-4 mr-2" />
+                                )}
+                                Salvar e Finalizar
                             </Button>
                         </div>
                     </div>
@@ -957,6 +1001,7 @@ export default function PrescriptionPage() {
                         email: patient.email,
                     }}
                     type={prescriptionType}
+                    forwardingStatus={forwardingStatus}
                 />
             )}
 

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import { X, Printer, Send, MessageSquare, ShieldCheck, Download, Mail } from 'lucide-react';
+import { X, Printer, Send, MessageSquare, ShieldCheck, Download, Mail, Syringe, Building2, CheckCircle2, Clock } from 'lucide-react';
 import { PrintParameters } from './PrintParametersModal';
 import { DOCTOR_CONFIG, formatCRM, formatDate, formatDateTime } from '@/lib/doctor-config';
 import { useRef, useEffect, useState } from 'react';
@@ -24,6 +24,22 @@ interface PatientData {
     email?: string;
 }
 
+export interface ForwardingInfo {
+    nursing?: {
+        sent: boolean;
+        sentAt?: string;
+        orderCount?: number;
+        routes?: string[]; // e.g. ['IM', 'SC']
+    };
+    pharmacy?: {
+        sent: boolean;
+        sentAt?: string;
+        partnerName?: string;
+        responsibleName?: string;
+        status?: 'pending' | 'sent' | 'confirmed' | 'delivered';
+    };
+}
+
 interface PrescriptionPreviewModalProps {
     open: boolean;
     onClose: () => void;
@@ -31,6 +47,7 @@ interface PrescriptionPreviewModalProps {
     params: PrintParameters | null;
     patient?: PatientData;
     type?: 'simples' | 'controlada';
+    forwardingStatus?: ForwardingInfo;
 }
 
 export function PrescriptionPreviewModal({
@@ -39,7 +56,8 @@ export function PrescriptionPreviewModal({
     content,
     params,
     patient: patientProp,
-    type = 'simples'
+    type = 'simples',
+    forwardingStatus
 }: PrescriptionPreviewModalProps) {
     const [qrCodeUrl, setQrCodeUrl] = useState('');
     const printRef = useRef<HTMLDivElement>(null);
@@ -254,6 +272,46 @@ export function PrescriptionPreviewModal({
                                         </div>
                                     </div>
                                 </div>
+
+                                {/* Forwarding Status Extension */}
+                                {forwardingStatus && (forwardingStatus.nursing?.sent || forwardingStatus.pharmacy?.sent) && (
+                                    <div className="mt-6 border-2 border-dashed border-gray-300 rounded-lg p-3 bg-gray-50/50 print:border-gray-400">
+                                        <div className="text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-2 text-center">
+                                            Encaminhamentos desta Receita
+                                        </div>
+                                        <div className="flex gap-4 justify-center">
+                                            {forwardingStatus.nursing?.sent && (
+                                                <div className="flex items-center gap-2 text-[10px] text-blue-700 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-200">
+                                                    <Syringe className="w-3 h-3" />
+                                                    <span className="font-semibold">Enfermagem</span>
+                                                    <span>•</span>
+                                                    <span>{forwardingStatus.nursing.orderCount || 1} pedido(s)</span>
+                                                    {forwardingStatus.nursing.routes && forwardingStatus.nursing.routes.length > 0 && (
+                                                        <span>({forwardingStatus.nursing.routes.join(', ')})</span>
+                                                    )}
+                                                    <CheckCircle2 className="w-3 h-3 text-green-600" />
+                                                </div>
+                                            )}
+                                            {forwardingStatus.pharmacy?.sent && (
+                                                <div className="flex items-center gap-2 text-[10px] text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200">
+                                                    <Building2 className="w-3 h-3" />
+                                                    <span className="font-semibold">Farmácia</span>
+                                                    {forwardingStatus.pharmacy.partnerName && (
+                                                        <><span>•</span><span>{forwardingStatus.pharmacy.partnerName}</span></>
+                                                    )}
+                                                    {forwardingStatus.pharmacy.responsibleName && (
+                                                        <><span>•</span><span>Resp: {forwardingStatus.pharmacy.responsibleName}</span></>
+                                                    )}
+                                                    {forwardingStatus.pharmacy.status === 'confirmed' || forwardingStatus.pharmacy.status === 'delivered' ? (
+                                                        <CheckCircle2 className="w-3 h-3 text-green-600" />
+                                                    ) : (
+                                                        <Clock className="w-3 h-3 text-amber-500" />
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         ) : (
                             // ========== RECEITUÁRIO SIMPLES ==========
@@ -334,6 +392,46 @@ export function PrescriptionPreviewModal({
                                         </div>
                                     )}
                                 </div>
+
+                                {/* Forwarding Status Extension */}
+                                {forwardingStatus && (forwardingStatus.nursing?.sent || forwardingStatus.pharmacy?.sent) && (
+                                    <div className="mt-4 border-2 border-dashed border-gray-300 rounded-lg p-3 bg-gray-50/50 print:border-gray-400">
+                                        <div className="text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-2 text-center">
+                                            Encaminhamentos desta Receita
+                                        </div>
+                                        <div className="flex gap-4 justify-center">
+                                            {forwardingStatus.nursing?.sent && (
+                                                <div className="flex items-center gap-2 text-[10px] text-blue-700 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-200">
+                                                    <Syringe className="w-3 h-3" />
+                                                    <span className="font-semibold">Enfermagem</span>
+                                                    <span>•</span>
+                                                    <span>{forwardingStatus.nursing.orderCount || 1} pedido(s)</span>
+                                                    {forwardingStatus.nursing.routes && forwardingStatus.nursing.routes.length > 0 && (
+                                                        <span>({forwardingStatus.nursing.routes.join(', ')})</span>
+                                                    )}
+                                                    <CheckCircle2 className="w-3 h-3 text-green-600" />
+                                                </div>
+                                            )}
+                                            {forwardingStatus.pharmacy?.sent && (
+                                                <div className="flex items-center gap-2 text-[10px] text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200">
+                                                    <Building2 className="w-3 h-3" />
+                                                    <span className="font-semibold">Farmácia</span>
+                                                    {forwardingStatus.pharmacy.partnerName && (
+                                                        <><span>•</span><span>{forwardingStatus.pharmacy.partnerName}</span></>
+                                                    )}
+                                                    {forwardingStatus.pharmacy.responsibleName && (
+                                                        <><span>•</span><span>Resp: {forwardingStatus.pharmacy.responsibleName}</span></>
+                                                    )}
+                                                    {forwardingStatus.pharmacy.status === 'confirmed' || forwardingStatus.pharmacy.status === 'delivered' ? (
+                                                        <CheckCircle2 className="w-3 h-3 text-green-600" />
+                                                    ) : (
+                                                        <Clock className="w-3 h-3 text-amber-500" />
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
