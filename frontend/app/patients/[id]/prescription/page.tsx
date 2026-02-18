@@ -533,6 +533,66 @@ export default function PrescriptionPage() {
         }
     };
 
+    // Parse injectable items from prescription HTML content
+    const parseInjectablesFromText = (html: string): Array<{ name: string; route: string; dosage: string }> => {
+        // Strip HTML tags to get plain text
+        const text = html.replace(/<[^>]*>/g, '\n').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ');
+        const items: Array<{ name: string; route: string; dosage: string }> = [];
+
+        // Strategy 1: Detect "USO INJETÁVEL" blocks (from formula panel insertion)
+        const injectableBlockRegex = /USO INJET[AÁ]VEL[^]*?(?=USO INJET[AÁ]VEL|────|$)/gi;
+        const blocks = text.match(injectableBlockRegex) || [];
+
+        for (const block of blocks) {
+            // Extract medication name — usually the first bold/strong line after "USO INJETÁVEL"
+            const nameMatch = block.match(/(?:USO INJET[AÁ]VEL\s+)([A-ZÀ-Ú][A-Za-zÀ-ú0-9\s\-\+\.]+?)(?:\s*[-–]\s*\d|\s+\d+\s*(?:mg|mcg|ml|ui|amp))/i);
+            const name = nameMatch ? nameMatch[1].trim() : '';
+
+            // Extract route
+            const routeMatch = block.match(/\b(IM|EV|SC|ID|IV)\b/i);
+            const route = routeMatch ? routeMatch[1].toUpperCase() : 'IM';
+
+            // Extract dosage
+            const dosageMatch = block.match(/(?:Posologia:\s*)([^\n]+)/i);
+            const dosage = dosageMatch ? dosageMatch[1].trim() : '';
+
+            if (name) {
+                items.push({ name, route, dosage });
+            }
+        }
+
+        // Strategy 2: Fallback — detect lines with injectable route keywords even without "USO INJETÁVEL" header
+        if (items.length === 0) {
+            const lines = text.split(/\n|\.(?=\s)/);
+            for (const line of lines) {
+                const routeMatch = line.match(/\b(IM|EV|SC|ID|IV|intramuscular|endovenosa|subcutânea|intradérmica|intravenosa)\b/i);
+                if (routeMatch) {
+                    // Try to extract a medication name from the same line
+                    const medMatch = line.match(/([A-ZÀ-Ú][A-Za-zÀ-ú0-9\s\-\+\.]+?)(?:\s*[-–]\s*\d|\s+\d+\s*(?:mg|mcg|ml|ui|amp)|\s+[-–]\s+\d|\s+via\b)/i);
+                    if (medMatch) {
+                        const routeAbbrev = routeMatch[1].length <= 2
+                            ? routeMatch[1].toUpperCase()
+                            : routeMatch[1].substring(0, 2).toUpperCase();
+                        items.push({
+                            name: medMatch[1].trim(),
+                            route: routeAbbrev,
+                            dosage: '',
+                        });
+                    }
+                }
+            }
+        }
+
+        // Deduplicate by name
+        const seen = new Set<string>();
+        return items.filter(item => {
+            const key = item.name.toLowerCase();
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
+    };
+
     // Save first, then open print modal — prevents freeze from fire-and-forget async
     const handleSaveAndFinalize = async () => {
         if (!editorRef.current) return;
@@ -545,12 +605,39 @@ export default function PrescriptionPage() {
 
         setIsSaving(true);
         try {
-            await savePrescription.mutateAsync({
+            const saveResult = await savePrescription.mutateAsync({
                 title: prescriptionTitle || 'Receita sem título',
                 content,
                 type: prescriptionType,
             });
             toast.success('Receita salva!');
+
+            // Parse content for injectables that may not have been captured by formula selection
+            if (patient) {
+                const detectedItems = parseInjectablesFromText(content);
+                const alreadyTracked = forwardingStatus?.nursing?.routes?.length || 0;
+
+                if (detectedItems.length > alreadyTracked) {
+                    // There are injectables in the text not yet tracked — create orders for the extras
+                    const newItems = detectedItems.slice(alreadyTracked);
+                    let created = 0;
+
+                    for (const item of newItems) {
+                        const success = await createApplicationOrder(
+                            { name: item.name, dosage: item.dosage, usage: item.route } as PrescriptionFormula,
+                            item.route,
+                        );
+                        if (success) created++;
+                    }
+
+                    if (created > 0) {
+                        toast.success(`${created} ordem(ns) de injetável detectada(s) no texto`, {
+                            description: `💉 ${newItems.map(i => `${i.name} (${i.route})`).join(', ')}`,
+                        });
+                    }
+                }
+            }
+
             // Only open print after save succeeds
             handleOpenPrintParams('simples');
         } catch (error) {
