@@ -29,6 +29,7 @@ export function Sidebar() {
         { href: '/questionarios', label: 'Questionários', icon: ClipboardList },
         { href: '/transactions', label: 'Financeiro', icon: DollarSign },
         { href: '/enfermagem', label: 'Enfermagem', icon: Syringe },
+        { href: '/aplicacoes', label: 'Aplicações', icon: Syringe },
         { href: '/parceiros', label: 'Parceiros', icon: Building2 },
         { href: '/whatsapp', label: 'WhatsApp', icon: Smartphone },
         { href: '/configuracoes', label: 'Configurações', icon: Settings },

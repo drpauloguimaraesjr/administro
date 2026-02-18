@@ -24,6 +24,7 @@ import inventoryRoutes from './routes/inventory.routes.js';
 import billingRoutes from './routes/billing.routes.js';
 import nursingOrdersRoutes from './routes/nursing-orders.routes.js';
 import partnersRoutes from './routes/partners.routes.js';
+import applicationsRoutes from './routes/applications.routes.js';
 
 const app = express();
 
@@ -78,6 +79,7 @@ app.use('/api/inventory', inventoryRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/nursing-orders', nursingOrdersRoutes);
 app.use('/api/partners', partnersRoutes);
+app.use('/api/applications', applicationsRoutes);
 
 // Inicia servidor
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
