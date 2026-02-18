@@ -1,8 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { LogOut } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { usePathname } from 'next/navigation';
+import { LogOut, User, Calendar } from 'lucide-react';
 import { useAuth } from '@/components/auth/auth-provider';
+import { useQuery } from '@tanstack/react-query';
+import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -42,17 +45,80 @@ function useClock(): string {
     return time;
 }
 
+function calculateAge(birthDate: string): number | null {
+    if (!birthDate) return null;
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const m = today.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+    return age;
+}
+
+function formatPatientSince(dateStr: string): string {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+}
+
 export function Header() {
     const { user, logout } = useAuth();
     const greeting = useGreeting();
     const clock = useClock();
+    const pathname = usePathname();
+
+    // Detect patient route: /patients/[id] or /patients/[id]/prescription etc.
+    const patientId = useMemo(() => {
+        const match = pathname.match(/\/patients\/([^/]+)/);
+        return match ? match[1] : null;
+    }, [pathname]);
+
+    // Fetch patient data when on a patient route
+    const { data: patient } = useQuery({
+        queryKey: ['patient-header', patientId],
+        queryFn: async () => {
+            const res = await api.get(`/patients/${patientId}`);
+            return res.data;
+        },
+        enabled: !!patientId,
+        staleTime: 60_000,
+    });
+
+    const isPatientPage = !!patientId && !!patient;
 
     return (
         <div className="flex flex-1 items-center justify-between">
-            {/* Left — Serif Greeting */}
-            <h2 className="font-serif text-xl font-semibold text-foreground tracking-tight">
-                {greeting}, {user?.displayName?.split(' ')[0] || 'Dr.'}
-            </h2>
+            {/* Left — Patient Info or Greeting */}
+            {isPatientPage ? (
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                        {patient.name?.charAt(0)?.toUpperCase() || 'P'}
+                    </div>
+                    <div className="flex flex-col">
+                        <h2 className="font-serif text-lg font-semibold text-foreground tracking-tight leading-tight">
+                            {patient.name}
+                        </h2>
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                            {patient.birthDate && (
+                                <span className="flex items-center gap-1">
+                                    <User className="w-3 h-3" />
+                                    {calculateAge(patient.birthDate)} anos
+                                </span>
+                            )}
+                            {patient.createdAt && (
+                                <span className="flex items-center gap-1">
+                                    <Calendar className="w-3 h-3" />
+                                    Paciente desde {formatPatientSince(patient.createdAt)}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            ) : (
+                <h2 className="font-serif text-xl font-semibold text-foreground tracking-tight">
+                    {greeting}, {user?.displayName?.split(' ')[0] || 'Dr.'}
+                </h2>
+            )}
 
             {/* Right — Mono Clock + Logout */}
             <div className="flex items-center gap-4">
@@ -97,3 +163,4 @@ export function Header() {
         </div>
     );
 }
+
