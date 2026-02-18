@@ -193,7 +193,7 @@ export default function AplicacoesPage() {
             <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
               Aplicações
             </h1>
-            <p className="text-muted-foreground/70 mt-1">Gestão de medicamentos externos — compra e aplicação</p>
+            <p className="text-muted-foreground/70 mt-1">Injetáveis — compra e aplicação</p>
           </div>
           <div className="flex gap-3">
             <Link href="/aplicacoes/produtos">
