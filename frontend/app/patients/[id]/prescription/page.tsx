@@ -271,6 +271,69 @@ export default function PrescriptionPage() {
         }
     };
 
+    // Helper: detect if formula is injectable
+    const detectInjectable = (formula: PrescriptionFormula) => {
+        const injectableRoutes = ['im', 'ev', 'sc', 'id', 'intramuscular', 'endovenosa', 'subcutânea', 'intradérmica', 'intravenosa', 'iv'];
+        const usageLower = (formula.usage || '').toLowerCase();
+        const isInjectable = injectableRoutes.some(r => usageLower.includes(r));
+        if (!isInjectable) return null;
+        const routeMatch = usageLower.match(/\b(im|ev|sc|id|iv)\b/i);
+        return routeMatch ? routeMatch[1].toUpperCase() : 'IM';
+    };
+
+    // Helper: create application order for injectable
+    const createApplicationOrder = async (
+        formula: PrescriptionFormula,
+        adminRoute: string,
+        options?: { batchNumber?: string; batchExpiration?: string; manufacturer?: string; hasPurchased?: boolean }
+    ) => {
+        try {
+            await api.post('/applications', {
+                prescriptionId: currentPrescriptionId || undefined,
+                patientId,
+                patientName: patient?.name || 'Paciente',
+                productName: formula.name,
+                productDetails: formula.dosage || '',
+                quantity: 1,
+                unit: 'amp',
+                route: adminRoute,
+                priority: 'routine',
+                prescribedBy: 'Médico',
+            });
+
+            // If patient already purchased (has stock), confirm purchase automatically
+            if (options?.hasPurchased && options.batchNumber) {
+                // The order was just created — get it to confirm purchase
+                const ordersRes = await api.get('/applications', { params: { patientId, status: 'prescribed' } });
+                const latestOrder = ordersRes.data?.[0];
+                if (latestOrder) {
+                    await api.put(`/applications/${latestOrder.id}/purchase`, {
+                        confirmedBy: 'Prescrição automática',
+                        batchNumber: options.batchNumber,
+                        batchExpiration: options.batchExpiration,
+                        manufacturer: options.manufacturer,
+                    });
+                }
+            }
+
+            // Track for print forwarding extension
+            setForwardingStatus(prev => ({
+                ...prev,
+                nursing: {
+                    sent: true,
+                    sentAt: new Date().toISOString(),
+                    orderCount: (prev.nursing?.orderCount || 0) + 1,
+                    routes: [...(prev.nursing?.routes || []), adminRoute],
+                }
+            }));
+
+            return true;
+        } catch (error) {
+            console.error('Error creating application order:', error);
+            return false;
+        }
+    };
+
     // Handle formula selection - check stock first
     const handleSelectFormula = async (formula: PrescriptionFormula) => {
         // Store the formula for later use
@@ -286,13 +349,24 @@ export default function PrescriptionPage() {
                 setStockMatchResult(match);
                 setIsStockDialogOpen(true);
             } else {
-                // Not found in stock or no stock available - just insert
+                // Not found in stock — insert formula
                 insertFormulaIntoEditor(formula);
-                toast.success(`${formula.name} adicionado!`);
+
+                // If injectable, create application order (status: waiting_purchase)
+                const adminRoute = detectInjectable(formula);
+                if (adminRoute && patient) {
+                    const created = await createApplicationOrder(formula, adminRoute);
+                    toast.success(`${formula.name} adicionado!`, {
+                        description: created
+                            ? `💉 Ordem de aplicação ${adminRoute} gerada — aguardando compra pelo paciente`
+                            : undefined,
+                    });
+                } else {
+                    toast.success(`${formula.name} adicionado!`);
+                }
             }
         } catch (error) {
             console.error('Error checking stock:', error);
-            // On error, just insert without stock integration
             insertFormulaIntoEditor(formula);
             toast.success(`${formula.name} adicionado!`);
         } finally {
@@ -333,58 +407,22 @@ export default function PrescriptionPage() {
                 quantity: data.quantity,
             });
 
-            // Detect if injectable and create nursing order
-            const injectableRoutes = ['im', 'ev', 'sc', 'id', 'intramuscular', 'endovenosa', 'subcutânea', 'intradérmica', 'intravenosa'];
-            const usageLower = (pendingFormula.usage || '').toLowerCase();
-            const isInjectable = injectableRoutes.some(r => usageLower.includes(r));
+            // Detect if injectable and create application order
+            const adminRoute = detectInjectable(pendingFormula);
 
-            if (isInjectable) {
-                try {
-                    // Extract administration route from usage
-                    const routeMatch = usageLower.match(/\b(im|ev|sc|id|iv)\b/i);
-                    const adminRoute = routeMatch ? routeMatch[1].toUpperCase() : 'IM';
+            if (adminRoute) {
+                const created = await createApplicationOrder(pendingFormula, adminRoute, {
+                    hasPurchased: true,
+                    batchNumber: stockMatchResult?.suggestedBatch?.batchNumber,
+                    batchExpiration: stockMatchResult?.suggestedBatch?.expirationDate,
+                    manufacturer: (stockMatchResult?.product as any)?.manufacturer,
+                });
 
-                    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://administro-production.up.railway.app';
-                    await fetch(`${API_URL}/api/nursing-orders`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            prescriptionId: currentPrescriptionId,
-                            patientId,
-                            patientName: patient.name,
-                            productId: data.productId,
-                            productName: stockMatchResult?.product?.name || pendingFormula.name,
-                            batchId: data.batchId,
-                            batchNumber: stockMatchResult?.suggestedBatch?.batchNumber,
-                            quantity: data.quantity,
-                            unit: stockMatchResult?.product?.unit || 'amp',
-                            route: adminRoute,
-                            instructions: `${pendingFormula.name} - ${pendingFormula.usage || ''} - ${pendingFormula.dosage || ''}`.trim(),
-                            priority: 'routine',
-                            prescribedBy: 'Médico',
-                        }),
-                    });
-
-                    toast.success(`${pendingFormula.name} adicionado e registrado no estoque!`, {
-                        description: `💉 Pedido de administração ${adminRoute} gerado para a enfermagem`,
-                    });
-
-                    // Track for print forwarding extension
-                    setForwardingStatus(prev => ({
-                        ...prev,
-                        nursing: {
-                            sent: true,
-                            sentAt: new Date().toISOString(),
-                            orderCount: (prev.nursing?.orderCount || 0) + 1,
-                            routes: [...(prev.nursing?.routes || []), adminRoute],
-                        }
-                    }));
-                } catch (nursingError) {
-                    console.error('Error creating nursing order:', nursingError);
-                    toast.success(`${pendingFormula.name} adicionado e registrado no estoque!`, {
-                        description: '⚠️ Pedido de enfermagem não foi gerado (erro de conexão)',
-                    });
-                }
+                toast.success(`${pendingFormula.name} adicionado e registrado no estoque!`, {
+                    description: created
+                        ? `💉 Ordem de aplicação ${adminRoute} gerada para a enfermagem`
+                        : '⚠️ Ordem de aplicação não foi gerada (erro de conexão)',
+                });
             } else {
                 toast.success(`${pendingFormula.name} adicionado e registrado no estoque!`, {
                     description: data.generateBilling 
@@ -414,10 +452,22 @@ export default function PrescriptionPage() {
     };
 
     // Handle skipping stock registration
-    const handleStockSkip = () => {
+    const handleStockSkip = async () => {
         if (pendingFormula) {
             insertFormulaIntoEditor(pendingFormula);
-            toast.success(`${pendingFormula.name} adicionado!`);
+
+            // If injectable, still create application order (waiting_purchase)
+            const adminRoute = detectInjectable(pendingFormula);
+            if (adminRoute && patient) {
+                const created = await createApplicationOrder(pendingFormula, adminRoute);
+                toast.success(`${pendingFormula.name} adicionado!`, {
+                    description: created
+                        ? `💉 Ordem de aplicação ${adminRoute} gerada — aguardando compra pelo paciente`
+                        : undefined,
+                });
+            } else {
+                toast.success(`${pendingFormula.name} adicionado!`);
+            }
         }
         setIsStockDialogOpen(false);
         setPendingFormula(null);
