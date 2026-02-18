@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import { X, Printer, Send, MessageSquare, ShieldCheck, Download, Mail, Syringe, Building2, CheckCircle2, Clock } from 'lucide-react';
+import { X, Printer, Send, MessageSquare, ShieldCheck, Download, Mail, Syringe, Building2, CheckCircle2, Clock, FileText, AlertTriangle } from 'lucide-react';
 import { PrintParameters } from './PrintParametersModal';
 import { DOCTOR_CONFIG, formatCRM, formatDate, formatDateTime } from '@/lib/doctor-config';
 import { useRef, useEffect, useState } from 'react';
@@ -60,6 +60,7 @@ export function PrescriptionPreviewModal({
     forwardingStatus
 }: PrescriptionPreviewModalProps) {
     const [qrCodeUrl, setQrCodeUrl] = useState('');
+    const [activeType, setActiveType] = useState<'simples' | 'controlada'>(type);
     const printRef = useRef<HTMLDivElement>(null);
 
     const documentId = `${Date.now().toString(36).toUpperCase()}`;
@@ -124,16 +125,42 @@ export function PrescriptionPreviewModal({
 
                 {/* Left Column: Preview */}
                 <div className="flex-1 bg-foreground/90 p-4 overflow-y-auto flex justify-center relative">
-                    <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-foreground/80 backdrop-blur text-white px-4 py-2 rounded-full flex gap-4 z-10">
+                    <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-foreground/80 backdrop-blur text-white px-4 py-2 rounded-full flex gap-4 items-center z-10">
+                        {/* Type Toggle */}
+                        <div className="flex bg-white/10 rounded-full p-0.5 gap-0.5">
+                            <button
+                                onClick={() => setActiveType('simples')}
+                                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                                    activeType === 'simples'
+                                        ? 'bg-emerald-500 text-white shadow-sm'
+                                        : 'text-white/60 hover:text-white/90'
+                                }`}
+                            >
+                                <FileText className="w-3 h-3" />
+                                Simples
+                            </button>
+                            <button
+                                onClick={() => setActiveType('controlada')}
+                                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                                    activeType === 'controlada'
+                                        ? 'bg-red-500 text-white shadow-sm'
+                                        : 'text-white/60 hover:text-white/90'
+                                }`}
+                            >
+                                <AlertTriangle className="w-3 h-3" />
+                                Controle Especial
+                            </button>
+                        </div>
+                        <div className="w-px h-4 bg-white/20"></div>
                         <span className="text-sm">1 / 1</span>
-                        <div className="w-px bg-white/20"></div>
+                        <div className="w-px h-4 bg-white/20"></div>
                         <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-white"><Download className="w-4 h-4" /></Button>
                         <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-white" onClick={handlePrint}><Printer className="w-4 h-4" /></Button>
                     </div>
 
                     {/* Paper */}
                     <div ref={printRef} className="bg-white shadow-2xl w-[210mm] min-h-[297mm] relative print:shadow-none">
-                        {type === 'controlada' ? (
+                        {activeType === 'controlada' ? (
                             // ========== RECEITUÁRIO DE CONTROLE ESPECIAL ==========
                             <div className="p-6 text-[11px] leading-tight">
                                 {/* Header */}
