@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import api from '@/lib/api';
 
 // Components
-import { PatientHeader } from '@/components/medical-record/patient-header';
+
 import { MedicalToolbar } from '@/components/medical-record/medical-toolbar';
 import { ImportantData } from '@/components/medical-record/important-data';
 import { Timeline } from '@/components/medical-record/timeline';
@@ -52,12 +52,7 @@ export default function PatientProntuarioPage() {
 
     return (
         <div className="flex flex-col h-[calc(100vh-64px)] bg-gray-50 overflow-hidden relative">
-            {/* Header do Paciente */}
-            <PatientHeader
-                name={patient.name}
-                age={calculateAge(patient.birthDate)}
-                gender={patient.gender === 'M' ? 'Masculino' : patient.gender === 'F' ? 'Feminino' : 'Outro'}
-            />
+
 
             {/* Layout Principal Dividido */}
             <div className="flex flex-1 overflow-hidden pb-20"> {/* pb-20 para dar espaço à toolbar fixa */}

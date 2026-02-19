@@ -247,7 +247,7 @@ export default function RelatoriosEstoquePage() {
   const maxConsumption = Math.max(...consumptionChartData.map(d => d.value), 1);
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-7xl">
+    <div className="px-4 py-6">
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

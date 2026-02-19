@@ -31,7 +31,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
 
                 {/* Content — With scroll and padding */}
                 <main className={cn("flex-1 overflow-y-auto relative", isMedicalRecord ? "p-0" : "p-6 md:p-8")}>
-                    <div className="mx-auto max-w-7xl h-full">
+                    <div className="w-full h-full">
                         {children}
                     </div>
                 </main>

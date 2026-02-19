@@ -126,7 +126,7 @@ export default function PatientsPage() {
 
     return (
         <main className="min-h-screen bg-background">
-            <div className="container mx-auto px-4 py-6 max-w-7xl">
+            <div className="px-4 py-6">
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}

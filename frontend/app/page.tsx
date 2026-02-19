@@ -97,7 +97,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-7xl mx-auto space-y-8">
+      <div className="space-y-8">
         <motion.div
           variants={containerVariants}
           initial="hidden"
