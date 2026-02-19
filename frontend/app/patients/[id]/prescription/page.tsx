@@ -18,7 +18,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogT
 import { Label } from '@/components/ui/label';
 import api from '@/lib/api';
 
-import { PatientHeader } from '@/components/medical-record/patient-header';
+
 import { LegacyEditor, LegacyEditorRef } from '@/components/ui/legacy-editor';
 import { PrintParameters, PrintParametersModal } from '@/components/prescription/PrintParametersModal';
 import { PrescriptionPreviewModal, ForwardingInfo } from '@/components/prescription/PrescriptionPreviewModal';
@@ -697,11 +697,7 @@ export default function PrescriptionPage() {
 
     return (
         <div className={`flex flex-col h-[calc(100vh-64px)] overflow-hidden relative ${isDarkMode ? 'bg-slate-900' : 'bg-gray-50'}`}>
-            <PatientHeader
-                name={patient.name}
-                age={calculateAge(patient.birthDate)}
-                gender={patient.gender === 'M' ? 'Masculino' : 'Feminino'}
-            />
+
 
             <div className="flex flex-1 overflow-hidden">
                 {/* Left Side: Editor (60%) */}

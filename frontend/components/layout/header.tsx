@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
-import { LogOut, User, Calendar } from 'lucide-react';
+import { LogOut, User, Calendar, Clock, FileText, Activity } from 'lucide-react';
 import { useAuth } from '@/components/auth/auth-provider';
 import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
@@ -120,8 +120,23 @@ export function Header() {
                 </h2>
             )}
 
-            {/* Right — Mono Clock + Logout */}
+            {/* Right — Patient Actions + Mono Clock + Logout */}
             <div className="flex items-center gap-4">
+                {isPatientPage && (
+                    <div className="flex items-center gap-1">
+                        <Button variant="ghost" size="icon" title="Histórico" className="h-8 w-8">
+                            <Clock className="w-4 h-4 text-muted-foreground" />
+                        </Button>
+                        <Button variant="ghost" size="icon" title="Exames" className="h-8 w-8">
+                            <FileText className="w-4 h-4 text-muted-foreground" />
+                        </Button>
+                        <Button variant="ghost" size="icon" title="Sinais Vitais" className="h-8 w-8">
+                            <Activity className="w-4 h-4 text-muted-foreground" />
+                        </Button>
+                        <div className="h-4 w-px bg-border" />
+                    </div>
+                )}
+
                 <span className="mono-label text-muted-foreground">
                     {clock}
                 </span>
