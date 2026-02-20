@@ -418,7 +418,7 @@ export default function SentinelaPage() {
                             <MessageSquare className="w-3 h-3" />
                             Mensagem que disparou o alerta:
                           </p>
-                          <p className="text-sm italic">"{alert.triggerMessage}"</p>
+                          <p className="text-sm italic">&quot;{alert.triggerMessage}&quot;</p>
                         </div>
 
                         {/* Suggested Action */}

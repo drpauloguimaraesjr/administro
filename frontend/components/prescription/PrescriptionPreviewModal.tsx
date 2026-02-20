@@ -10,7 +10,9 @@ import { X, Printer, Send, MessageSquare, ShieldCheck, Download, Mail, Syringe, 
 import { PrintParameters } from './PrintParametersModal';
 import { DOCTOR_CONFIG, formatCRM, formatDate, formatDateTime } from '@/lib/doctor-config';
 import { useRef, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import QRCode from 'qrcode';
+import api from '@/lib/api';
 
 interface PatientData {
     name: string;
@@ -61,6 +63,31 @@ export function PrescriptionPreviewModal({
 }: PrescriptionPreviewModalProps) {
     const [qrCodeUrl, setQrCodeUrl] = useState('');
     const [activeType, setActiveType] = useState<'simples' | 'controlada'>(type);
+
+    // Load saved prescription settings (header/footer/watermark)
+    const { data: rxSettings } = useQuery({
+        queryKey: ['prescription-settings'],
+        queryFn: async () => {
+            const res = await api.get('/settings/prescription');
+            return res.data as {
+                headerImageUrl?: string | null;
+                footerImageUrl?: string | null;
+                watermark?: {
+                    enabled: boolean;
+                    type: 'image' | 'text';
+                    imageUrl?: string | null;
+                    text?: string;
+                    opacity: number;
+                    applyTo: 'simples' | 'controlada' | 'ambas';
+                };
+                margins?: { headerSpacing: number; footerSpacing: number };
+            };
+        },
+        staleTime: 60_000,
+    });
+
+    const showWatermark = rxSettings?.watermark?.enabled &&
+        (rxSettings.watermark.applyTo === 'ambas' || rxSettings.watermark.applyTo === activeType);
     const printRef = useRef<HTMLDivElement>(null);
 
     const documentId = `${Date.now().toString(36).toUpperCase()}`;
@@ -160,6 +187,25 @@ export function PrescriptionPreviewModal({
 
                     {/* Paper */}
                     <div ref={printRef} className="bg-white shadow-2xl w-[210mm] min-h-[297mm] relative print:shadow-none">
+                        {/* Watermark Overlay */}
+                        {showWatermark && (
+                            <div
+                                className="absolute inset-0 flex items-center justify-center pointer-events-none z-0"
+                                style={{ opacity: rxSettings!.watermark!.opacity }}
+                            >
+                                {rxSettings!.watermark!.type === 'image' && rxSettings!.watermark!.imageUrl ? (
+                                    <img
+                                        src={rxSettings!.watermark!.imageUrl}
+                                        alt="Watermark"
+                                        className="max-w-[60%] max-h-[60%] object-contain"
+                                    />
+                                ) : rxSettings!.watermark!.type === 'text' && rxSettings!.watermark!.text ? (
+                                    <div className="text-gray-400 font-serif text-7xl transform -rotate-45 select-none whitespace-nowrap">
+                                        {rxSettings!.watermark!.text}
+                                    </div>
+                                ) : null}
+                            </div>
+                        )}
                         {activeType === 'controlada' ? (
                             // ========== RECEITUÁRIO DE CONTROLE ESPECIAL ==========
                             <div className="p-6 text-[11px] leading-tight">
@@ -353,17 +399,23 @@ export function PrescriptionPreviewModal({
                             >
                                 {/* Header */}
                                 {params.showHeaderFooter && (
-                                    <div className="mb-6 flex gap-4 items-center border-b pb-4">
-                                        <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                                            PG
+                                    rxSettings?.headerImageUrl ? (
+                                        <div style={{ marginBottom: `${rxSettings?.margins?.headerSpacing ?? 1}cm` }}>
+                                            <img src={rxSettings.headerImageUrl} alt="Cabeçalho" className="w-full" />
                                         </div>
-                                        <div>
-                                            <h1 className="font-bold text-lg text-gray-800">{DOCTOR_CONFIG.shortName}</h1>
-                                            <p className="text-xs text-gray-500">{formatCRM(DOCTOR_CONFIG.crm, DOCTOR_CONFIG.uf)}</p>
-                                            <p className="text-xs text-gray-500">{DOCTOR_CONFIG.fullAddress}</p>
-                                            <p className="text-xs text-gray-500">{DOCTOR_CONFIG.phone} | {DOCTOR_CONFIG.email}</p>
+                                    ) : (
+                                        <div className="mb-6 flex gap-4 items-center border-b pb-4">
+                                            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                                                PG
+                                            </div>
+                                            <div>
+                                                <h1 className="font-bold text-lg text-gray-800">{DOCTOR_CONFIG.shortName}</h1>
+                                                <p className="text-xs text-gray-500">{formatCRM(DOCTOR_CONFIG.crm, DOCTOR_CONFIG.uf)}</p>
+                                                <p className="text-xs text-gray-500">{DOCTOR_CONFIG.fullAddress}</p>
+                                                <p className="text-xs text-gray-500">{DOCTOR_CONFIG.phone} | {DOCTOR_CONFIG.email}</p>
+                                            </div>
                                         </div>
-                                    </div>
+                                    )
                                 )}
 
                                 {/* Patient Info */}
@@ -413,10 +465,16 @@ export function PrescriptionPreviewModal({
 
                                     {/* Footer Line */}
                                     {params.showHeaderFooter && (
-                                        <div className="mt-6 pt-2 border-t text-[10px] text-center text-gray-400 flex justify-between">
-                                            <span>{DOCTOR_CONFIG.phone} | {DOCTOR_CONFIG.email}</span>
-                                            {params.showPageNumber && <span>Pág 1/1</span>}
-                                        </div>
+                                        rxSettings?.footerImageUrl ? (
+                                            <div style={{ marginTop: `${rxSettings?.margins?.footerSpacing ?? 1}cm` }}>
+                                                <img src={rxSettings.footerImageUrl} alt="Rodapé" className="w-full" />
+                                            </div>
+                                        ) : (
+                                            <div className="mt-6 pt-2 border-t text-[10px] text-center text-gray-400 flex justify-between">
+                                                <span>{DOCTOR_CONFIG.phone} | {DOCTOR_CONFIG.email}</span>
+                                                {params.showPageNumber && <span>Pág 1/1</span>}
+                                            </div>
+                                        )
                                     )}
                                 </div>
 

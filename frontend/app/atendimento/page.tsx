@@ -435,9 +435,9 @@ export default function AtendimentoPage() {
                             </div>
                             <p className="font-medium mt-1">{alert.title}</p>
                             <p className="text-sm mt-1 opacity-75">{alert.description}</p>
-                            <p className="text-xs mt-2 italic opacity-60">
-                              "{alert.triggerMessage.slice(0, 100)}..."
-                            </p>
+                              <p className="text-xs mt-2 italic opacity-60">
+                                &quot;{alert.triggerMessage.slice(0, 100)}...&quot;
+                              </p>
                           </div>
                         </div>
                         <div className="flex justify-between items-center mt-3 pt-2 border-t border-current/10">

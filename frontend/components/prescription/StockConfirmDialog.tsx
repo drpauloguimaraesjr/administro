@@ -118,7 +118,7 @@ export function StockConfirmDialog({
             
             {formulaName !== product.name && (
               <p className="text-xs text-primary mt-2">
-                Pesquisado: "{formulaName}"
+                Pesquisado: &quot;{formulaName}&quot;
               </p>
             )}
           </div>
