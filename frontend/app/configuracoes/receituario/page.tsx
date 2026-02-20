@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Upload, Image, Type, Eye, Trash2, Save, ArrowLeft, FileText, AlertTriangle, Droplets } from 'lucide-react';
+import { Upload, Image, Type, Eye, Trash2, Save, ArrowLeft, FileText, AlertTriangle, Droplets, Sparkles, Maximize2, Phone, MapPin, Instagram, AtSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,6 +11,64 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DOCTOR_CONFIG, formatCRM } from '@/lib/doctor-config';
 import api from '@/lib/api';
 import Link from 'next/link';
+
+// Decorative background effects catalog
+const DECORATIVE_EFFECTS = [
+    {
+        id: 'none',
+        name: 'Nenhum',
+        icon: '✕',
+        svg: '',
+    },
+    {
+        id: 'dna-helix',
+        name: 'DNA Helix',
+        icon: '🧬',
+        svg: `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="80" viewBox="0 0 60 80"><path d="M30 0Q45 20 30 40Q15 60 30 80" stroke="currentColor" fill="none" stroke-width="1.5" opacity="0.15"/><path d="M30 0Q15 20 30 40Q45 60 30 80" stroke="currentColor" fill="none" stroke-width="1.5" opacity="0.15"/><line x1="18" y1="10" x2="42" y2="10" stroke="currentColor" stroke-width="0.8" opacity="0.1"/><line x1="15" y1="20" x2="45" y2="20" stroke="currentColor" stroke-width="0.8" opacity="0.1"/><line x1="18" y1="30" x2="42" y2="30" stroke="currentColor" stroke-width="0.8" opacity="0.1"/><line x1="18" y1="50" x2="42" y2="50" stroke="currentColor" stroke-width="0.8" opacity="0.1"/><line x1="15" y1="60" x2="45" y2="60" stroke="currentColor" stroke-width="0.8" opacity="0.1"/><line x1="18" y1="70" x2="42" y2="70" stroke="currentColor" stroke-width="0.8" opacity="0.1"/></svg>`,
+    },
+    {
+        id: 'clouds',
+        name: 'Nuvens',
+        icon: '☁️',
+        svg: `<svg xmlns="http://www.w3.org/2000/svg" width="120" height="60" viewBox="0 0 120 60"><ellipse cx="40" cy="35" rx="25" ry="15" fill="currentColor" opacity="0.06"/><ellipse cx="55" cy="28" rx="18" ry="12" fill="currentColor" opacity="0.05"/><ellipse cx="25" cy="30" rx="15" ry="10" fill="currentColor" opacity="0.04"/><ellipse cx="95" cy="45" rx="20" ry="12" fill="currentColor" opacity="0.05"/><ellipse cx="108" cy="40" rx="14" ry="9" fill="currentColor" opacity="0.04"/></svg>`,
+    },
+    {
+        id: 'bamboo',
+        name: 'Bambu',
+        icon: '🎋',
+        svg: `<svg xmlns="http://www.w3.org/2000/svg" width="80" height="100" viewBox="0 0 80 100"><line x1="20" y1="0" x2="20" y2="100" stroke="currentColor" stroke-width="3" opacity="0.08"/><line x1="60" y1="0" x2="60" y2="100" stroke="currentColor" stroke-width="2.5" opacity="0.06"/><line x1="18" y1="25" x2="22" y2="25" stroke="currentColor" stroke-width="2" opacity="0.1"/><line x1="18" y1="50" x2="22" y2="50" stroke="currentColor" stroke-width="2" opacity="0.1"/><line x1="18" y1="75" x2="22" y2="75" stroke="currentColor" stroke-width="2" opacity="0.1"/><line x1="58" y1="20" x2="62" y2="20" stroke="currentColor" stroke-width="1.5" opacity="0.08"/><line x1="58" y1="55" x2="62" y2="55" stroke="currentColor" stroke-width="1.5" opacity="0.08"/><line x1="58" y1="85" x2="62" y2="85" stroke="currentColor" stroke-width="1.5" opacity="0.08"/><path d="M22 25Q35 15 35 25Q35 35 22 30" fill="currentColor" opacity="0.05"/><path d="M22 50Q38 40 35 50Q32 60 22 55" fill="currentColor" opacity="0.04"/></svg>`,
+    },
+    {
+        id: 'caduceus',
+        name: 'Caduceu',
+        icon: '⚕️',
+        svg: `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="80" viewBox="0 0 60 80"><line x1="30" y1="5" x2="30" y2="75" stroke="currentColor" stroke-width="2" opacity="0.08"/><path d="M30 15Q45 20 30 30Q15 40 30 50" stroke="currentColor" fill="none" stroke-width="1.5" opacity="0.06"/><path d="M30 15Q15 20 30 30Q45 40 30 50" stroke="currentColor" fill="none" stroke-width="1.5" opacity="0.06"/><circle cx="22" cy="8" r="5" fill="none" stroke="currentColor" stroke-width="1" opacity="0.07"/><circle cx="38" cy="8" r="5" fill="none" stroke="currentColor" stroke-width="1" opacity="0.07"/><line x1="25" y1="75" x2="35" y2="75" stroke="currentColor" stroke-width="2" opacity="0.08"/></svg>`,
+    },
+    {
+        id: 'hexagons',
+        name: 'Hexágonos',
+        icon: '⬡',
+        svg: `<svg xmlns="http://www.w3.org/2000/svg" width="80" height="70" viewBox="0 0 80 70"><polygon points="40,5 65,17 65,42 40,54 15,42 15,17" fill="none" stroke="currentColor" stroke-width="1" opacity="0.06"/><polygon points="40,35 55,42 55,56 40,63 25,56 25,42" fill="none" stroke="currentColor" stroke-width="0.7" opacity="0.04"/></svg>`,
+    },
+    {
+        id: 'waves',
+        name: 'Ondas',
+        icon: '🌊',
+        svg: `<svg xmlns="http://www.w3.org/2000/svg" width="120" height="40" viewBox="0 0 120 40"><path d="M0 20Q15 5 30 20Q45 35 60 20Q75 5 90 20Q105 35 120 20" stroke="currentColor" fill="none" stroke-width="1.5" opacity="0.06"/><path d="M0 30Q15 18 30 30Q45 42 60 30Q75 18 90 30Q105 42 120 30" stroke="currentColor" fill="none" stroke-width="1" opacity="0.04"/></svg>`,
+    },
+    {
+        id: 'leaves',
+        name: 'Folhas',
+        icon: '🍃',
+        svg: `<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><path d="M40 10Q60 20 50 40Q40 60 20 50Q30 30 40 10Z" fill="currentColor" opacity="0.04"/><path d="M55 55Q70 45 65 60Q60 75 45 70Q50 60 55 55Z" fill="currentColor" opacity="0.03"/></svg>`,
+    },
+    {
+        id: 'circles',
+        name: 'Círculos',
+        icon: '◎',
+        svg: `<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="30" fill="none" stroke="currentColor" stroke-width="1" opacity="0.05"/><circle cx="40" cy="40" r="20" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.04"/><circle cx="40" cy="40" r="10" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.03"/></svg>`,
+    },
+];
 
 interface PrescriptionSettings {
     headerImageUrl?: string | null;
@@ -21,11 +79,20 @@ interface PrescriptionSettings {
         imageUrl?: string | null;
         text?: string;
         opacity: number;
+        scale?: number;
+        effect?: string;
         applyTo: 'simples' | 'controlada' | 'ambas';
     };
     margins?: {
         headerSpacing: number;
         footerSpacing: number;
+    };
+    footerInfo?: {
+        address?: string;
+        phone?: string;
+        showWhatsAppIcon?: boolean;
+        instagramDoctor?: string;
+        instagramClinic?: string;
     };
 }
 
@@ -136,8 +203,20 @@ export default function ReceituarioPage() {
                 enabled: prev.watermark?.enabled ?? false,
                 type: prev.watermark?.type ?? 'text',
                 opacity: prev.watermark?.opacity ?? 0.15,
+                scale: prev.watermark?.scale ?? 60,
                 applyTo: prev.watermark?.applyTo ?? 'ambas',
                 ...prev.watermark,
+                ...updates,
+            }
+        }));
+        setIsDirty(true);
+    };
+
+    const updateFooterInfo = (updates: Partial<NonNullable<PrescriptionSettings['footerInfo']>>) => {
+        setLocalSettings(prev => ({
+            ...prev,
+            footerInfo: {
+                ...prev.footerInfo,
                 ...updates,
             }
         }));
@@ -365,6 +444,76 @@ export default function ReceituarioPage() {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Footer Contact Info */}
+                            <div className="border border-border rounded-lg p-4 space-y-3 bg-card">
+                                <Label className="text-sm font-semibold">Informações de Contato (Rodapé)</Label>
+                                <p className="text-xs text-muted-foreground">
+                                    Aparecerão no rodapé da receita, abaixo da imagem de rodapé (se houver).
+                                </p>
+
+                                <div className="space-y-3">
+                                    <div className="space-y-1">
+                                        <Label className="text-xs text-muted-foreground flex items-center gap-1">
+                                            <MapPin className="w-3 h-3" /> Endereço da Clínica
+                                        </Label>
+                                        <Input
+                                            value={localSettings.footerInfo?.address ?? ''}
+                                            onChange={(e) => updateFooterInfo({ address: e.target.value })}
+                                            placeholder="Rua Exemplo, 123 - Bairro - Cidade/UF"
+                                            className="h-8"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <Label className="text-xs text-muted-foreground flex items-center gap-1">
+                                            <Phone className="w-3 h-3" /> Telefone / WhatsApp
+                                        </Label>
+                                        <div className="flex gap-2 items-center">
+                                            <Input
+                                                value={localSettings.footerInfo?.phone ?? ''}
+                                                onChange={(e) => updateFooterInfo({ phone: e.target.value })}
+                                                placeholder="(47) 99999-9999"
+                                                className="h-8 flex-1"
+                                            />
+                                            <div className="flex items-center gap-1.5">
+                                                <Switch
+                                                    checked={localSettings.footerInfo?.showWhatsAppIcon ?? true}
+                                                    onCheckedChange={(v) => updateFooterInfo({ showWhatsAppIcon: v })}
+                                                />
+                                                <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                                                    {localSettings.footerInfo?.showWhatsAppIcon !== false ? '📱 WhatsApp' : 'Sem ícone'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="space-y-1">
+                                            <Label className="text-xs text-muted-foreground flex items-center gap-1">
+                                                <Instagram className="w-3 h-3" /> Instagram Médico
+                                            </Label>
+                                            <Input
+                                                value={localSettings.footerInfo?.instagramDoctor ?? ''}
+                                                onChange={(e) => updateFooterInfo({ instagramDoctor: e.target.value })}
+                                                placeholder="@dr.exemplo"
+                                                className="h-8"
+                                            />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <Label className="text-xs text-muted-foreground flex items-center gap-1">
+                                                <Instagram className="w-3 h-3" /> Instagram Clínica
+                                            </Label>
+                                            <Input
+                                                value={localSettings.footerInfo?.instagramClinic ?? ''}
+                                                onChange={(e) => updateFooterInfo({ instagramClinic: e.target.value })}
+                                                placeholder="@clinica.exemplo"
+                                                className="h-8"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </>
                     )}
 
@@ -493,6 +642,26 @@ export default function ReceituarioPage() {
                                             />
                                         </div>
 
+                                        {/* Scale */}
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <Label className="text-xs text-muted-foreground flex items-center gap-1">
+                                                    <Maximize2 className="w-3 h-3" /> Tamanho
+                                                </Label>
+                                                <span className="text-xs font-mono text-muted-foreground">
+                                                    {localSettings.watermark?.scale ?? 60}%
+                                                </span>
+                                            </div>
+                                            <input
+                                                type="range"
+                                                min="20"
+                                                max="100"
+                                                value={localSettings.watermark?.scale ?? 60}
+                                                onChange={(e) => updateWatermark({ scale: parseInt(e.target.value) })}
+                                                className="w-full accent-primary"
+                                            />
+                                        </div>
+
                                         {/* Apply To */}
                                         <div className="space-y-1">
                                             <Label className="text-xs text-muted-foreground">Aplicar em</Label>
@@ -509,6 +678,32 @@ export default function ReceituarioPage() {
                                                     <SelectItem value="controlada">Apenas Receita Controlada</SelectItem>
                                                 </SelectContent>
                                             </Select>
+                                        </div>
+
+                                        {/* Decorative Effects */}
+                                        <div className="space-y-2 pt-2 border-t border-border/50">
+                                            <Label className="text-xs text-muted-foreground flex items-center gap-1">
+                                                <Sparkles className="w-3 h-3" /> Efeito Decorativo
+                                            </Label>
+                                            <p className="text-[10px] text-muted-foreground/60">
+                                                Padrões sutis que preenchem o fundo além da marca d&apos;água
+                                            </p>
+                                            <div className="grid grid-cols-3 gap-2">
+                                                {DECORATIVE_EFFECTS.map((effect) => (
+                                                    <button
+                                                        key={effect.id}
+                                                        onClick={() => updateWatermark({ effect: effect.id })}
+                                                        className={`flex flex-col items-center gap-1 py-2 px-1 rounded-lg border text-xs transition-all ${
+                                                            (localSettings.watermark?.effect ?? 'none') === effect.id
+                                                                ? 'border-primary bg-primary/10 text-primary ring-1 ring-primary/30'
+                                                                : 'border-border text-muted-foreground hover:border-primary/50 hover:bg-primary/5'
+                                                        }`}
+                                                    >
+                                                        <span className="text-base">{effect.icon}</span>
+                                                        <span className="text-[10px] leading-tight">{effect.name}</span>
+                                                    </button>
+                                                ))}
+                                            </div>
                                         </div>
                                     </>
                                 )}
@@ -686,23 +881,45 @@ export default function ReceituarioPage() {
                                         O conteúdo da prescrição aparecerá aqui...
                                     </p>
 
+                                    {/* Decorative effect pattern */}
+                                    {localSettings.watermark?.enabled &&
+                                        localSettings.watermark?.effect &&
+                                        localSettings.watermark.effect !== 'none' && (
+                                        <div
+                                            className="absolute inset-0 pointer-events-none z-0 overflow-hidden"
+                                            style={{
+                                                opacity: localSettings.watermark.opacity * 1.5,
+                                                backgroundImage: `url("data:image/svg+xml,${encodeURIComponent(
+                                                    DECORATIVE_EFFECTS.find(e => e.id === localSettings.watermark?.effect)?.svg?.replace(/currentColor/g, '%23999') || ''
+                                                )}")`,
+                                                backgroundRepeat: 'repeat',
+                                                backgroundSize: `${(localSettings.watermark.scale ?? 60) * 1.5}px`,
+                                            }}
+                                        />
+                                    )}
+
                                     {/* Watermark preview */}
                                     {localSettings.watermark?.enabled && (
                                         activeTab === 'watermark' || activeTab === 'header-footer'
                                     ) && (
                                         <div
-                                            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                                            className="absolute inset-0 flex items-center justify-center pointer-events-none z-[1]"
                                             style={{ opacity: localSettings.watermark.opacity }}
                                         >
                                             {localSettings.watermark.type === 'image' && localSettings.watermark.imageUrl ? (
                                                 <img
                                                     src={localSettings.watermark.imageUrl}
                                                     alt="Watermark"
-                                                    className="max-w-[60%] max-h-[60%] object-contain"
+                                                    style={{
+                                                        maxWidth: `${localSettings.watermark.scale ?? 60}%`,
+                                                        maxHeight: `${localSettings.watermark.scale ?? 60}%`,
+                                                    }}
+                                                    className="object-contain"
                                                 />
                                             ) : localSettings.watermark.type === 'text' && localSettings.watermark.text ? (
                                                 <div
-                                                    className="text-gray-400 font-serif text-6xl transform -rotate-45 select-none whitespace-nowrap"
+                                                    className="text-gray-400 font-serif transform -rotate-45 select-none whitespace-nowrap"
+                                                    style={{ fontSize: `${Math.max(24, (localSettings.watermark.scale ?? 60) * 0.9)}px` }}
                                                 >
                                                     {localSettings.watermark.text}
                                                 </div>
@@ -718,6 +935,45 @@ export default function ReceituarioPage() {
                                     ) : (
                                         <div className="h-16 border-t-2 border-dashed border-gray-200 flex items-center justify-center text-gray-300 text-sm">
                                             Rodapé (faça upload à esquerda)
+                                        </div>
+                                    )}
+
+                                    {/* Footer Contact Info Bar */}
+                                    {(localSettings.footerInfo?.address || localSettings.footerInfo?.phone || localSettings.footerInfo?.instagramDoctor || localSettings.footerInfo?.instagramClinic) && (
+                                        <div className="mt-2 pt-2 border-t border-gray-200 px-4">
+                                            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[9px] text-gray-500">
+                                                {localSettings.footerInfo.address && (
+                                                    <span className="flex items-center gap-1">
+                                                        <MapPin className="w-2.5 h-2.5" />
+                                                        {localSettings.footerInfo.address}
+                                                    </span>
+                                                )}
+                                                {localSettings.footerInfo.phone && (
+                                                    <span className="flex items-center gap-1">
+                                                        {localSettings.footerInfo.showWhatsAppIcon !== false ? (
+                                                            <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="currentColor">
+                                                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                                                                <path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a8 8 0 01-4.243-1.215l-.29-.175-3.01.79.79-3.01-.175-.29A8 8 0 1112 20z"/>
+                                                            </svg>
+                                                        ) : (
+                                                            <Phone className="w-2.5 h-2.5" />
+                                                        )}
+                                                        {localSettings.footerInfo.phone}
+                                                    </span>
+                                                )}
+                                                {localSettings.footerInfo.instagramDoctor && (
+                                                    <span className="flex items-center gap-1">
+                                                        <Instagram className="w-2.5 h-2.5" />
+                                                        {localSettings.footerInfo.instagramDoctor}
+                                                    </span>
+                                                )}
+                                                {localSettings.footerInfo.instagramClinic && (
+                                                    <span className="flex items-center gap-1">
+                                                        <Instagram className="w-2.5 h-2.5" />
+                                                        {localSettings.footerInfo.instagramClinic}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
                                     )}
                                 </div>
