@@ -85,30 +85,21 @@ export function PostEmissionActionsModal({
 
         setIsSendingWhatsApp(true);
         try {
-            // Generate PDF first if not generated
-            let currentPdfUrl = pdfUrl;
-            if (!currentPdfUrl) {
-                const res = await api.post(`/settings/prescriptions/${data.prescriptionId}/pdf`, {
-                    patientId: data.patientId,
-                    type: data.prescriptionType,
-                    saveToStorage: true,
-                });
-                currentPdfUrl = res.data.storageUrl;
-            }
-
-            // Send via WhatsApp
-            await api.post('/whatsapp/send-document', {
+            // Unified endpoint: generates PDF, saves to Storage, sends via WhatsApp
+            const res = await api.post('/whatsapp/send-document', {
                 phone: data.patientPhone,
-                documentUrl: currentPdfUrl,
-                fileName: `Receita - ${data.patientName}`,
-                caption: `Receita médica de ${data.patientName}`,
+                patientId: data.patientId,
+                prescriptionId: data.prescriptionId,
+                prescriptionType: data.prescriptionType,
+                patientName: data.patientName,
             });
 
             setWhatsAppSent(true);
             toast.success('Receita enviada por WhatsApp!');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error sending WhatsApp:', error);
-            toast.error('Erro ao enviar WhatsApp. Tente novamente.');
+            const errorMsg = error.response?.data?.error || 'Erro ao enviar WhatsApp. Tente novamente.';
+            toast.error(errorMsg);
         } finally {
             setIsSendingWhatsApp(false);
         }

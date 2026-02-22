@@ -351,5 +351,52 @@ router.get('/status', async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * POST /api/whatsapp/send-document
+ * Generates prescription PDF and sends it as a WhatsApp document
+ */
+router.post('/send-document', async (req: Request, res: Response) => {
+  try {
+    const { phone, patientId, prescriptionId, prescriptionType, patientName } = req.body;
+
+    if (!phone || !patientId || !prescriptionId) {
+      return res.status(400).json({
+        error: 'Campos obrigatórios: phone, patientId, prescriptionId',
+      });
+    }
+
+    // Generate PDF
+    const { generatePrescriptionPdf, savePdfToStorage } = await import('../services/prescription-pdf.service.js');
+    const pdfBytes = await generatePrescriptionPdf(patientId, prescriptionId, prescriptionType || 'simples');
+
+    // Save to Storage
+    const storageUrl = await savePdfToStorage(patientId, prescriptionId, pdfBytes);
+
+    // Send via WhatsApp
+    const { sendDocument } = await import('../services/whatsapp.js');
+    const filename = `Receita - ${patientName || 'Paciente'}.pdf`;
+    const sent = await sendDocument(phone, storageUrl, filename);
+
+    if (!sent) {
+      return res.status(503).json({
+        error: 'WhatsApp não conectado. Verifique a conexão.',
+        storageUrl,
+      });
+    }
+
+    res.json({
+      success: true,
+      storageUrl,
+      message: `Receita enviada para ${phone}`,
+    });
+  } catch (error: any) {
+    console.error('❌ Erro ao enviar documento WhatsApp:', error);
+    res.status(500).json({
+      error: 'Erro ao enviar documento',
+      message: error.message,
+    });
+  }
+});
+
 export default router;
 
