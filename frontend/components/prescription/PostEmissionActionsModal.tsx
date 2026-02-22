@@ -2,7 +2,7 @@
 
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Printer, FileDown, Send, Syringe, Check, X, Loader2, FileText } from 'lucide-react';
+import { Printer, FileDown, Send, Syringe, Check, X, Loader2, FileText, Users, Building2, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import api from '@/lib/api';
@@ -39,14 +39,13 @@ export function PostEmissionActionsModal({
     onPrint,
 }: PostEmissionActionsModalProps) {
     const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
-    const [isSendingWhatsApp, setIsSendingWhatsApp] = useState(false);
+    const [isEmittingInternal, setIsEmittingInternal] = useState(false);
     const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-    const [whatsAppSent, setWhatsAppSent] = useState(false);
+    const [internalEmitted, setInternalEmitted] = useState(false);
 
     if (!data) return null;
 
     const hasInjectables = data.injectables.length > 0;
-    const hasPhone = !!data.patientPhone;
 
     const handleGeneratePdf = async () => {
         setIsGeneratingPdf(true);
@@ -60,7 +59,6 @@ export function PostEmissionActionsModal({
             const url = URL.createObjectURL(blob);
             setPdfUrl(url);
 
-            // Auto-download
             const link = document.createElement('a');
             link.href = url;
             link.download = `receita-${data.patientName.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.pdf`;
@@ -77,37 +75,34 @@ export function PostEmissionActionsModal({
         }
     };
 
-    const handleSendWhatsApp = async () => {
-        if (!hasPhone) {
-            toast.error('Paciente não possui telefone cadastrado');
-            return;
-        }
-
-        setIsSendingWhatsApp(true);
+    const handleInternalEmission = async () => {
+        setIsEmittingInternal(true);
         try {
-            // Unified endpoint: generates PDF, saves to Storage, sends via WhatsApp
-            const res = await api.post('/whatsapp/send-document', {
-                phone: data.patientPhone,
-                patientId: data.patientId,
+            await api.post(`/nursing-orders/internal-emission`, {
                 prescriptionId: data.prescriptionId,
-                prescriptionType: data.prescriptionType,
+                patientId: data.patientId,
                 patientName: data.patientName,
+                prescriptionType: data.prescriptionType,
+                injectables: data.injectables,
+                nursingOrdersCreated: data.nursingOrdersCreated,
             });
 
-            setWhatsAppSent(true);
-            toast.success('Receita enviada por WhatsApp!');
+            setInternalEmitted(true);
+            toast.success('Receita emitida internamente!', {
+                description: 'Sua equipe foi notificada e pode acompanhar o fluxo.',
+            });
         } catch (error: any) {
-            console.error('Error sending WhatsApp:', error);
-            const errorMsg = error.response?.data?.error || 'Erro ao enviar WhatsApp. Tente novamente.';
+            console.error('Error emitting internally:', error);
+            const errorMsg = error.response?.data?.error || 'Erro ao emitir internamente.';
             toast.error(errorMsg);
         } finally {
-            setIsSendingWhatsApp(false);
+            setIsEmittingInternal(false);
         }
     };
 
     const handleClose = () => {
         setPdfUrl(null);
-        setWhatsAppSent(false);
+        setInternalEmitted(false);
         onClose();
     };
 
@@ -172,6 +167,52 @@ export function PostEmissionActionsModal({
 
                     {/* Action Buttons */}
                     <div className="space-y-2">
+
+                        {/* EMISSÃO INTERNA — Primary action */}
+                        <Button
+                            onClick={handleInternalEmission}
+                            className={`w-full justify-start gap-3 h-14 text-left ${
+                                internalEmitted
+                                    ? 'bg-emerald-600 hover:bg-emerald-700'
+                                    : 'bg-blue-600 hover:bg-blue-700'
+                            }`}
+                            disabled={isEmittingInternal || internalEmitted}
+                        >
+                            <div className="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
+                                {isEmittingInternal ? (
+                                    <Loader2 className="w-5 h-5 text-white animate-spin" />
+                                ) : internalEmitted ? (
+                                    <Check className="w-5 h-5 text-white" />
+                                ) : (
+                                    <Users className="w-5 h-5 text-white" />
+                                )}
+                            </div>
+                            <div className="flex-1">
+                                <div className="font-semibold text-sm text-white">
+                                    {internalEmitted ? 'Emitido para Equipe ✓' : isEmittingInternal ? 'Emitindo...' : 'Emissão Interna'}
+                                </div>
+                                <div className="text-xs text-white/70">
+                                    {internalEmitted
+                                        ? 'Enfermagem e equipe notificadas'
+                                        : 'Encaminhar para enfermagem e equipe seguir o fluxo'}
+                                </div>
+                            </div>
+                            {!internalEmitted && !isEmittingInternal && (
+                                <ArrowRight className="w-4 h-4 text-white/60" />
+                            )}
+                        </Button>
+
+                        {/* Divider */}
+                        <div className="relative py-1">
+                            <div className="absolute inset-0 flex items-center">
+                                <div className="w-full border-t border-border" />
+                            </div>
+                            <div className="relative flex justify-center text-xs">
+                                <span className="bg-background px-2 text-muted-foreground">Outras ações</span>
+                            </div>
+                        </div>
+
+                        {/* Print */}
                         <Button
                             onClick={onPrint}
                             variant="outline"
@@ -186,6 +227,7 @@ export function PostEmissionActionsModal({
                             </div>
                         </Button>
 
+                        {/* PDF */}
                         <Button
                             onClick={handleGeneratePdf}
                             variant="outline"
@@ -207,36 +249,6 @@ export function PostEmissionActionsModal({
                                 </div>
                                 <div className="text-xs text-muted-foreground">
                                     {pdfUrl ? 'Clique para baixar novamente' : 'Download como arquivo PDF'}
-                                </div>
-                            </div>
-                        </Button>
-
-                        <Button
-                            onClick={handleSendWhatsApp}
-                            variant="outline"
-                            className={`w-full justify-start gap-3 h-12 text-left ${!hasPhone ? 'opacity-50' : ''}`}
-                            disabled={isSendingWhatsApp || !hasPhone}
-                        >
-                            <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center shrink-0">
-                                {isSendingWhatsApp ? (
-                                    <Loader2 className="w-4 h-4 text-green-600 animate-spin" />
-                                ) : whatsAppSent ? (
-                                    <Check className="w-4 h-4 text-emerald-600" />
-                                ) : (
-                                    <Send className="w-4 h-4 text-green-600" />
-                                )}
-                            </div>
-                            <div>
-                                <div className="font-medium text-sm">
-                                    {whatsAppSent ? 'WhatsApp Enviado ✓' : isSendingWhatsApp ? 'Enviando...' : 'Enviar por WhatsApp'}
-                                </div>
-                                <div className="text-xs text-muted-foreground">
-                                    {!hasPhone
-                                        ? 'Paciente sem telefone cadastrado'
-                                        : whatsAppSent
-                                            ? `Enviado para ${data.patientPhone}`
-                                            : `Enviar PDF para ${data.patientPhone}`
-                                    }
                                 </div>
                             </div>
                         </Button>

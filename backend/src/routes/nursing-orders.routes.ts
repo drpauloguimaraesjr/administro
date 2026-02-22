@@ -3,8 +3,10 @@
 import { Router, Request, Response } from 'express';
 import * as nursingService from '../services/nursing-orders.service.js';
 import type { NursingOrderStatus } from '../types/nursing-orders.types.js';
+import admin from 'firebase-admin';
 
 const router = Router();
+const db = admin.firestore();
 
 // =====================
 // List & Fetch
@@ -57,6 +59,80 @@ router.get('/:id', async (req: Request, res: Response) => {
         res.json(order);
     } catch (error: any) {
         console.error('Erro ao buscar pedido:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// =====================
+// Internal Emission
+// =====================
+
+// POST /api/nursing-orders/internal-emission — Marca a receita como emitida internamente
+router.post('/internal-emission', async (req: Request, res: Response) => {
+    try {
+        const {
+            prescriptionId,
+            patientId,
+            patientName,
+            prescriptionType,
+            injectables,
+            nursingOrdersCreated,
+        } = req.body;
+
+        if (!prescriptionId || !patientId) {
+            return res.status(400).json({
+                error: 'Campos obrigatórios: prescriptionId, patientId',
+            });
+        }
+
+        const now = new Date().toISOString();
+
+        // Update prescription document with internal emission status
+        const prescriptionRef = db
+            .collection('patients')
+            .doc(patientId)
+            .collection('prescriptions')
+            .doc(prescriptionId);
+
+        const prescriptionDoc = await prescriptionRef.get();
+        if (!prescriptionDoc.exists) {
+            return res.status(404).json({ error: 'Receita não encontrada' });
+        }
+
+        await prescriptionRef.update({
+            internalEmission: {
+                emitted: true,
+                emittedAt: now,
+                emittedBy: 'Médico',
+                nursing: {
+                    forwarded: nursingOrdersCreated > 0,
+                    orderCount: nursingOrdersCreated || 0,
+                    injectables: injectables || [],
+                },
+                pharmacy: {
+                    forwarded: false, // Will be built later
+                    status: 'pending',
+                },
+            },
+            status: 'finalized',
+            updatedAt: now,
+        });
+
+        console.log(`✅ Emissão interna: Receita ${prescriptionId} para paciente ${patientName}`);
+
+        res.json({
+            success: true,
+            message: 'Receita emitida internamente',
+            prescriptionId,
+            patientId,
+            timestamp: now,
+            nursing: {
+                forwarded: nursingOrdersCreated > 0,
+                orderCount: nursingOrdersCreated || 0,
+            },
+        });
+    } catch (error: any) {
+        console.error('❌ Erro na emissão interna:', error);
         res.status(500).json({ error: error.message });
     }
 });
