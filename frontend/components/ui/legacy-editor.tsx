@@ -512,6 +512,184 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
     };
 
 
+    // --- Group Injectable Items ---
+    const handleGroupItems = () => {
+        if (!editorRef.current) return;
+
+        const html = editorRef.current.innerHTML;
+
+        // Parse the HTML to find all USO INJETÁVEL blocks
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`<div>${html}</div>`, 'text/html');
+        const allElements = Array.from(doc.body.firstElementChild!.children);
+
+        interface ParsedItem {
+            name: string;
+            dosage: string;
+            route: string;
+            frequency: string;
+        }
+
+        const items: ParsedItem[] = [];
+        const blockRanges: { start: number; end: number }[] = [];
+        let i = 0;
+
+        while (i < allElements.length) {
+            const el = allElements[i];
+            const text = el.textContent?.trim() || '';
+
+            // Detect "USO INJETÁVEL" header
+            if (text === 'USO INJETÁVEL') {
+                const blockStart = i;
+                let blockEnd = i;
+
+                // Find the name/dosage/route line (next non-empty paragraph after header)
+                let nameText = '';
+                let routeMatch = '';
+                let frequency = 'a cada 30 dias';
+
+                for (let j = i + 1; j < allElements.length && j < i + 15; j++) {
+                    const lineText = allElements[j].textContent?.trim() || '';
+
+                    // Detect the main line: "NAME DOSAGE - 1 amp ROUTE a cada X dias."
+                    const mainLineRegex = /^(.+?)\s*-\s*\d+\s*amp\s+(IM|EV|SC|ID|IV)\s+(.+?)\.?$/i;
+                    const match = lineText.match(mainLineRegex);
+
+                    if (match) {
+                        nameText = match[1].trim();
+                        routeMatch = match[2].toUpperCase();
+                        frequency = match[3].trim();
+                        blockEnd = j;
+                        continue;
+                    }
+
+                    // Detect separator line (end of block)
+                    if (lineText.includes('────') || lineText.includes('---')) {
+                        blockEnd = j;
+                        break;
+                    }
+
+                    // Track block end for non-empty lines
+                    if (lineText) {
+                        blockEnd = j;
+                    }
+                }
+
+                if (nameText && routeMatch) {
+                    // Try to parse name and dosage separately
+                    // Pattern: "VITAMINA B12 2500mcg / 5000mcg" -> name="VITAMINA B12", dosage="2500mcg / 5000mcg"
+                    const nameDoseRegex = /^(.+?)\s+(\d[\d.,/\s]*(?:mcg|mg|g|ml|ui|%)[^\s]*)$/i;
+                    const ndMatch = nameText.match(nameDoseRegex);
+
+                    items.push({
+                        name: ndMatch ? ndMatch[1].trim() : nameText,
+                        dosage: ndMatch ? ndMatch[2].trim() : '',
+                        route: routeMatch,
+                        frequency,
+                    });
+
+                    // Skip empty lines after separator
+                    let endIdx = blockEnd;
+                    while (endIdx + 1 < allElements.length) {
+                        const nextText = allElements[endIdx + 1].textContent?.trim() || '';
+                        if (!nextText || nextText === '\u00A0') {
+                            endIdx++;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    blockRanges.push({ start: blockStart, end: endIdx });
+                    i = endIdx + 1;
+                    continue;
+                }
+            }
+            i++;
+        }
+
+        if (items.length < 2) {
+            // Need at least 2 items to group
+            alert('É necessário pelo menos 2 itens "USO INJETÁVEL" para agrupar.');
+            return;
+        }
+
+        // Use the first item's route for all
+        const groupRoute = items[0].route;
+        const groupFrequency = items[0].frequency;
+
+        // Build the grouped table HTML
+        const rowCount = items.length;
+        let tableRows = '';
+
+        items.forEach((item, idx) => {
+            const displayName = item.dosage
+                ? `${item.name} ${item.dosage}`
+                : item.name;
+
+            if (idx === 0) {
+                tableRows += `
+                    <tr>
+                        <td style="padding: 2px 10px 2px 0; border-right: 2px solid #666;">${idx + 1}. <strong>${displayName.toUpperCase()}</strong> - 1 AMP</td>
+                        <td rowspan="${rowCount}" style="padding: 2px 0 2px 10px; vertical-align: middle;"><strong>Fazer ${groupRoute}.</strong> ${groupFrequency.charAt(0).toUpperCase() + groupFrequency.slice(1)}.</td>
+                    </tr>`;
+            } else {
+                tableRows += `
+                    <tr>
+                        <td style="padding: 2px 10px 2px 0; border-right: 2px solid #666;">${idx + 1}. <strong>${displayName.toUpperCase()}</strong> - 1 AMP</td>
+                    </tr>`;
+            }
+        });
+
+        // Build summary line
+        const summaryParts = items.map(item => {
+            const displayName = item.dosage ? `${item.name} ${item.dosage}` : item.name;
+            return `2 amp ${displayName.toUpperCase()}`;
+        });
+
+        const summaryText = summaryParts.length > 1
+            ? summaryParts.slice(0, -1).join(', ') + ' e ' + summaryParts[summaryParts.length - 1]
+            : summaryParts[0];
+
+        const groupedHTML = `
+            <p><strong>USO INJETÁVEL</strong></p>
+            <p>────────────────────────────────</p>
+            <p></p>
+            <table style="border-collapse: collapse; margin: 10px 0;">
+                ${tableRows}
+            </table>
+            <p></p>
+            <p>Para 2 meses: ${summaryText}.</p>
+            <p></p>
+            <p>────────────────────────────────</p>
+            <p></p>
+        `;
+
+        // Now rebuild the HTML: replace blocks with grouped content
+        // Remove all found blocks and insert grouped content at the position of the first block
+        const newElements: string[] = [];
+        let insertedGrouped = false;
+        let skipUntil = -1;
+
+        for (let idx = 0; idx < allElements.length; idx++) {
+            if (idx <= skipUntil) continue;
+
+            const inBlock = blockRanges.find(r => idx >= r.start && idx <= r.end);
+            if (inBlock) {
+                if (!insertedGrouped) {
+                    newElements.push(groupedHTML);
+                    insertedGrouped = true;
+                }
+                skipUntil = inBlock.end;
+                continue;
+            }
+
+            newElements.push(allElements[idx].outerHTML);
+        }
+
+        editorRef.current.innerHTML = newElements.join('');
+        handleInput();
+    };
+
     if (!editable) {
         return (
             <div
@@ -810,6 +988,19 @@ export const LegacyEditor = forwardRef<LegacyEditorRef, LegacyEditorProps>(({ co
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
+
+                {/* Group Items Button */}
+                <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleGroupItems}
+                    className="h-8 px-3 gap-2 bg-gradient-to-r from-teal-50 to-cyan-50 border-teal-300/50 text-teal-700 hover:from-teal-100 hover:to-cyan-100 hover:border-teal-400 font-medium shadow-sm"
+                    title="Agrupar todos os itens USO INJETÁVEL em um único bloco"
+                >
+                    <Layers className="w-4 h-4" />
+                    Agrupar Itens
+                </Button>
 
                 {/* Colors & Fonts */}
                 <div className="flex items-center gap-2 border-r pr-2 mr-2 border-gray-300">
