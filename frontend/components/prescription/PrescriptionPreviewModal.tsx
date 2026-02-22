@@ -9,7 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { X, Printer, Send, MessageSquare, ShieldCheck, Download, Mail, Syringe, Building2, CheckCircle2, Clock, FileText, AlertTriangle } from 'lucide-react';
 import { PrintParameters } from './PrintParametersModal';
 import { DOCTOR_CONFIG, formatCRM, formatDate, formatDateTime } from '@/lib/doctor-config';
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import QRCode from 'qrcode';
 import api from '@/lib/api';
@@ -63,6 +63,20 @@ export function PrescriptionPreviewModal({
 }: PrescriptionPreviewModalProps) {
     const [qrCodeUrl, setQrCodeUrl] = useState('');
     const [activeType, setActiveType] = useState<'simples' | 'controlada'>(type);
+    const [isReady, setIsReady] = useState(false);
+
+    // Defer heavy rendering to prevent Dialog from freezing the main thread
+    useEffect(() => {
+        if (open) {
+            setIsReady(false);
+            const raf = requestAnimationFrame(() => {
+                setTimeout(() => setIsReady(true), 50);
+            });
+            return () => cancelAnimationFrame(raf);
+        } else {
+            setIsReady(false);
+        }
+    }, [open]);
 
     // Load saved prescription settings (header/footer/watermark)
     const { data: rxSettings } = useQuery({
@@ -90,20 +104,20 @@ export function PrescriptionPreviewModal({
         (rxSettings.watermark.applyTo === 'ambas' || rxSettings.watermark.applyTo === activeType);
     const printRef = useRef<HTMLDivElement>(null);
 
-    const documentId = `${Date.now().toString(36).toUpperCase()}`;
-    const validationUrl = `${DOCTOR_CONFIG.validationUrl}?i=${documentId}`;
-    const currentDate = new Date();
+    const documentId = useMemo(() => `${Date.now().toString(36).toUpperCase()}`, [open]);
+    const validationUrl = useMemo(() => `${DOCTOR_CONFIG.validationUrl}?i=${documentId}`, [documentId]);
+    const currentDate = useMemo(() => new Date(), [open]);
 
-    // Generate QR Code
+    // Generate QR Code — only when ready and params exist
     useEffect(() => {
-        if (params?.qrCode) {
+        if (isReady && params?.qrCode) {
             QRCode.toDataURL(validationUrl, {
                 width: 100,
                 margin: 1,
                 color: { dark: '#000000', light: '#ffffff' }
             }).then(setQrCodeUrl).catch(console.error);
         }
-    }, [params?.qrCode, validationUrl]);
+    }, [isReady, params?.qrCode, validationUrl]);
 
     // Early return after hooks
     if (!params) return null;
@@ -150,6 +164,15 @@ export function PrescriptionPreviewModal({
                     <Button variant="ghost" size="icon" onClick={onClose}><X className="w-6 h-6" /></Button>
                 </div>
 
+                {!isReady ? (
+                    <div className="flex-1 flex items-center justify-center">
+                        <div className="flex flex-col items-center gap-3">
+                            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                            <span className="text-sm text-muted-foreground">Gerando pré-visualização...</span>
+                        </div>
+                    </div>
+                ) : (
+                <>
                 {/* Left Column: Preview */}
                 <div className="flex-1 bg-foreground/90 p-4 overflow-y-auto flex justify-center relative">
                     <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-foreground/80 backdrop-blur text-white px-4 py-2 rounded-full flex gap-4 items-center z-10">
@@ -698,6 +721,8 @@ export function PrescriptionPreviewModal({
                         </div>
                     </div>
                 </div>
+                </>
+                )}
             </DialogContent>
         </Dialog>
     );
