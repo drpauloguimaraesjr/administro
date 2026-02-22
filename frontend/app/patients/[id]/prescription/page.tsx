@@ -1,4 +1,4 @@
-'use client';
+ 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -22,6 +22,7 @@ import api from '@/lib/api';
 import { LegacyEditor, LegacyEditorRef } from '@/components/ui/legacy-editor';
 import { PrintParameters, PrintParametersModal } from '@/components/prescription/PrintParametersModal';
 import { PrescriptionPreviewModal, ForwardingInfo } from '@/components/prescription/PrescriptionPreviewModal';
+import { PostEmissionActionsModal } from '@/components/prescription/PostEmissionActionsModal';
 import { FormulasPanel } from '@/components/prescription/FormulasPanel';
 import { StockConfirmDialog, StockConfirmData } from '@/components/prescription/StockConfirmDialog';
 import { PrescriptionFormula } from '@/types/prescription';
@@ -89,6 +90,20 @@ export default function PrescriptionPage() {
 
     // Forwarding tracking for print extension
     const [forwardingStatus, setForwardingStatus] = useState<ForwardingInfo>({});
+
+    // Post-emission modal
+    const [isPostEmissionOpen, setIsPostEmissionOpen] = useState(false);
+    const [postEmissionData, setPostEmissionData] = useState<{
+        prescriptionId: string;
+        prescriptionTitle: string;
+        prescriptionContent: string;
+        prescriptionType: 'simples' | 'controlada';
+        patientId: string;
+        patientName: string;
+        patientPhone?: string;
+        injectables: Array<{ name: string; route: string; dosage: string }>;
+        nursingOrdersCreated: number;
+    } | null>(null);
 
     // Fetch patient data
     const { data: patient } = useQuery({
@@ -613,33 +628,46 @@ export default function PrescriptionPage() {
             toast.success('Receita salva!');
 
             // Parse content for injectables that may not have been captured by formula selection
+            let detectedItems: Array<{ name: string; route: string; dosage: string }> = [];
+            let nursingCreated = 0;
+
             if (patient) {
-                const detectedItems = parseInjectablesFromText(content);
+                detectedItems = parseInjectablesFromText(content);
                 const alreadyTracked = forwardingStatus?.nursing?.routes?.length || 0;
 
                 if (detectedItems.length > alreadyTracked) {
-                    // There are injectables in the text not yet tracked — create orders for the extras
                     const newItems = detectedItems.slice(alreadyTracked);
-                    let created = 0;
-
                     for (const item of newItems) {
                         const success = await createApplicationOrder(
                             { name: item.name, dosage: item.dosage, usage: item.route } as PrescriptionFormula,
                             item.route,
                         );
-                        if (success) created++;
+                        if (success) nursingCreated++;
                     }
 
-                    if (created > 0) {
-                        toast.success(`${created} ordem(ns) de injetável detectada(s) no texto`, {
+                    if (nursingCreated > 0) {
+                        toast.success(`${nursingCreated} ordem(ns) de injetável detectada(s) no texto`, {
                             description: `💉 ${newItems.map(i => `${i.name} (${i.route})`).join(', ')}`,
                         });
                     }
                 }
             }
 
-            // Only open print after save succeeds
-            handleOpenPrintParams('simples');
+            // Open post-emission actions modal
+            const savedId = saveResult?.data?.id || currentPrescriptionId || 'unknown';
+            setEditorContent(content);
+            setPostEmissionData({
+                prescriptionId: savedId,
+                prescriptionTitle: prescriptionTitle || 'Receita sem título',
+                prescriptionContent: content,
+                prescriptionType,
+                patientId,
+                patientName: patient?.name || 'Paciente',
+                patientPhone: patient?.phone,
+                injectables: detectedItems,
+                nursingOrdersCreated: nursingCreated + (forwardingStatus?.nursing?.orderCount || 0),
+            });
+            setIsPostEmissionOpen(true);
         } catch (error) {
             toast.error('Erro ao salvar receita. Tente novamente.');
         } finally {
@@ -1154,6 +1182,17 @@ export default function PrescriptionPage() {
                     isLoading={isStockLoading}
                 />
             )}
+
+            {/* Post-Emission Actions Modal */}
+            <PostEmissionActionsModal
+                open={isPostEmissionOpen}
+                onClose={() => setIsPostEmissionOpen(false)}
+                data={postEmissionData}
+                onPrint={() => {
+                    setIsPostEmissionOpen(false);
+                    handleOpenPrintParams(prescriptionType);
+                }}
+            />
         </div>
     );
 }

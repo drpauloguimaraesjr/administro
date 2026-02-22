@@ -140,4 +140,36 @@ router.delete('/prescription/image/:type', async (req: Request, res: Response) =
     }
 });
 
+// =====================
+// PDF Generation
+// =====================
+
+// POST /api/settings/prescriptions/:id/pdf — Generate prescription PDF
+router.post('/prescriptions/:id/pdf', async (req: Request, res: Response) => {
+    try {
+        const { id: prescriptionId } = req.params;
+        const { patientId, type = 'simples', saveToStorage = false } = req.body;
+
+        if (!patientId) {
+            return res.status(400).json({ error: 'Campo obrigatório: patientId' });
+        }
+
+        const { generatePrescriptionPdf, savePdfToStorage } = await import('../services/prescription-pdf.service.js');
+
+        const pdfBytes = await generatePrescriptionPdf(patientId, prescriptionId, type);
+
+        if (saveToStorage) {
+            const storageUrl = await savePdfToStorage(patientId, prescriptionId, pdfBytes);
+            return res.json({ storageUrl });
+        }
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="receita-${prescriptionId}.pdf"`);
+        res.send(Buffer.from(pdfBytes));
+    } catch (error: any) {
+        console.error('Erro ao gerar PDF da prescrição:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 export default router;
