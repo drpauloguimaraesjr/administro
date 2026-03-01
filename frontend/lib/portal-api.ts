@@ -53,6 +53,11 @@ export const fetchPatientDocuments = async () => {
     return res.data;
 };
 
+export const fetchPatientAppointments = async () => {
+    const res = await portalApi.get('/portal/appointments');
+    return res.data;
+};
+
 export const fetchPatientTimeline = async () => {
     const res = await portalApi.get('/portal/timeline');
     return res.data;

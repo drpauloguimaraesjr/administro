@@ -159,6 +159,8 @@ router.get('/applications', async (req: Request, res: Response) => {
                 applicationSite: data.applicationSite,
                 batchNumber: data.batchNumber,
                 batchExpiration: data.batchExpiration,
+                manufacturer: data.manufacturer,
+                administrationNotes: data.administrationNotes,
                 createdAt: data.createdAt,
             };
         });
@@ -166,6 +168,46 @@ router.get('/applications', async (req: Request, res: Response) => {
         res.json(applications);
     } catch (error: any) {
         console.error('Erro ao buscar aplicações:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// =====================
+// Consultas (Appointments)
+// =====================
+
+/**
+ * GET /api/portal/appointments — Consultas do paciente
+ */
+router.get('/appointments', async (req: Request, res: Response) => {
+    try {
+        if (!db) return res.status(503).json({ error: 'Firebase não configurado' });
+
+        const { patientId } = req as PortalRequest;
+
+        const snapshot = await db
+            .collection('appointments')
+            .where('patientId', '==', patientId)
+            .orderBy('date', 'desc')
+            .get();
+
+        const appointments = snapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                date: data.date,
+                startTime: data.startTime,
+                endTime: data.endTime,
+                duration: data.duration,
+                type: data.type,
+                status: data.status,
+                notes: data.notes,
+            };
+        });
+
+        res.json(appointments);
+    } catch (error: any) {
+        console.error('Erro ao buscar consultas:', error);
         res.status(500).json({ error: error.message });
     }
 });
