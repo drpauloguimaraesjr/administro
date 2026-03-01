@@ -1,6 +1,6 @@
 // backend/src/services/partners.service.ts
 
-import { getFirestore } from 'firebase-admin/firestore';
+import { db } from '../config/firebaseAdmin.js';
 import type {
     Partner,
     CreatePartnerInput,
@@ -8,7 +8,10 @@ import type {
     CreateForwardingInput,
 } from '../types/partners.types.js';
 
-const db = getFirestore();
+const getDb = () => {
+    if (!db) throw new Error('Firebase not configured');
+    return db;
+};
 const PARTNERS_COLLECTION = 'partners';
 const FORWARDINGS_COLLECTION = 'partner_forwardings';
 
@@ -17,11 +20,11 @@ const FORWARDINGS_COLLECTION = 'partner_forwardings';
 // =====================
 
 export async function getAllPartners(activeOnly = false): Promise<Partner[]> {
-    let query: FirebaseFirestore.Query = db.collection(PARTNERS_COLLECTION)
+    let query: FirebaseFirestore.Query = getDb().collection(PARTNERS_COLLECTION)
         .orderBy('name', 'asc');
 
     if (activeOnly) {
-        query = db.collection(PARTNERS_COLLECTION)
+        query = getDb().collection(PARTNERS_COLLECTION)
             .where('isActive', '==', true)
             .orderBy('name', 'asc');
     }
@@ -31,7 +34,7 @@ export async function getAllPartners(activeOnly = false): Promise<Partner[]> {
 }
 
 export async function getPartnerById(id: string): Promise<Partner | null> {
-    const doc = await db.collection(PARTNERS_COLLECTION).doc(id).get();
+    const doc = await getDb().collection(PARTNERS_COLLECTION).doc(id).get();
     if (!doc.exists) return null;
     return { id: doc.id, ...doc.data() } as Partner;
 }
@@ -46,12 +49,12 @@ export async function createPartner(data: CreatePartnerInput): Promise<Partner> 
         updatedAt: now,
     };
 
-    const docRef = await db.collection(PARTNERS_COLLECTION).add(partnerData);
+    const docRef = await getDb().collection(PARTNERS_COLLECTION).add(partnerData);
     return { id: docRef.id, ...partnerData } as Partner;
 }
 
 export async function updatePartner(id: string, data: Partial<CreatePartnerInput & { isActive: boolean }>): Promise<Partner | null> {
-    const docRef = db.collection(PARTNERS_COLLECTION).doc(id);
+    const docRef = getDb().collection(PARTNERS_COLLECTION).doc(id);
     const doc = await docRef.get();
     if (!doc.exists) return null;
 
@@ -66,7 +69,7 @@ export async function updatePartner(id: string, data: Partial<CreatePartnerInput
 }
 
 export async function deletePartner(id: string): Promise<boolean> {
-    const docRef = db.collection(PARTNERS_COLLECTION).doc(id);
+    const docRef = getDb().collection(PARTNERS_COLLECTION).doc(id);
     const doc = await docRef.get();
     if (!doc.exists) return false;
 
@@ -83,17 +86,17 @@ export async function getForwardings(filters?: {
     patientId?: string;
     status?: string;
 }): Promise<PartnerForwarding[]> {
-    let query: FirebaseFirestore.Query = db.collection(FORWARDINGS_COLLECTION)
+    let query: FirebaseFirestore.Query = getDb().collection(FORWARDINGS_COLLECTION)
         .orderBy('createdAt', 'desc');
 
     if (filters?.partnerId) {
-        query = db.collection(FORWARDINGS_COLLECTION)
+        query = getDb().collection(FORWARDINGS_COLLECTION)
             .where('partnerId', '==', filters.partnerId)
             .orderBy('createdAt', 'desc');
     }
 
     if (filters?.patientId) {
-        query = db.collection(FORWARDINGS_COLLECTION)
+        query = getDb().collection(FORWARDINGS_COLLECTION)
             .where('patientId', '==', filters.patientId)
             .orderBy('createdAt', 'desc');
     }
@@ -118,7 +121,7 @@ export async function createForwarding(data: CreateForwardingInput): Promise<Par
         updatedAt: now,
     };
 
-    const docRef = await db.collection(FORWARDINGS_COLLECTION).add(forwardingData);
+    const docRef = await getDb().collection(FORWARDINGS_COLLECTION).add(forwardingData);
     return { id: docRef.id, ...forwardingData } as PartnerForwarding;
 }
 
@@ -127,7 +130,7 @@ export async function updateForwardingStatus(
     status: 'sent' | 'confirmed' | 'delivered' | 'cancelled',
     data?: { sentBy?: string; responseNotes?: string }
 ): Promise<PartnerForwarding | null> {
-    const docRef = db.collection(FORWARDINGS_COLLECTION).doc(id);
+    const docRef = getDb().collection(FORWARDINGS_COLLECTION).doc(id);
     const doc = await docRef.get();
     if (!doc.exists) return null;
 

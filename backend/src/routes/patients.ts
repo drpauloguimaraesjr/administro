@@ -1,18 +1,24 @@
 // src/routes/patients.ts
 import { Router, Request, Response } from 'express';
-import { getFirestore, FieldValue } from 'firebase-admin/firestore';
+import { FieldValue } from 'firebase-admin/firestore';
+import { db } from '../config/firebaseAdmin.js';
+
+const getDb = () => {
+    if (!db) throw new Error('Firebase not configured');
+    return db;
+};
 
 const router = Router();
 
 // GET /api/patients - Listar todos (com busca opcional e filtros)
 router.get('/', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
+        const db = getDb();
         const search = (req.query.search as string || '').toLowerCase();
         const tag = req.query.tag as string;
         const status = req.query.status as string;
 
-        let query = db.collection('patients').orderBy('name');
+        let query = getDb().collection('patients').orderBy('name');
         const snapshot = await query.get();
 
         let patients = snapshot.docs.map(doc => ({
@@ -53,10 +59,10 @@ router.get('/', async (req: Request, res: Response) => {
 // GET /api/patients/birthdays - Aniversariantes do mês
 router.get('/birthdays', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
+        const db = getDb();
         const month = parseInt(req.query.month as string) || new Date().getMonth() + 1;
 
-        const snapshot = await db.collection('patients').get();
+        const snapshot = await getDb().collection('patients').get();
 
         const birthdays = snapshot.docs
             .map(doc => ({ id: doc.id, ...doc.data() }))
@@ -81,12 +87,12 @@ router.get('/birthdays', async (req: Request, res: Response) => {
 // GET /api/patients/inactive - Pacientes inativos (sem consulta há X dias)
 router.get('/inactive', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
+        const db = getDb();
         const days = parseInt(req.query.days as string) || 90; // Default 90 dias
         const cutoffDate = new Date();
         cutoffDate.setDate(cutoffDate.getDate() - days);
 
-        const snapshot = await db.collection('patients').get();
+        const snapshot = await getDb().collection('patients').get();
 
         const inactive = snapshot.docs
             .map(doc => ({ id: doc.id, ...doc.data() }))
@@ -115,8 +121,8 @@ router.get('/inactive', async (req: Request, res: Response) => {
 // GET /api/patients/stats - Estatísticas gerais
 router.get('/stats', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        const snapshot = await db.collection('patients').get();
+        const db = getDb();
+        const snapshot = await getDb().collection('patients').get();
 
         const patients = snapshot.docs.map(doc => doc.data());
         const now = new Date();
@@ -161,8 +167,8 @@ router.get('/stats', async (req: Request, res: Response) => {
 // GET /api/patients/:id - Buscar por ID
 router.get('/:id', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        const doc = await db.collection('patients').doc(req.params.id).get();
+        const db = getDb();
+        const doc = await getDb().collection('patients').doc(req.params.id).get();
 
         if (!doc.exists) {
             return res.status(404).json({ error: 'Paciente não encontrado' });
@@ -178,12 +184,12 @@ router.get('/:id', async (req: Request, res: Response) => {
 // GET /api/patients/:id/timeline - Timeline completa do paciente
 router.get('/:id/timeline', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
+        const db = getDb();
         const patientId = req.params.id;
         const timeline: any[] = [];
 
         // Get patient info
-        const patientDoc = await db.collection('patients').doc(patientId).get();
+        const patientDoc = await getDb().collection('patients').doc(patientId).get();
         if (!patientDoc.exists) {
             return res.status(404).json({ error: 'Paciente não encontrado' });
         }
@@ -198,7 +204,7 @@ router.get('/:id/timeline', async (req: Request, res: Response) => {
         });
 
         // Get prescriptions
-        const prescriptionsSnap = await db.collection('medical_records')
+        const prescriptionsSnap = await getDb().collection('medical_records')
             .doc(patientId)
             .collection('prescriptions')
             .orderBy('createdAt', 'desc')
@@ -216,7 +222,7 @@ router.get('/:id/timeline', async (req: Request, res: Response) => {
         });
 
         // Get notes
-        const notesSnap = await db.collection('patients')
+        const notesSnap = await getDb().collection('patients')
             .doc(patientId)
             .collection('notes')
             .orderBy('createdAt', 'desc')
@@ -235,7 +241,7 @@ router.get('/:id/timeline', async (req: Request, res: Response) => {
         });
 
         // Get anamnesis
-        const anamnesisDoc = await db.collection('medical_records')
+        const anamnesisDoc = await getDb().collection('medical_records')
             .doc(patientId)
             .collection('anamnesis')
             .doc('main')
@@ -264,8 +270,8 @@ router.get('/:id/timeline', async (req: Request, res: Response) => {
 // GET /api/patients/:id/notes - Listar notas do paciente
 router.get('/:id/notes', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        const snapshot = await db.collection('patients')
+        const db = getDb();
+        const snapshot = await getDb().collection('patients')
             .doc(req.params.id)
             .collection('notes')
             .orderBy('createdAt', 'desc')
@@ -286,7 +292,7 @@ router.get('/:id/notes', async (req: Request, res: Response) => {
 // POST /api/patients/:id/notes - Adicionar nota
 router.post('/:id/notes', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
+        const db = getDb();
         const now = new Date().toISOString();
 
         const note = {
@@ -296,7 +302,7 @@ router.post('/:id/notes', async (req: Request, res: Response) => {
             createdBy: req.body.createdBy || 'system'
         };
 
-        const docRef = await db.collection('patients')
+        const docRef = await getDb().collection('patients')
             .doc(req.params.id)
             .collection('notes')
             .add(note);
@@ -311,8 +317,8 @@ router.post('/:id/notes', async (req: Request, res: Response) => {
 // DELETE /api/patients/:id/notes/:noteId - Remover nota
 router.delete('/:id/notes/:noteId', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        await db.collection('patients')
+        const db = getDb();
+        await getDb().collection('patients')
             .doc(req.params.id)
             .collection('notes')
             .doc(req.params.noteId)
@@ -328,10 +334,10 @@ router.delete('/:id/notes/:noteId', async (req: Request, res: Response) => {
 // PUT /api/patients/:id/tags - Atualizar tags do paciente
 router.put('/:id/tags', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
+        const db = getDb();
         const { tags } = req.body;
 
-        await db.collection('patients')
+        await getDb().collection('patients')
             .doc(req.params.id)
             .update({
                 tags,
@@ -348,7 +354,7 @@ router.put('/:id/tags', async (req: Request, res: Response) => {
 // PUT /api/patients/:id/score - Atualizar score do paciente
 router.put('/:id/score', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
+        const db = getDb();
         const { score, grade } = req.body;
 
         // Validate score range
@@ -364,7 +370,7 @@ router.put('/:id/score', async (req: Request, res: Response) => {
             else calculatedGrade = 'C';
         }
 
-        await db.collection('patients')
+        await getDb().collection('patients')
             .doc(req.params.id)
             .update({
                 score: validScore,
@@ -383,11 +389,11 @@ router.put('/:id/score', async (req: Request, res: Response) => {
 // POST /api/patients/:id/calculate-score - Calcular score automaticamente
 router.post('/:id/calculate-score', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
+        const db = getDb();
         const patientId = req.params.id;
 
         // Get patient data
-        const patientDoc = await db.collection('patients').doc(patientId).get();
+        const patientDoc = await getDb().collection('patients').doc(patientId).get();
         if (!patientDoc.exists) {
             return res.status(404).json({ error: 'Paciente não encontrado' });
         }
@@ -469,7 +475,7 @@ router.post('/:id/calculate-score', async (req: Request, res: Response) => {
         else grade = 'C';
 
         // Update patient
-        await db.collection('patients').doc(patientId).update({
+        await getDb().collection('patients').doc(patientId).update({
             score,
             grade,
             scoreUpdatedAt: new Date().toISOString(),
@@ -497,7 +503,7 @@ router.post('/:id/calculate-score', async (req: Request, res: Response) => {
 // POST /api/patients - Criar paciente
 router.post('/', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
+        const db = getDb();
         const now = new Date().toISOString();
 
         const patient = {
@@ -510,7 +516,7 @@ router.post('/', async (req: Request, res: Response) => {
             updatedAt: now
         };
 
-        const docRef = await db.collection('patients').add(patient);
+        const docRef = await getDb().collection('patients').add(patient);
         res.status(201).json({ id: docRef.id, ...patient });
     } catch (error: any) {
         console.error('Erro ao criar paciente:', error);
@@ -521,8 +527,8 @@ router.post('/', async (req: Request, res: Response) => {
 // PUT /api/patients/:id - Atualizar paciente
 router.put('/:id', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        const docRef = db.collection('patients').doc(req.params.id);
+        const db = getDb();
+        const docRef = getDb().collection('patients').doc(req.params.id);
         const doc = await docRef.get();
 
         if (!doc.exists) {
@@ -545,8 +551,8 @@ router.put('/:id', async (req: Request, res: Response) => {
 // DELETE /api/patients/:id - Remover paciente
 router.delete('/:id', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        const docRef = db.collection('patients').doc(req.params.id);
+        const db = getDb();
+        const docRef = getDb().collection('patients').doc(req.params.id);
         const doc = await docRef.get();
 
         if (!doc.exists) {

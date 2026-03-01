@@ -41,9 +41,9 @@ if (!admin.apps.length) {
   }
 }
 
-export const db: any = admin.firestore();
-export const storage: any = admin.storage();
-export const auth: any = admin.auth();
+export const db: any = admin.apps.length ? admin.firestore() : null;
+export const storage: any = admin.apps.length ? admin.storage() : null;
+export const auth: any = admin.apps.length ? admin.auth() : null;
 
 export default admin;
 

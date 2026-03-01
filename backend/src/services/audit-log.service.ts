@@ -2,13 +2,16 @@
 import { db } from '../config/firebaseAdmin.js';
 import { AuditLog } from '../shared/types/index.js';
 
-const collection = db.collection('audit_logs');
+const getCollection = () => {
+    if (!db) throw new Error('Firebase not configured');
+    return db.getCollection()('audit_logs');
+};
 
 export const AuditLogService = {
     async log(entry: Omit<AuditLog, 'id' | 'timestamp'>) {
         try {
             const timestamp = new Date().toISOString();
-            await collection.add({
+            await getCollection().add({
                 ...entry,
                 timestamp
             });
@@ -20,7 +23,7 @@ export const AuditLogService = {
 
     async getByUser(userId: string, limit = 50): Promise<AuditLog[]> {
         try {
-            const snapshot = await collection
+            const snapshot = await getCollection()
                 .where('userId', '==', userId)
                 .orderBy('timestamp', 'desc')
                 .limit(limit)

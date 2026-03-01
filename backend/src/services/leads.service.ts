@@ -3,16 +3,19 @@ import { db } from '../config/firebaseAdmin.js';
 import { Lead } from '../shared/types/index.js';
 import { sendMessage, isConnected } from './whatsapp.js';
 
-const collection = db.collection('leads');
+const getCollection = () => {
+    if (!db) throw new Error('Firebase not configured');
+    return db.collection('leads');
+};
 
 export const LeadsService = {
     async getAll(): Promise<Lead[]> {
-        const snapshot = await collection.get();
+        const snapshot = await getCollection().get();
         return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Lead));
     },
 
     async getById(id: string): Promise<Lead | null> {
-        const doc = await collection.doc(id).get();
+        const doc = await getCollection().doc(id).get();
         if (!doc.exists) return null;
         return { id: doc.id, ...doc.data() } as Lead;
     },
@@ -30,13 +33,13 @@ export const LeadsService = {
         // Auto-calculo inicial de score poderia vir aqui
         // cleanData.score = calculateScore(cleanData);
 
-        const docRef = await collection.add(cleanData);
+        const docRef = await getCollection().add(cleanData);
         const doc = await docRef.get();
         return { id: doc.id, ...doc.data() } as Lead;
     },
 
     async update(id: string, data: Partial<Lead>): Promise<Lead | null> {
-        const docRef = collection.doc(id);
+        const docRef = getCollection().doc(id);
         const doc = await docRef.get();
         if (!doc.exists) return null;
 
@@ -51,12 +54,12 @@ export const LeadsService = {
     },
 
     async delete(id: string): Promise<boolean> {
-        await collection.doc(id).delete();
+        await getCollection().doc(id).delete();
         return true;
     },
 
     async updateStage(id: string, newStage: string, userId: string): Promise<void> {
-        const docRef = collection.doc(id);
+        const docRef = getCollection().doc(id);
         const doc = await docRef.get();
         if (!doc.exists) throw new Error('Lead not found');
 
@@ -90,7 +93,7 @@ export const LeadsService = {
 
     // Atribuir lead a um membro da equipe
     async assignTo(id: string, assignedTo: string | null): Promise<void> {
-        const docRef = collection.doc(id);
+        const docRef = getCollection().doc(id);
         const doc = await docRef.get();
         if (!doc.exists) throw new Error('Lead not found');
 

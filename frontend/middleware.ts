@@ -7,6 +7,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Portal do paciente tem seu próprio auth - não redireciona para /login do admin
+  if (request.nextUrl.pathname.startsWith('/portal')) {
+    return NextResponse.next();
+  }
+
   // Para outras rotas, a autenticação será verificada no AuthProvider
   return NextResponse.next();
 }

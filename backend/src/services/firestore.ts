@@ -2,10 +2,13 @@
 import { db } from '../config/firebaseAdmin.js';
 import { Appointment } from '../shared/types/index.js';
 
-const collection = db.collection('appointments');
+const getCollection = () => {
+    if (!db) throw new Error('Firebase not configured - set FIREBASE_SERVICE_ACCOUNT in .env');
+    return db.collection('appointments');
+};
 
 export const getAllAppointments = async (): Promise<Appointment[]> => {
-    const snapshot = await collection.get();
+    const snapshot = await getCollection().get();
     const appointments: Appointment[] = [];
     snapshot.forEach((doc: FirebaseFirestore.DocumentSnapshot) => {
         appointments.push({ id: doc.id, ...(doc.data() as any) });
@@ -14,19 +17,19 @@ export const getAllAppointments = async (): Promise<Appointment[]> => {
 };
 
 export const getAppointmentById = async (id: string): Promise<Appointment | null> => {
-    const doc = await collection.doc(id).get();
+    const doc = await getCollection().doc(id).get();
     if (!doc.exists) return null;
     return { id: doc.id, ...(doc.data() as any) } as Appointment;
 };
 
 export const createAppointment = async (data: Omit<Appointment, 'id'>): Promise<Appointment> => {
-    const docRef = await collection.add(data);
+    const docRef = await getCollection().add(data);
     const doc = await docRef.get();
     return { id: doc.id, ...(doc.data() as any) } as Appointment;
 };
 
 export const updateAppointment = async (id: string, data: Partial<Appointment>): Promise<Appointment | null> => {
-    const docRef = collection.doc(id);
+    const docRef = getCollection().doc(id);
     const doc = await docRef.get();
     if (!doc.exists) return null;
     await docRef.update(data);
@@ -35,7 +38,7 @@ export const updateAppointment = async (id: string, data: Partial<Appointment>):
 };
 
 export const deleteAppointment = async (id: string): Promise<boolean> => {
-    const docRef = collection.doc(id);
+    const docRef = getCollection().doc(id);
     const doc = await docRef.get();
     if (!doc.exists) return false;
     await docRef.delete();
@@ -43,7 +46,7 @@ export const deleteAppointment = async (id: string): Promise<boolean> => {
 };
 
 export const getAppointmentsByDate = async (date: string): Promise<Appointment[]> => {
-    const snapshot = await collection.where('date', '==', date).get();
+    const snapshot = await getCollection().where('date', '==', date).get();
     const result: Appointment[] = [];
     snapshot.forEach((doc: FirebaseFirestore.DocumentSnapshot) => {
         result.push({ id: doc.id, ...(doc.data() as any) });
@@ -53,10 +56,13 @@ export const getAppointmentsByDate = async (date: string): Promise<Appointment[]
 
 // --- USERS ---
 import { User, Intercurrence } from '../shared/types/index.js';
-const usersCollection = db.collection('users');
+const getUsersCollection = () => {
+    if (!db) throw new Error('Firebase not configured - set FIREBASE_SERVICE_ACCOUNT in .env');
+    return db.collection('users');
+};
 
 export const getAllUsers = async (): Promise<User[]> => {
-    const snapshot = await usersCollection.get();
+    const snapshot = await getUsersCollection().get();
     const users: User[] = [];
     snapshot.forEach(doc => {
         users.push({ id: doc.id, ...(doc.data() as any) });
@@ -65,13 +71,13 @@ export const getAllUsers = async (): Promise<User[]> => {
 };
 
 export const getUserById = async (id: string): Promise<User | null> => {
-    const doc = await usersCollection.doc(id).get();
+    const doc = await getUsersCollection().doc(id).get();
     if (!doc.exists) return null;
     return { id: doc.id, ...(doc.data() as any) } as User;
 };
 
 export const getUserByEmail = async (email: string): Promise<User | null> => {
-    const snapshot = await usersCollection.where('email', '==', email).limit(1).get();
+    const snapshot = await getUsersCollection().where('email', '==', email).limit(1).get();
     if (snapshot.empty) return null;
     const doc = snapshot.docs[0];
     return { id: doc.id, ...(doc.data() as any) } as User;
@@ -81,13 +87,13 @@ export const createUser = async (data: Omit<User, 'id'>): Promise<User> => {
     // If it's a manual create, we might use add(), but often we want to use the Auth UID as doc ID.
     // For now, let's assume we use add() unless an ID is provided in a separate parameter logic.
     // However, to keep it simple and consistent:
-    const docRef = await usersCollection.add(data);
+    const docRef = await getUsersCollection().add(data);
     const doc = await docRef.get();
     return { id: doc.id, ...(doc.data() as any) } as User;
 };
 
 export const updateUser = async (id: string, data: Partial<User>): Promise<User | null> => {
-    const docRef = usersCollection.doc(id);
+    const docRef = getUsersCollection().doc(id);
     const doc = await docRef.get();
     if (!doc.exists) return null;
     await docRef.update(data);
@@ -96,7 +102,7 @@ export const updateUser = async (id: string, data: Partial<User>): Promise<User 
 };
 
 export const deleteUser = async (id: string): Promise<boolean> => {
-    const docRef = usersCollection.doc(id);
+    const docRef = getUsersCollection().doc(id);
     const doc = await docRef.get();
     if (!doc.exists) return false;
     await docRef.delete();
@@ -104,10 +110,13 @@ export const deleteUser = async (id: string): Promise<boolean> => {
 };
 
 // --- INTERCURRENCES ---
-const intercurrencesCollection = db.collection('intercurrences');
+const getIntercurrencesCollection = () => {
+    if (!db) throw new Error('Firebase not configured - set FIREBASE_SERVICE_ACCOUNT in .env');
+    return db.collection('intercurrences');
+};
 
 export const getOpenIntercurrences = async (): Promise<Intercurrence[]> => {
-    const snapshot = await intercurrencesCollection.where('status', '!=', 'resolved').get();
+    const snapshot = await getIntercurrencesCollection().where('status', '!=', 'resolved').get();
     const items: Intercurrence[] = [];
     snapshot.forEach(doc => {
         items.push({ id: doc.id, ...(doc.data() as any) });
@@ -116,13 +125,13 @@ export const getOpenIntercurrences = async (): Promise<Intercurrence[]> => {
 };
 
 export const createIntercurrence = async (data: Omit<Intercurrence, 'id'>): Promise<Intercurrence> => {
-    const docRef = await intercurrencesCollection.add(data);
+    const docRef = await getIntercurrencesCollection().add(data);
     const doc = await docRef.get();
     return { id: doc.id, ...(doc.data() as any) } as Intercurrence;
 };
 
 export const updateIntercurrence = async (id: string, data: Partial<Intercurrence>): Promise<Intercurrence | null> => {
-    const docRef = intercurrencesCollection.doc(id);
+    const docRef = getIntercurrencesCollection().doc(id);
     const doc = await docRef.get();
     if (!doc.exists) return null;
     await docRef.update(data);

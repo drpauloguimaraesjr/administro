@@ -1,6 +1,11 @@
 // src/routes/medicalRecords.ts
 import { Router, Request, Response } from 'express';
-import { getFirestore } from 'firebase-admin/firestore';
+import { db } from '../config/firebaseAdmin.js';
+
+const getDb = () => {
+    if (!db) throw new Error('Firebase not configured');
+    return db;
+};
 
 const router = Router();
 
@@ -9,8 +14,8 @@ const router = Router();
 // GET /api/medical-records/:patientId/anamnesis
 router.get('/:patientId/anamnesis', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        const doc = await db.collection('medical_records')
+        const db = getDb();
+        const doc = await getDb().collection('medical_records')
             .doc(req.params.patientId)
             .collection('anamnesis')
             .doc('main')
@@ -30,7 +35,7 @@ router.get('/:patientId/anamnesis', async (req: Request, res: Response) => {
 // POST/PUT /api/medical-records/:patientId/anamnesis
 router.post('/:patientId/anamnesis', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
+        const db = getDb();
         const now = new Date().toISOString();
 
         const anamnesis = {
@@ -40,7 +45,7 @@ router.post('/:patientId/anamnesis', async (req: Request, res: Response) => {
             createdAt: req.body.createdAt || now,
         };
 
-        await db.collection('medical_records')
+        await getDb().collection('medical_records')
             .doc(req.params.patientId)
             .collection('anamnesis')
             .doc('main')
@@ -58,8 +63,8 @@ router.post('/:patientId/anamnesis', async (req: Request, res: Response) => {
 // GET /api/medical-records/:patientId/evolutions
 router.get('/:patientId/evolutions', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        const snapshot = await db.collection('medical_records')
+        const db = getDb();
+        const snapshot = await getDb().collection('medical_records')
             .doc(req.params.patientId)
             .collection('evolutions')
             .orderBy('date', 'desc')
@@ -80,7 +85,7 @@ router.get('/:patientId/evolutions', async (req: Request, res: Response) => {
 // POST /api/medical-records/:patientId/evolutions
 router.post('/:patientId/evolutions', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
+        const db = getDb();
         const now = new Date().toISOString();
 
         const evolution = {
@@ -90,7 +95,7 @@ router.post('/:patientId/evolutions', async (req: Request, res: Response) => {
             updatedAt: now,
         };
 
-        const docRef = await db.collection('medical_records')
+        const docRef = await getDb().collection('medical_records')
             .doc(req.params.patientId)
             .collection('evolutions')
             .add(evolution);
@@ -105,8 +110,8 @@ router.post('/:patientId/evolutions', async (req: Request, res: Response) => {
 // PUT /api/medical-records/:patientId/evolutions/:id
 router.put('/:patientId/evolutions/:id', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        const docRef = db.collection('medical_records')
+        const db = getDb();
+        const docRef = getDb().collection('medical_records')
             .doc(req.params.patientId)
             .collection('evolutions')
             .doc(req.params.id);
@@ -127,8 +132,8 @@ router.put('/:patientId/evolutions/:id', async (req: Request, res: Response) => 
 // DELETE /api/medical-records/:patientId/evolutions/:id
 router.delete('/:patientId/evolutions/:id', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        await db.collection('medical_records')
+        const db = getDb();
+        await getDb().collection('medical_records')
             .doc(req.params.patientId)
             .collection('evolutions')
             .doc(req.params.id)
@@ -146,8 +151,8 @@ router.delete('/:patientId/evolutions/:id', async (req: Request, res: Response) 
 // GET /api/medical-records/:patientId/prescriptions
 router.get('/:patientId/prescriptions', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        const snapshot = await db.collection('medical_records')
+        const db = getDb();
+        const snapshot = await getDb().collection('medical_records')
             .doc(req.params.patientId)
             .collection('prescriptions')
             .orderBy('date', 'desc')
@@ -168,7 +173,7 @@ router.get('/:patientId/prescriptions', async (req: Request, res: Response) => {
 // POST /api/medical-records/:patientId/prescriptions
 router.post('/:patientId/prescriptions', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
+        const db = getDb();
         const now = new Date().toISOString();
 
         const prescription = {
@@ -178,7 +183,7 @@ router.post('/:patientId/prescriptions', async (req: Request, res: Response) => 
             updatedAt: now,
         };
 
-        const docRef = await db.collection('medical_records')
+        const docRef = await getDb().collection('medical_records')
             .doc(req.params.patientId)
             .collection('prescriptions')
             .add(prescription);
@@ -193,8 +198,8 @@ router.post('/:patientId/prescriptions', async (req: Request, res: Response) => 
 // PUT /api/medical-records/:patientId/prescriptions/:id (for auto-save)
 router.put('/:patientId/prescriptions/:id', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        const docRef = db.collection('medical_records')
+        const db = getDb();
+        const docRef = getDb().collection('medical_records')
             .doc(req.params.patientId)
             .collection('prescriptions')
             .doc(req.params.id);
@@ -215,8 +220,8 @@ router.put('/:patientId/prescriptions/:id', async (req: Request, res: Response) 
 // DELETE /api/medical-records/:patientId/prescriptions/:id
 router.delete('/:patientId/prescriptions/:id', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        await db.collection('medical_records')
+        const db = getDb();
+        await getDb().collection('medical_records')
             .doc(req.params.patientId)
             .collection('prescriptions')
             .doc(req.params.id)
@@ -343,8 +348,8 @@ function extractKeywords(text: string): string {
 // GET /api/medical-records/:patientId/documents
 router.get('/:patientId/documents', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        const snapshot = await db.collection('medical_records')
+        const db = getDb();
+        const snapshot = await getDb().collection('medical_records')
             .doc(req.params.patientId)
             .collection('documents')
             .orderBy('uploadedAt', 'desc')
@@ -365,7 +370,7 @@ router.get('/:patientId/documents', async (req: Request, res: Response) => {
 // POST /api/medical-records/:patientId/documents (metadata only, URL from client)
 router.post('/:patientId/documents', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
+        const db = getDb();
         const now = new Date().toISOString();
 
         const document = {
@@ -376,7 +381,7 @@ router.post('/:patientId/documents', async (req: Request, res: Response) => {
             uploadedAt: now,
         };
 
-        const docRef = await db.collection('medical_records')
+        const docRef = await getDb().collection('medical_records')
             .doc(req.params.patientId)
             .collection('documents')
             .add(document);
@@ -391,8 +396,8 @@ router.post('/:patientId/documents', async (req: Request, res: Response) => {
 // DELETE /api/medical-records/:patientId/documents/:id
 router.delete('/:patientId/documents/:id', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        await db.collection('medical_records')
+        const db = getDb();
+        await getDb().collection('medical_records')
             .doc(req.params.patientId)
             .collection('documents')
             .doc(req.params.id)
@@ -410,8 +415,8 @@ router.delete('/:patientId/documents/:id', async (req: Request, res: Response) =
 // GET /api/medical-records/templates - Get all templates (global, not patient-specific)
 router.get('/templates', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        const snapshot = await db.collection('prescription_templates')
+        const db = getDb();
+        const snapshot = await getDb().collection('prescription_templates')
             .orderBy('usageCount', 'desc')
             .get();
 
@@ -430,7 +435,7 @@ router.get('/templates', async (req: Request, res: Response) => {
 // POST /api/medical-records/templates - Create a new template
 router.post('/templates', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
+        const db = getDb();
         const now = new Date().toISOString();
 
         const template = {
@@ -445,7 +450,7 @@ router.post('/templates', async (req: Request, res: Response) => {
             updatedAt: now,
         };
 
-        const docRef = await db.collection('prescription_templates').add(template);
+        const docRef = await getDb().collection('prescription_templates').add(template);
 
         res.status(201).json({ id: docRef.id, ...template });
     } catch (error: any) {
@@ -457,8 +462,8 @@ router.post('/templates', async (req: Request, res: Response) => {
 // PUT /api/medical-records/templates/:id - Update a template
 router.put('/templates/:id', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        const docRef = db.collection('prescription_templates').doc(req.params.id);
+        const db = getDb();
+        const docRef = getDb().collection('prescription_templates').doc(req.params.id);
 
         const updates = {
             ...req.body,
@@ -476,8 +481,8 @@ router.put('/templates/:id', async (req: Request, res: Response) => {
 // PUT /api/medical-records/templates/:id/use - Increment usage count
 router.put('/templates/:id/use', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        const docRef = db.collection('prescription_templates').doc(req.params.id);
+        const db = getDb();
+        const docRef = getDb().collection('prescription_templates').doc(req.params.id);
 
         const doc = await docRef.get();
         if (!doc.exists) {
@@ -500,8 +505,8 @@ router.put('/templates/:id/use', async (req: Request, res: Response) => {
 // PUT /api/medical-records/templates/:id/favorite - Toggle favorite status
 router.put('/templates/:id/favorite', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        const docRef = db.collection('prescription_templates').doc(req.params.id);
+        const db = getDb();
+        const docRef = getDb().collection('prescription_templates').doc(req.params.id);
 
         const doc = await docRef.get();
         if (!doc.exists) {
@@ -521,8 +526,8 @@ router.put('/templates/:id/favorite', async (req: Request, res: Response) => {
 // DELETE /api/medical-records/templates/:id - Delete a template
 router.delete('/templates/:id', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        await db.collection('prescription_templates').doc(req.params.id).delete();
+        const db = getDb();
+        await getDb().collection('prescription_templates').doc(req.params.id).delete();
 
         res.json({ success: true });
     } catch (error: any) {

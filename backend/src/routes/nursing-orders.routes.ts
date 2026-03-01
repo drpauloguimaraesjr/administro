@@ -3,10 +3,13 @@
 import { Router, Request, Response } from 'express';
 import * as nursingService from '../services/nursing-orders.service.js';
 import type { NursingOrderStatus } from '../types/nursing-orders.types.js';
-import admin from 'firebase-admin';
+import { db } from '../config/firebaseAdmin.js';
 
 const router = Router();
-const db = admin.firestore();
+const getDb = () => {
+    if (!db) throw new Error('Firebase not configured');
+    return db;
+};
 
 // =====================
 // List & Fetch
@@ -87,8 +90,7 @@ router.post('/internal-emission', async (req: Request, res: Response) => {
 
         const now = new Date().toISOString();
 
-        // Update prescription document with internal emission status
-        const prescriptionRef = db
+        const prescriptionRef = getDb()
             .collection('patients')
             .doc(patientId)
             .collection('prescriptions')

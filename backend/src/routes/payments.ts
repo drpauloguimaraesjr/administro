@@ -1,14 +1,19 @@
 // src/routes/payments.ts
 import { Router, Request, Response } from 'express';
-import { getFirestore } from 'firebase-admin/firestore';
+import { db } from '../config/firebaseAdmin.js';
+
+const getDb = () => {
+    if (!db) throw new Error('Firebase not configured');
+    return db;
+};
 
 const router = Router();
 
 // GET /api/payments - List all payments (with optional filters)
 router.get('/', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        let query: any = db.collection('payments').orderBy('date', 'desc');
+        const db = getDb();
+        let query: any = getDb().collection('payments').orderBy('date', 'desc');
 
         const snapshot = await query.get();
 
@@ -37,8 +42,8 @@ router.get('/', async (req: Request, res: Response) => {
 // GET /api/payments/:id
 router.get('/:id', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        const doc = await db.collection('payments').doc(req.params.id).get();
+        const db = getDb();
+        const doc = await getDb().collection('payments').doc(req.params.id).get();
 
         if (!doc.exists) {
             return res.status(404).json({ error: 'Pagamento não encontrado' });
@@ -54,7 +59,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 // POST /api/payments - Create payment
 router.post('/', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
+        const db = getDb();
         const now = new Date().toISOString();
 
         const payment = {
@@ -71,7 +76,7 @@ router.post('/', async (req: Request, res: Response) => {
             updatedAt: now,
         };
 
-        const docRef = await db.collection('payments').add(payment);
+        const docRef = await getDb().collection('payments').add(payment);
         res.status(201).json({ id: docRef.id, ...payment });
     } catch (error: any) {
         console.error('Erro ao criar pagamento:', error);
@@ -82,8 +87,8 @@ router.post('/', async (req: Request, res: Response) => {
 // PUT /api/payments/:id - Update payment
 router.put('/:id', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        const docRef = db.collection('payments').doc(req.params.id);
+        const db = getDb();
+        const docRef = getDb().collection('payments').doc(req.params.id);
         const doc = await docRef.get();
 
         if (!doc.exists) {
@@ -112,8 +117,8 @@ router.put('/:id', async (req: Request, res: Response) => {
 // DELETE /api/payments/:id
 router.delete('/:id', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        await db.collection('payments').doc(req.params.id).delete();
+        const db = getDb();
+        await getDb().collection('payments').doc(req.params.id).delete();
         res.json({ success: true });
     } catch (error: any) {
         console.error('Erro ao remover pagamento:', error);
@@ -124,8 +129,8 @@ router.delete('/:id', async (req: Request, res: Response) => {
 // GET /api/payments/stats/summary - Financial summary
 router.get('/stats/summary', async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        const snapshot = await db.collection('payments').get();
+        const db = getDb();
+        const snapshot = await getDb().collection('payments').get();
 
         let totalReceived = 0;
         let totalPending = 0;

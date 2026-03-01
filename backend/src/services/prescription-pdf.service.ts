@@ -1,10 +1,13 @@
 // backend/src/services/prescription-pdf.service.ts
 
 import { PDFDocument, StandardFonts, rgb, PDFPage, PDFFont, degrees } from 'pdf-lib';
-import { getFirestore } from 'firebase-admin/firestore';
+import { db } from '../config/firebaseAdmin.js';
 import { getStorage } from 'firebase-admin/storage';
 
-const db = getFirestore();
+const getDb = () => {
+    if (!db) throw new Error('Firebase not configured');
+    return db;
+};
 
 interface PrescriptionSettings {
     headerImageUrl?: string | null;
@@ -128,11 +131,11 @@ export async function generatePrescriptionPdf(
     const prescription = { id: prescriptionDoc.id, ...prescriptionDoc.data() } as PrescriptionData;
 
     // 2. Fetch patient data
-    const patientDoc = await db.collection('patients').doc(patientId).get();
+    const patientDoc = await getDb().collection('patients').doc(patientId).get();
     const patient = patientDoc.exists ? (patientDoc.data() as PatientData) : { name: 'Paciente' };
 
     // 3. Fetch prescription settings
-    const settingsDoc = await db.collection('prescription-settings').doc('default').get();
+    const settingsDoc = await getDb().collection('prescription-settings').doc('default').get();
     const settings = (settingsDoc.exists ? settingsDoc.data() : {}) as PrescriptionSettings;
 
     // 4. Create PDF

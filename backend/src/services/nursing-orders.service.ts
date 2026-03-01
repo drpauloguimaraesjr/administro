@@ -1,6 +1,7 @@
 // backend/src/services/nursing-orders.service.ts
 
-import { getFirestore, FieldValue } from 'firebase-admin/firestore';
+import { FieldValue } from 'firebase-admin/firestore';
+import { db } from '../config/firebaseAdmin.js';
 import type {
     NursingOrder,
     NursingOrderStatus,
@@ -9,7 +10,10 @@ import type {
     NursingOrderSummary,
 } from '../types/nursing-orders.types.js';
 
-const db = getFirestore();
+const getDb = () => {
+    if (!db) throw new Error('Firebase not configured');
+    return db;
+};
 const COLLECTION = 'nursing_orders';
 
 // =====================
@@ -21,17 +25,17 @@ export async function getAllOrders(filters?: {
     patientId?: string;
     date?: string; // YYYY-MM-DD
 }): Promise<NursingOrder[]> {
-    let query: FirebaseFirestore.Query = db.collection(COLLECTION)
+    let query: FirebaseFirestore.Query = getDb().collection(COLLECTION)
         .orderBy('createdAt', 'desc');
 
     if (filters?.status) {
-        query = db.collection(COLLECTION)
+        query = getDb().collection(COLLECTION)
             .where('status', '==', filters.status)
             .orderBy('createdAt', 'desc');
     }
 
     if (filters?.patientId) {
-        query = db.collection(COLLECTION)
+        query = getDb().collection(COLLECTION)
             .where('patientId', '==', filters.patientId)
             .orderBy('createdAt', 'desc');
     }
@@ -51,7 +55,7 @@ export async function getTodayOrders(): Promise<NursingOrder[]> {
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
     // Get all non-cancelled orders from today
-    const snapshot = await db.collection(COLLECTION)
+    const snapshot = await getDb().collection(COLLECTION)
         .orderBy('createdAt', 'desc')
         .get();
 
@@ -65,7 +69,7 @@ export async function getTodayOrders(): Promise<NursingOrder[]> {
 }
 
 export async function getOrderById(id: string): Promise<NursingOrder | null> {
-    const doc = await db.collection(COLLECTION).doc(id).get();
+    const doc = await getDb().collection(COLLECTION).doc(id).get();
     if (!doc.exists) return null;
     return { id: doc.id, ...doc.data() } as NursingOrder;
 }
@@ -81,7 +85,7 @@ export async function createOrder(data: CreateNursingOrderInput): Promise<Nursin
         updatedAt: now,
     };
 
-    const docRef = await db.collection(COLLECTION).add(orderData);
+    const docRef = await getDb().collection(COLLECTION).add(orderData);
     return { id: docRef.id, ...orderData } as NursingOrder;
 }
 
@@ -90,18 +94,18 @@ export async function createOrder(data: CreateNursingOrderInput): Promise<Nursin
 // =====================
 
 const VALID_TRANSITIONS: Record<NursingOrderStatus, NursingOrderStatus[]> = {
-    pending:      ['preparing', 'cancelled'],
-    preparing:    ['ready', 'pending', 'cancelled'],  // can revert to pending
-    ready:        ['administered', 'preparing', 'cancelled'],
+    pending: ['preparing', 'cancelled'],
+    preparing: ['ready', 'pending', 'cancelled'],  // can revert to pending
+    ready: ['administered', 'preparing', 'cancelled'],
     administered: [],  // terminal state
-    cancelled:    ['pending'],  // can reactivate
+    cancelled: ['pending'],  // can reactivate
 };
 
 export async function updateOrderStatus(
     id: string,
     input: UpdateNursingOrderStatusInput
 ): Promise<NursingOrder | null> {
-    const docRef = db.collection(COLLECTION).doc(id);
+    const docRef = getDb().collection(COLLECTION).doc(id);
     const doc = await docRef.get();
 
     if (!doc.exists) return null;
@@ -172,7 +176,7 @@ export async function updateOrderStatus(
 export async function getSummary(): Promise<NursingOrderSummary> {
     const today = new Date().toISOString().split('T')[0];
 
-    const snapshot = await db.collection(COLLECTION)
+    const snapshot = await getDb().collection(COLLECTION)
         .orderBy('createdAt', 'desc')
         .get();
 

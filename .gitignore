@@ -37,6 +37,9 @@ yarn-error.log*
 backend/.env
 frontend/.env
 frontend/.env.local
+BACKEND_ENV_LOCAL.env
+FRONTEND_ENV_LOCAL.env
+VERCEL_ENV_VARS.txt
 
 # Arquivos com credenciais (não commitar)
 RAILWAY_QUICK_COPY.txt

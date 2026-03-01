@@ -1,6 +1,6 @@
 // backend/src/services/applications.service.ts
 
-import { getFirestore } from 'firebase-admin/firestore';
+import { db } from '../config/firebaseAdmin.js';
 import type {
     ApplicationOrder,
     ApplicationStatus,
@@ -11,7 +11,10 @@ import type {
     ProductSummaryItem,
 } from '../types/applications.types.js';
 
-const db = getFirestore();
+const getDb = () => {
+    if (!db) throw new Error('Firebase not configured');
+    return db;
+};
 const COLLECTION = 'applications';
 
 // =====================
@@ -19,12 +22,12 @@ const COLLECTION = 'applications';
 // =====================
 
 const VALID_TRANSITIONS: Record<ApplicationStatus, ApplicationStatus[]> = {
-    prescribed:       ['waiting_purchase', 'cancelled'],
+    prescribed: ['waiting_purchase', 'cancelled'],
     waiting_purchase: ['purchased', 'cancelled'],
-    purchased:        ['scheduled', 'administered', 'cancelled'],
-    scheduled:        ['administered', 'purchased', 'cancelled'],
-    administered:     [],  // terminal
-    cancelled:        ['prescribed'],  // can reactivate
+    purchased: ['scheduled', 'administered', 'cancelled'],
+    scheduled: ['administered', 'purchased', 'cancelled'],
+    administered: [],  // terminal
+    cancelled: ['prescribed'],  // can reactivate
 };
 
 // =====================
@@ -36,17 +39,17 @@ export async function getAllOrders(filters?: {
     patientId?: string;
     date?: string;
 }): Promise<ApplicationOrder[]> {
-    let query: FirebaseFirestore.Query = db.collection(COLLECTION)
+    let query: FirebaseFirestore.Query = getDb().collection(COLLECTION)
         .orderBy('createdAt', 'desc');
 
     if (filters?.status) {
-        query = db.collection(COLLECTION)
+        query = getDb().collection(COLLECTION)
             .where('status', '==', filters.status)
             .orderBy('createdAt', 'desc');
     }
 
     if (filters?.patientId) {
-        query = db.collection(COLLECTION)
+        query = getDb().collection(COLLECTION)
             .where('patientId', '==', filters.patientId)
             .orderBy('createdAt', 'desc');
     }
@@ -62,7 +65,7 @@ export async function getAllOrders(filters?: {
 }
 
 export async function getOrderById(id: string): Promise<ApplicationOrder | null> {
-    const doc = await db.collection(COLLECTION).doc(id).get();
+    const doc = await getDb().collection(COLLECTION).doc(id).get();
     if (!doc.exists) return null;
     return { id: doc.id, ...doc.data() } as ApplicationOrder;
 }
@@ -83,7 +86,7 @@ export async function createOrder(data: CreateApplicationInput): Promise<Applica
         updatedAt: now,
     };
 
-    const docRef = await db.collection(COLLECTION).add(orderData);
+    const docRef = await getDb().collection(COLLECTION).add(orderData);
     return { id: docRef.id, ...orderData } as ApplicationOrder;
 }
 
@@ -95,7 +98,7 @@ export async function confirmPurchase(
     id: string,
     input: ConfirmPurchaseInput
 ): Promise<ApplicationOrder | null> {
-    const docRef = db.collection(COLLECTION).doc(id);
+    const docRef = getDb().collection(COLLECTION).doc(id);
     const doc = await docRef.get();
 
     if (!doc.exists) return null;
@@ -138,7 +141,7 @@ export async function scheduleApplication(
     scheduledFor: string,
     scheduledBy: string
 ): Promise<ApplicationOrder | null> {
-    const docRef = db.collection(COLLECTION).doc(id);
+    const docRef = getDb().collection(COLLECTION).doc(id);
     const doc = await docRef.get();
 
     if (!doc.exists) return null;
@@ -171,7 +174,7 @@ export async function registerApplication(
     id: string,
     input: RegisterApplicationInput
 ): Promise<ApplicationOrder | null> {
-    const docRef = db.collection(COLLECTION).doc(id);
+    const docRef = getDb().collection(COLLECTION).doc(id);
     const doc = await docRef.get();
 
     if (!doc.exists) return null;
@@ -211,7 +214,7 @@ export async function cancelOrder(
     cancelledBy: string,
     reason?: string
 ): Promise<ApplicationOrder | null> {
-    const docRef = db.collection(COLLECTION).doc(id);
+    const docRef = getDb().collection(COLLECTION).doc(id);
     const doc = await docRef.get();
 
     if (!doc.exists) return null;
@@ -243,7 +246,7 @@ export async function cancelOrder(
 // =====================
 
 export async function getPatientTimeline(patientId: string): Promise<ApplicationOrder[]> {
-    const snapshot = await db.collection(COLLECTION)
+    const snapshot = await getDb().collection(COLLECTION)
         .where('patientId', '==', patientId)
         .orderBy('createdAt', 'desc')
         .get();
@@ -256,7 +259,7 @@ export async function getPatientTimeline(patientId: string): Promise<Application
 // =====================
 
 export async function getProductSummary(): Promise<ProductSummaryItem[]> {
-    const snapshot = await db.collection(COLLECTION).get();
+    const snapshot = await getDb().collection(COLLECTION).get();
     const orders = snapshot.docs.map(doc => doc.data() as Omit<ApplicationOrder, 'id'>);
 
     const productMap = new Map<string, ProductSummaryItem>();
@@ -299,7 +302,7 @@ export async function getProductSummary(): Promise<ProductSummaryItem[]> {
 export async function getDashboardSummary(): Promise<ApplicationSummary> {
     const today = new Date().toISOString().split('T')[0];
 
-    const snapshot = await db.collection(COLLECTION).get();
+    const snapshot = await getDb().collection(COLLECTION).get();
     const orders = snapshot.docs.map(doc => doc.data() as Omit<ApplicationOrder, 'id'>);
 
     const todayAdministered = orders.filter(o =>

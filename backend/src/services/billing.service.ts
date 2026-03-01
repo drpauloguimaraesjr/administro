@@ -11,7 +11,10 @@ import {
 
 const CLINIC_ID = 'default'; // TODO: Get from auth context
 
-const billingCollection = db.collection('billing_items');
+const getBillingCollection = () => {
+  if (!db) throw new Error('Firebase not configured');
+  return db.collection('billing_items');
+};
 
 export const BillingService = {
   // ====================================
@@ -19,7 +22,7 @@ export const BillingService = {
   // ====================================
 
   async getAll(filters?: BillingFilters, limit: number = 100): Promise<BillingItem[]> {
-    let query: FirebaseFirestore.Query = billingCollection
+    let query: FirebaseFirestore.Query = getBillingCollection()
       .where('clinicId', '==', CLINIC_ID);
 
     if (filters?.patientId) {
@@ -59,13 +62,13 @@ export const BillingService = {
   },
 
   async getById(id: string): Promise<BillingItem | null> {
-    const doc = await billingCollection.doc(id).get();
+    const doc = await getBillingCollection().doc(id).get();
     if (!doc.exists) return null;
     return { id: doc.id, ...doc.data() } as BillingItem;
   },
 
   async getByPatient(patientId: string, status?: BillingItem['status'][]): Promise<BillingItem[]> {
-    let query: FirebaseFirestore.Query = billingCollection
+    let query: FirebaseFirestore.Query = getBillingCollection()
       .where('clinicId', '==', CLINIC_ID)
       .where('patientId', '==', patientId);
 
@@ -80,7 +83,7 @@ export const BillingService = {
   },
 
   async getPending(): Promise<BillingItem[]> {
-    const snapshot = await billingCollection
+    const snapshot = await getBillingCollection()
       .where('clinicId', '==', CLINIC_ID)
       .where('status', '==', 'pending')
       .orderBy('createdAt', 'desc')
@@ -129,12 +132,12 @@ export const BillingService = {
       updatedAt: now,
     };
 
-    const docRef = await billingCollection.add(item);
+    const docRef = await getBillingCollection().add(item);
     return { id: docRef.id, ...item };
   },
 
   async update(id: string, data: UpdateBillingItemDTO): Promise<BillingItem | null> {
-    const docRef = billingCollection.doc(id);
+    const docRef = getBillingCollection().doc(id);
     const doc = await docRef.get();
     if (!doc.exists) return null;
 
@@ -166,7 +169,7 @@ export const BillingService = {
   },
 
   async markAsPaid(id: string, data: MarkAsPaidDTO): Promise<BillingItem | null> {
-    const docRef = billingCollection.doc(id);
+    const docRef = getBillingCollection().doc(id);
     const doc = await docRef.get();
     if (!doc.exists) return null;
 
@@ -188,7 +191,7 @@ export const BillingService = {
     const paymentDate = data.paymentDate || now;
 
     for (const id of ids) {
-      const docRef = billingCollection.doc(id);
+      const docRef = getBillingCollection().doc(id);
       batch.update(docRef, {
         status: 'paid',
         paymentMethod: data.paymentMethod,
@@ -203,7 +206,7 @@ export const BillingService = {
   },
 
   async cancel(id: string): Promise<BillingItem | null> {
-    const docRef = billingCollection.doc(id);
+    const docRef = getBillingCollection().doc(id);
     const doc = await docRef.get();
     if (!doc.exists) return null;
 
@@ -217,7 +220,7 @@ export const BillingService = {
   },
 
   async delete(id: string): Promise<boolean> {
-    const docRef = billingCollection.doc(id);
+    const docRef = getBillingCollection().doc(id);
     const doc = await docRef.get();
     if (!doc.exists) return false;
 
@@ -230,7 +233,7 @@ export const BillingService = {
   // ====================================
 
   async getSummary(dateFrom?: string, dateTo?: string): Promise<BillingSummary> {
-    let query: FirebaseFirestore.Query = billingCollection
+    let query: FirebaseFirestore.Query = getBillingCollection()
       .where('clinicId', '==', CLINIC_ID);
 
     const snapshot = await query.get();
@@ -299,7 +302,7 @@ export const BillingService = {
   },
 
   async getPatientsSummary(): Promise<PatientBillingSummary[]> {
-    const snapshot = await billingCollection
+    const snapshot = await getBillingCollection()
       .where('clinicId', '==', CLINIC_ID)
       .get();
 

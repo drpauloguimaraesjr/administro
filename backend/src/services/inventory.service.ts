@@ -1,7 +1,8 @@
 // backend/src/services/inventory.service.ts
 // Versão simplificada e corrigida - sem dependências externas complexas
 
-import { getFirestore, FieldValue } from 'firebase-admin/firestore';
+import { FieldValue } from 'firebase-admin/firestore';
+import { db as _db } from '../config/firebaseAdmin.js';
 import type {
     InventoryItem,
     InventoryBatch,
@@ -11,19 +12,22 @@ import type {
     InventorySummary
 } from '../types/inventory.types.js';
 
-const db = getFirestore();
+const getDb = () => {
+    if (!_db) throw new Error('Firebase not configured');
+    return _db;
+};
 
 // =====================
 // CRUD Items
 // =====================
 
 export async function getAllItems(): Promise<InventoryItem[]> {
-    const snapshot = await db.collection('inventory_items').orderBy('name').get();
+    const snapshot = await getDb().collection('inventory_items').orderBy('name').get();
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as InventoryItem));
 }
 
 export async function getItemById(id: string): Promise<InventoryItem | null> {
-    const doc = await db.collection('inventory_items').doc(id).get();
+    const doc = await getDb().collection('inventory_items').doc(id).get();
     if (!doc.exists) return null;
     return { id: doc.id, ...doc.data() } as InventoryItem;
 }
@@ -36,12 +40,12 @@ export async function createItem(data: Omit<InventoryItem, 'id' | 'createdAt' | 
         createdAt: now,
         updatedAt: now
     };
-    const docRef = await db.collection('inventory_items').add(itemData);
+    const docRef = await getDb().collection('inventory_items').add(itemData);
     return { id: docRef.id, ...itemData } as InventoryItem;
 }
 
 export async function updateItem(id: string, data: Partial<InventoryItem>): Promise<InventoryItem | null> {
-    const docRef = db.collection('inventory_items').doc(id);
+    const docRef = getDb().collection('inventory_items').doc(id);
     const doc = await docRef.get();
     if (!doc.exists) return null;
 
@@ -53,7 +57,7 @@ export async function updateItem(id: string, data: Partial<InventoryItem>): Prom
 }
 
 export async function deleteItem(id: string): Promise<boolean> {
-    const docRef = db.collection('inventory_items').doc(id);
+    const docRef = getDb().collection('inventory_items').doc(id);
     const doc = await docRef.get();
     if (!doc.exists) return false;
     await docRef.delete();
@@ -65,9 +69,9 @@ export async function deleteItem(id: string): Promise<boolean> {
 // =====================
 
 export async function getBatches(itemId?: string): Promise<InventoryBatch[]> {
-    let query = db.collection('inventory_batches').orderBy('expirationDate', 'asc') as FirebaseFirestore.Query;
+    let query = getDb().collection('inventory_batches').orderBy('expirationDate', 'asc') as FirebaseFirestore.Query;
     if (itemId) {
-        query = db.collection('inventory_batches')
+        query = getDb().collection('inventory_batches')
             .where('itemId', '==', itemId)
             .orderBy('expirationDate', 'asc');
     }
@@ -76,10 +80,10 @@ export async function getBatches(itemId?: string): Promise<InventoryBatch[]> {
 }
 
 export async function createBatch(data: Omit<InventoryBatch, 'id'>): Promise<InventoryBatch> {
-    const docRef = await db.collection('inventory_batches').add(data);
+    const docRef = await getDb().collection('inventory_batches').add(data);
 
     // Atualiza estoque do item
-    const itemRef = db.collection('inventory_items').doc(data.itemId);
+    const itemRef = getDb().collection('inventory_items').doc(data.itemId);
     await itemRef.update({
         currentQuantity: FieldValue.increment(data.quantity),
         updatedAt: new Date().toISOString()
@@ -105,12 +109,12 @@ export async function createBatch(data: Omit<InventoryBatch, 'id'>): Promise<Inv
 // =====================
 
 export async function getMovements(itemId?: string, limit = 100): Promise<InventoryMovement[]> {
-    let query: FirebaseFirestore.Query = db.collection('inventory_movements')
+    let query: FirebaseFirestore.Query = getDb().collection('inventory_movements')
         .orderBy('createdAt', 'desc')
         .limit(limit);
 
     if (itemId) {
-        query = db.collection('inventory_movements')
+        query = getDb().collection('inventory_movements')
             .where('itemId', '==', itemId)
             .orderBy('createdAt', 'desc')
             .limit(limit);
@@ -136,7 +140,7 @@ interface CreateMovementInput {
 
 export async function createMovement(data: CreateMovementInput): Promise<InventoryMovement> {
     // Busca quantidade atual do item
-    const itemDoc = await db.collection('inventory_items').doc(data.itemId).get();
+    const itemDoc = await getDb().collection('inventory_items').doc(data.itemId).get();
     const currentQty = itemDoc.exists ? (itemDoc.data()?.currentQuantity || 0) : 0;
 
     const movementData = {
@@ -146,11 +150,11 @@ export async function createMovement(data: CreateMovementInput): Promise<Invento
         createdAt: new Date().toISOString()
     };
 
-    const docRef = await db.collection('inventory_movements').add(movementData);
+    const docRef = await getDb().collection('inventory_movements').add(movementData);
 
     // Atualiza estoque do item (se não for entrada de lote, que já atualiza)
     if (data.type !== 'entrada') {
-        await db.collection('inventory_items').doc(data.itemId).update({
+        await getDb().collection('inventory_items').doc(data.itemId).update({
             currentQuantity: FieldValue.increment(data.quantity),
             updatedAt: new Date().toISOString()
         });
@@ -253,7 +257,7 @@ export async function matchProduct(searchName: string): Promise<StockMatchResult
 
     // Find best batch (FIFO — oldest valid expiration date)
     const now = new Date();
-    const batchesSnapshot = await db.collection('inventory_batches')
+    const batchesSnapshot = await getDb().collection('inventory_batches')
         .where('itemId', '==', bestMatch.id)
         .orderBy('expirationDate', 'asc')
         .get();
@@ -306,7 +310,7 @@ export async function createPrescriptionMovement(data: PrescriptionMovementInput
 
     // Find best batch (FIFO) and decrement
     const now = new Date();
-    const batchesSnapshot = await db.collection('inventory_batches')
+    const batchesSnapshot = await getDb().collection('inventory_batches')
         .where('itemId', '==', data.productId)
         .orderBy('expirationDate', 'asc')
         .get();
@@ -332,7 +336,7 @@ export async function createPrescriptionMovement(data: PrescriptionMovementInput
 
     // Apply batch decrements
     for (const update of batchUpdates) {
-        await db.collection('inventory_batches').doc(update.batchId).update({
+        await getDb().collection('inventory_batches').doc(update.batchId).update({
             quantity: FieldValue.increment(-update.deducted),
         });
     }
@@ -361,11 +365,11 @@ export async function createPrescriptionMovement(data: PrescriptionMovementInput
 // =====================
 
 export async function getAlerts(status?: string): Promise<InventoryAlert[]> {
-    let query: FirebaseFirestore.Query = db.collection('inventory_alerts')
+    let query: FirebaseFirestore.Query = getDb().collection('inventory_alerts')
         .orderBy('createdAt', 'desc');
 
     if (status) {
-        query = db.collection('inventory_alerts')
+        query = getDb().collection('inventory_alerts')
             .where('status', '==', status)
             .orderBy('createdAt', 'desc');
     }
@@ -386,7 +390,7 @@ interface CreateAlertInput {
 
 async function createAlert(data: CreateAlertInput): Promise<InventoryAlert> {
     // Verifica se já existe alerta ativo igual
-    const existingQuery = await db.collection('inventory_alerts')
+    const existingQuery = await getDb().collection('inventory_alerts')
         .where('itemId', '==', data.itemId)
         .where('type', '==', data.type)
         .where('status', '==', 'active')
@@ -403,7 +407,7 @@ async function createAlert(data: CreateAlertInput): Promise<InventoryAlert> {
         createdAt: new Date().toISOString()
     };
 
-    const docRef = await db.collection('inventory_alerts').add(alertData);
+    const docRef = await getDb().collection('inventory_alerts').add(alertData);
     return { id: docRef.id, ...alertData } as InventoryAlert;
 }
 
@@ -493,7 +497,7 @@ export async function checkAndGenerateAlerts(): Promise<InventoryAlert[]> {
 }
 
 export async function acknowledgeAlert(id: string, userId: string): Promise<InventoryAlert | null> {
-    const docRef = db.collection('inventory_alerts').doc(id);
+    const docRef = getDb().collection('inventory_alerts').doc(id);
     const doc = await docRef.get();
     if (!doc.exists) return null;
 
@@ -508,7 +512,7 @@ export async function acknowledgeAlert(id: string, userId: string): Promise<Inve
 }
 
 export async function resolveAlert(id: string): Promise<InventoryAlert | null> {
-    const docRef = db.collection('inventory_alerts').doc(id);
+    const docRef = getDb().collection('inventory_alerts').doc(id);
     const doc = await docRef.get();
     if (!doc.exists) return null;
 
@@ -532,7 +536,7 @@ export async function analyzeConsumption(itemId: string, periodDays = 30): Promi
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - periodDays);
 
-    const movementsSnapshot = await db.collection('inventory_movements')
+    const movementsSnapshot = await getDb().collection('inventory_movements')
         .where('itemId', '==', itemId)
         .where('type', '==', 'saída')
         .where('createdAt', '>=', startDate.toISOString())

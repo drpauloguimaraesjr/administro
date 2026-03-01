@@ -2,16 +2,19 @@
 import { db, auth } from '../config/firebaseAdmin.js';
 import { User, ROLE_PERMISSIONS } from '../shared/types/index.js';
 
-const collection = db.collection('users');
+const getCollection = () => {
+    if (!db) throw new Error('Firebase not configured');
+    return db.collection('users');
+};
 
 export const UsersService = {
     async getAll(): Promise<User[]> {
-        const snapshot = await collection.get();
+        const snapshot = await getCollection().get();
         return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User));
     },
 
     async getById(id: string): Promise<User | null> {
-        const doc = await collection.doc(id).get();
+        const doc = await getCollection().doc(id).get();
         if (!doc.exists) return null;
         return { id: doc.id, ...doc.data() } as User;
     },
@@ -46,13 +49,13 @@ export const UsersService = {
         };
 
         // 3. Salvar no Firestore com o UID do Auth
-        await collection.doc(userRecord.uid).set(userData);
+        await getCollection().doc(userRecord.uid).set(userData);
 
         return { id: userRecord.uid, ...userData } as User;
     },
 
     async update(id: string, data: Partial<User>): Promise<User | null> {
-        const docRef = collection.doc(id);
+        const docRef = getCollection().doc(id);
         const doc = await docRef.get();
         if (!doc.exists) return null;
 
@@ -93,7 +96,7 @@ export const UsersService = {
     async delete(id: string): Promise<boolean> {
         try {
             await auth.deleteUser(id);
-            await collection.doc(id).delete();
+            await getCollection().doc(id).delete();
             return true;
         } catch (error) {
             console.error('Erro ao deletar usuário:', error);

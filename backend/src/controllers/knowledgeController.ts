@@ -4,16 +4,25 @@ import { z } from "zod";
 import { Client } from "@notionhq/client";
 import { db } from "../config/firebaseAdmin.js";
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-    baseURL: process.env.OPENAI_BASE_URL,
-});
+// Lazy-init OpenAI client
+let _openai: OpenAI | null = null;
+const getOpenAI = () => {
+    if (!_openai) {
+        if (!process.env.OPENAI_API_KEY) throw new Error('OPENAI_API_KEY not configured');
+        _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY, baseURL: process.env.OPENAI_BASE_URL });
+    }
+    return _openai;
+};
 
-// Initialize Notion client
-const notion = new Client({
-    auth: process.env.NOTION_TOKEN,
-});
+// Lazy-init Notion client
+let _notion: Client | null = null;
+const getNotion = () => {
+    if (!_notion) {
+        if (!process.env.NOTION_TOKEN) throw new Error('NOTION_TOKEN not configured');
+        _notion = new Client({ auth: process.env.NOTION_TOKEN });
+    }
+    return _notion;
+};
 
 const NOTION_DATABASE_ID = "2f342023207580049c5fe31e9b4c19be"; // Medical Brain ID
 
@@ -116,7 +125,7 @@ SCHEMA DE CADA OBJETO (dentro da lista 'results'):
 
     console.log(`🧠 Processing chunk ${chunkIndex + 1}/${totalChunks} (${rawText.length} chars)...`);
 
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAI().chat.completions.create({
         model: "gpt-4o",
         messages: [
             { role: "system", content: systemPrompt },
@@ -198,7 +207,7 @@ export const saveKnowledge = async (req: Request, res: Response) => {
         // Ensure NOTION_TOKEN is present to avoid crashing if not configured yet
         if (process.env.NOTION_TOKEN) {
             try {
-                await notion.pages.create({
+                await getNotion().pages.create({
                     parent: { database_id: NOTION_DATABASE_ID },
                     properties: {
                         "Tópico": { title: [{ text: { content: validatedData.topic } }] },
