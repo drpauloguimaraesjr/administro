@@ -14,7 +14,7 @@ const getBaseURL = () => {
     if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
         return 'https://backendcalyx.up.railway.app/api';
     }
-    return 'http://localhost:4000/api';
+    return 'http://localhost:3001/api';
 };
 
 const portalApi = axios.create({
@@ -78,6 +78,39 @@ export const uploadPatientExam = async (file: File, title: string, description?:
     const res = await portalApi.post('/portal/exams/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
     });
+    return res.data;
+};
+
+export const submitExamAccessCode = async (data: {
+    labName: string;
+    accessCode: string;
+    password?: string;
+    notes?: string;
+    examDate?: string;
+}) => {
+    const res = await portalApi.post('/portal/exams/access-code', data);
+    return res.data;
+};
+
+export const uploadExamAccessPhoto = async (file: File, notes?: string, examDate?: string) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (notes) formData.append('notes', notes);
+    if (examDate) formData.append('examDate', examDate);
+
+    const res = await portalApi.post('/portal/exams/access-photo', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return res.data;
+};
+
+export const fetchClinicalSummary = async () => {
+    const res = await portalApi.get('/portal/clinical-summary');
+    return res.data;
+};
+
+export const fetchAssessments = async () => {
+    const res = await portalApi.get('/portal/assessments');
     return res.data;
 };
 

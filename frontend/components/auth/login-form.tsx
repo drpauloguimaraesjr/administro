@@ -6,6 +6,7 @@ import { Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { login } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
+import api from '@/lib/api';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
@@ -20,12 +21,48 @@ export function LoginForm() {
     setLoading(true);
 
     try {
-      await login(email, password);
-      router.push('/');
-      router.refresh();
+      const credential = await login(email, password);
+      const tokenResult = await credential.user.getIdTokenResult();
+      const claims = tokenResult.claims;
+
+      const isPatient = claims.role === 'patient' && !!claims.patientId;
+
+      // Verificar se é colaborador (existe na collection users)
+      let isStaff = false;
+      try {
+        const res = await api.get('/users');
+        const users = res.data;
+        isStaff = users.some((u: any) =>
+          u.email?.toLowerCase() === email.toLowerCase()
+        );
+      } catch {
+        // Se falhar a busca, assume que não é staff
+        // (pode ser paciente puro sem acesso ao endpoint de users)
+      }
+
+      if (isStaff) {
+        // Médico / funcionário → vai pro admin
+        router.push('/');
+        router.refresh();
+      } else if (isPatient) {
+        // Paciente puro → vai pro portal
+        router.push('/portal');
+      } else {
+        // Nenhum dos dois → erro
+        setError('Conta sem permissão de acesso ao sistema.');
+        const { logout } = await import('@/lib/auth');
+        await logout();
+        setLoading(false);
+        return;
+      }
     } catch (err: any) {
-      setError(err.message || 'Erro ao fazer login');
-    } finally {
+      if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password') {
+        setError('Email ou senha incorretos');
+      } else if (err.code === 'auth/user-not-found') {
+        setError('Conta não encontrada');
+      } else {
+        setError(err.message || 'Erro ao fazer login');
+      }
       setLoading(false);
     }
   };
@@ -96,7 +133,7 @@ export function LoginForm() {
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  Entrando...
+                  Identificando...
                 </span>
               ) : (
                 'Entrar'

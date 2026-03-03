@@ -18,7 +18,7 @@ const getBaseURL = () => {
         return 'https://backendcalyx.up.railway.app/api';
     }
 
-    return 'http://localhost:4000/api';
+    return 'http://localhost:3001/api';
 };
 
 let baseURL = getBaseURL();

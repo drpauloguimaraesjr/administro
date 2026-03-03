@@ -36,22 +36,24 @@ export function PortalAuthProvider({ children }: { children: React.ReactNode }) 
             if (firebaseUser) {
                 // Verifica custom claims
                 const tokenResult = await firebaseUser.getIdTokenResult();
-                if (tokenResult.claims.role === 'patient' && tokenResult.claims.patientId) {
+                if (tokenResult.claims.patientId) {
+                    // Aceita tanto pacientes puros (role=patient) quanto
+                    // colaboradores que também são pacientes (têm patientId)
                     setUser(firebaseUser);
                     setPatientId(tokenResult.claims.patientId as string);
                 } else {
-                    // Não é paciente, redireciona para login
+                    // Não tem vínculo de paciente, redireciona para login
                     setUser(null);
                     setPatientId(null);
                     if (pathname !== '/portal/login') {
-                        router.push('/portal/login');
+                        router.push('/login');
                     }
                 }
             } else {
                 setUser(null);
                 setPatientId(null);
                 if (pathname !== '/portal/login') {
-                    router.push('/portal/login');
+                    router.push('/login');
                 }
             }
             setLoading(false);
