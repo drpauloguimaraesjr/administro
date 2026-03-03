@@ -6,7 +6,6 @@ import { Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { login } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
-import api from '@/lib/api';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
@@ -27,33 +26,13 @@ export function LoginForm() {
 
       const isPatient = claims.role === 'patient' && !!claims.patientId;
 
-      // Verificar se é colaborador (existe na collection users)
-      let isStaff = false;
-      try {
-        const res = await api.get('/users');
-        const users = res.data;
-        isStaff = users.some((u: any) =>
-          u.email?.toLowerCase() === email.toLowerCase()
-        );
-      } catch {
-        // Se falhar a busca, assume que não é staff
-        // (pode ser paciente puro sem acesso ao endpoint de users)
-      }
-
-      if (isStaff) {
-        // Médico / funcionário → vai pro admin
-        router.push('/');
-        router.refresh();
-      } else if (isPatient) {
-        // Paciente puro → vai pro portal
+      if (isPatient) {
+        // Paciente → vai pro portal
         router.push('/portal');
       } else {
-        // Nenhum dos dois → erro
-        setError('Conta sem permissão de acesso ao sistema.');
-        const { logout } = await import('@/lib/auth');
-        await logout();
-        setLoading(false);
-        return;
+        // Qualquer outro (médico, funcionário, admin) → vai pro admin
+        router.push('/');
+        router.refresh();
       }
     } catch (err: any) {
       if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password') {
