@@ -167,7 +167,7 @@ export default function PortalDashboard() {
                                             </div>
                                             {nextAppt.notes && (
                                                 <p className="text-xs text-white/70 italic leading-relaxed bg-black/5 rounded-xl p-3 border border-white/5">
-                                                    "{nextAppt.notes}"
+                                                    &ldquo;{nextAppt.notes}&rdquo;
                                                 </p>
                                             )}
                                         </div>

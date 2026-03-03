@@ -406,7 +406,7 @@ export default function ExamesPage() {
                                 </div>
                                 {exam.description && (
                                     <div className="mt-4 pt-4 border-t border-slate-50">
-                                        <p className="text-xs text-slate-500 leading-relaxed italic">"{exam.description}"</p>
+                                        <p className="text-xs text-slate-500 leading-relaxed italic">&ldquo;{exam.description}&rdquo;</p>
                                     </div>
                                 )}
                             </div>
