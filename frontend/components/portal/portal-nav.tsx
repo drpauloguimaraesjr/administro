@@ -2,7 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import { usePortalAuth } from '@/components/portal/portal-auth-provider';
+import { auth as firebaseAuth } from '@/lib/firebase/config';
 
 const navItems = [
     { href: '/portal', label: 'Início', icon: '🏠' },
@@ -15,6 +17,25 @@ const navItems = [
 export function PortalNav() {
     const pathname = usePathname();
     const { user, logout } = usePortalAuth();
+    const [isAlsoStaff, setIsAlsoStaff] = useState(false);
+
+    // Verificar se o usuário é também colaborador (tem acesso ao admin)
+    useEffect(() => {
+        async function checkStaffRole() {
+            if (user && firebaseAuth?.currentUser) {
+                try {
+                    const tokenResult = await firebaseAuth.currentUser.getIdTokenResult();
+                    // Se o role NÃO é 'patient' exclusivamente, é staff também
+                    if (tokenResult.claims.role !== 'patient') {
+                        setIsAlsoStaff(true);
+                    }
+                } catch {
+                    // Silently fail
+                }
+            }
+        }
+        checkStaffRole();
+    }, [user]);
 
     if (!user) return null;
 
@@ -29,12 +50,23 @@ export function PortalNav() {
                         </div>
                         <span className="text-sm font-medium text-gray-900">Portal do Paciente</span>
                     </div>
-                    <button
-                        onClick={logout}
-                        className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
-                    >
-                        Sair
-                    </button>
+                    <div className="flex items-center gap-3">
+                        {/* Toggle para voltar ao Admin — só para médicos/funcionários */}
+                        {isAlsoStaff && (
+                            <Link
+                                href="/"
+                                className="text-xs text-emerald-600 hover:text-emerald-700 font-medium px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 transition-colors"
+                            >
+                                ← Admin
+                            </Link>
+                        )}
+                        <button
+                            onClick={logout}
+                            className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+                        >
+                            Sair
+                        </button>
+                    </div>
                 </div>
             </header>
 
@@ -68,8 +100,8 @@ export function PortalNav() {
                                 key={item.href}
                                 href={item.href}
                                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all ${isActive
-                                        ? 'bg-blue-50 text-blue-700 font-medium'
-                                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                    ? 'bg-blue-50 text-blue-700 font-medium'
+                                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                                     }`}
                             >
                                 <span>{item.icon}</span>
@@ -78,6 +110,19 @@ export function PortalNav() {
                         );
                     })}
                 </nav>
+
+                {/* Botão de voltar ao admin no sidebar (desktop) */}
+                {isAlsoStaff && (
+                    <div className="mt-6 pt-4 border-t border-gray-100">
+                        <Link
+                            href="/"
+                            className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-emerald-600 hover:bg-emerald-50 transition-all"
+                        >
+                            <span>🏥</span>
+                            <span>Voltar ao Admin</span>
+                        </Link>
+                    </div>
+                )}
             </aside>
         </>
     );
