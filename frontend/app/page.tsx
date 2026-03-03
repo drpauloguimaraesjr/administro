@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Users, Clock, Activity, Plus, ArrowRight } from 'lucide-react';
+import { Calendar, Users, Clock, Activity, Plus, ArrowRight, Syringe, User, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/components/auth/auth-provider';
 import { useRouter } from 'next/navigation';
@@ -18,17 +18,32 @@ interface Appointment {
   type: string;
 }
 
-interface Patient {
+interface Application {
   id: string;
-  name: string;
+  patientName: string;
+  productName: string;
+  dose: string;
+  route: string;
+  status: 'scheduled' | 'in_progress' | 'done';
+  nurseAssigned?: string;
 }
 
-// MOCK DATA FOR PRESENTATION
+// MOCK: Consultas do dia
 const mockAppointments: Appointment[] = [
   { id: '1', patientName: 'Eduardo Costa', date: new Date().toISOString().split('T')[0], startTime: '09:00', status: 'confirmed', type: 'first_visit' },
   { id: '2', patientName: 'Maria Silva', date: new Date().toISOString().split('T')[0], startTime: '10:30', status: 'pending', type: 'return' },
   { id: '3', patientName: 'João Santos', date: new Date().toISOString().split('T')[0], startTime: '14:00', status: 'confirmed', type: 'procedure' },
   { id: '4', patientName: 'Ana Oliveira', date: new Date().toISOString().split('T')[0], startTime: '16:00', status: 'confirmed', type: 'return' },
+  { id: '5', patientName: 'Carla Menezes', date: new Date().toISOString().split('T')[0], startTime: '17:00', status: 'pending', type: 'first_visit' },
+];
+
+// MOCK: Aplicações do dia
+const mockApplications: Application[] = [
+  { id: '1', patientName: 'Fernanda Lopes', productName: 'Gestrinona 20mg', dose: '20mg', route: 'Implante SC', status: 'done', nurseAssigned: 'Enfermeira Ana' },
+  { id: '2', patientName: 'Juliana Rocha', productName: 'Testosterona 50mg', dose: '50mg', route: 'Implante SC', status: 'in_progress', nurseAssigned: 'Enfermeira Ana' },
+  { id: '3', patientName: 'Patrícia Almeida', productName: 'Oxandrolona 15mg', dose: '15mg', route: 'Implante SC', status: 'scheduled' },
+  { id: '4', patientName: 'Roberto Lima', productName: 'Testosterona 75mg', dose: '75mg', route: 'Implante Glúteo', status: 'scheduled' },
+  { id: '5', patientName: 'Cláudia Dias', productName: 'Gestrinona 10mg + Testosterona 25mg', dose: '35mg total', route: 'Implante SC', status: 'scheduled' },
 ];
 
 export default function Home() {
@@ -71,6 +86,11 @@ export default function Home() {
     .sort((a: Appointment, b: Appointment) => a.startTime.localeCompare(b.startTime));
 
   const nextAppointment = upcomingToday[0];
+  const doneApps = mockApplications.filter(a => a.status === 'done').length;
+  const totalApps = mockApplications.length;
+
+  const greetingHour = new Date().getHours();
+  const greeting = greetingHour < 12 ? 'Bom dia' : greetingHour < 18 ? 'Boa tarde' : 'Boa noite';
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -108,10 +128,10 @@ export default function Home() {
           <motion.div variants={itemVariants} className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div className="space-y-1">
               <h1 className="font-serif text-3xl font-bold text-foreground tracking-tight">
-                Dashboard
+                {greeting}, Dr.
               </h1>
               <p className="font-mono text-sm text-muted-foreground">
-                Resumo do seu dia.
+                {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}
               </p>
             </div>
             <div className="flex gap-3">
@@ -137,29 +157,30 @@ export default function Home() {
               subtext={nextAppointment?.patientName}
             />
             <StatCard
+              icon={<Syringe className="w-4 h-4" />}
+              label="Aplicações Hoje"
+              value={`${doneApps}/${totalApps}`}
+              subtext="realizadas"
+            />
+            <StatCard
               icon={<Users className="w-4 h-4" />}
               label="Pacientes Ativos"
               value={patients.length || 1248}
             />
-            <StatCard
-              icon={<Activity className="w-4 h-4" />}
-              label="Taxa de Faltas"
-              value="2%"
-            />
           </motion.div>
 
-          {/* Today's Schedule & Quick Actions */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* === TWO-PANEL LAYOUT === */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-            {/* Schedule (2 columns) */}
-            <motion.div variants={itemVariants} className="lg:col-span-2 border border-border bg-card p-6">
+            {/* LEFT: Consultas do Dia */}
+            <motion.div variants={itemVariants} className="border border-border bg-card p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="font-serif text-xl font-bold text-foreground flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-[#7c9a72]" />
-                  Agenda de Hoje
+                  Consultas do Dia
                 </h2>
                 <Link href="/agenda" className="mono-label text-[#7c9a72] hover:text-[#6b8a62] transition-colors duration-150 flex items-center gap-1">
-                  Ver completa <ArrowRight className="w-3 h-3" />
+                  Ver agenda <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>
 
@@ -167,15 +188,10 @@ export default function Home() {
                 <div className="text-center py-12 text-muted-foreground border border-dashed border-border">
                   <Calendar className="w-10 h-10 mx-auto mb-3 opacity-20" />
                   <p className="font-mono text-sm">Nenhuma consulta agendada</p>
-                  <Link href="/agenda">
-                    <button className="mt-4 px-4 py-2 border border-border text-foreground font-mono text-xs uppercase tracking-[0.15em] hover:border-foreground/40 transition-colors duration-150">
-                      Agendar Consulta
-                    </button>
-                  </Link>
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {upcomingToday.slice(0, 5).map((apt: Appointment) => (
+                  {upcomingToday.slice(0, 6).map((apt: Appointment) => (
                     <div
                       key={apt.id}
                       className="flex items-center justify-between p-4 border border-border hover:border-foreground/30 transition-colors duration-150 group"
@@ -195,12 +211,11 @@ export default function Home() {
                           </p>
                         </div>
                       </div>
-                      <span className={`font-mono text-[10px] uppercase tracking-[0.15em] px-2.5 py-1 border ${
-                        apt.status === 'confirmed' ? 'border-[#7c9a72]/30 text-[#6b8a62]' :
-                        apt.status === 'pending' ? 'border-[#c48a3a]/30 text-[#c48a3a]' :
-                        apt.status === 'completed' ? 'border-border text-muted-foreground' :
-                        'border-destructive/30 text-destructive'
-                      }`}>
+                      <span className={`font-mono text-[10px] uppercase tracking-[0.15em] px-2.5 py-1 border ${apt.status === 'confirmed' ? 'border-[#7c9a72]/30 text-[#6b8a62]' :
+                          apt.status === 'pending' ? 'border-[#c48a3a]/30 text-[#c48a3a]' :
+                            apt.status === 'completed' ? 'border-border text-muted-foreground' :
+                              'border-destructive/30 text-destructive'
+                        }`}>
                         {apt.status === 'confirmed' ? 'Confirmado' :
                           apt.status === 'pending' ? 'Pendente' :
                             apt.status === 'completed' ? 'Concluído' : 'Cancelado'}
@@ -211,33 +226,85 @@ export default function Home() {
               )}
             </motion.div>
 
-            {/* Quick Actions (1 column) */}
-            <motion.div variants={itemVariants} className="space-y-3">
-              <h2 className="font-serif text-lg font-semibold text-foreground mb-4 px-1">
-                Acesso Rápido
-              </h2>
+            {/* RIGHT: Aplicações do Dia */}
+            <motion.div variants={itemVariants} className="border border-border bg-card p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="font-serif text-xl font-bold text-foreground flex items-center gap-2">
+                  <Syringe className="w-4 h-4 text-[#7c9a72]" />
+                  Aplicações do Dia
+                </h2>
+                <span className="font-mono text-xs text-muted-foreground">
+                  {doneApps} de {totalApps} feitas
+                </span>
+              </div>
 
-              <ActionCard
-                icon={<Users className="w-4 h-4" />}
-                title="Novo Paciente"
-                description="Cadastrar ficha completa"
-                href="/patients"
-              />
-              <ActionCard
-                icon={<Plus className="w-4 h-4" />}
-                title="Financeiro"
-                description="Registrar entrada/saída"
-                href="/transactions"
-              />
-              <ActionCard
-                icon={<Activity className="w-4 h-4" />}
-                title="CRM"
-                description="Gerenciar leads e pipeline"
-                href="/crm"
-              />
+              <div className="space-y-2">
+                {mockApplications.map((app) => (
+                  <div
+                    key={app.id}
+                    className={`p-4 border transition-colors duration-150 group ${app.status === 'done'
+                        ? 'border-[#7c9a72]/20 bg-[#7c9a72]/[0.02]'
+                        : app.status === 'in_progress'
+                          ? 'border-[#c48a3a]/30 bg-[#c48a3a]/[0.02]'
+                          : 'border-border hover:border-foreground/30'
+                      }`}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 flex items-center justify-center ${app.status === 'done' ? 'text-[#7c9a72]' :
+                            app.status === 'in_progress' ? 'text-[#c48a3a]' :
+                              'text-muted-foreground'
+                          }`}>
+                          {app.status === 'done' ? <CheckCircle2 className="w-5 h-5" /> :
+                            app.status === 'in_progress' ? <AlertCircle className="w-5 h-5" /> :
+                              <Syringe className="w-4 h-4" />}
+                        </div>
+                        <div>
+                          <p className="font-serif font-semibold text-foreground text-sm">
+                            {app.patientName}
+                          </p>
+                          <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
+                            {app.productName}
+                          </p>
+                        </div>
+                      </div>
+                      <span className={`font-mono text-[10px] uppercase tracking-[0.15em] px-2.5 py-1 border ${app.status === 'done' ? 'border-[#7c9a72]/30 text-[#6b8a62]' :
+                          app.status === 'in_progress' ? 'border-[#c48a3a]/30 text-[#c48a3a]' :
+                            'border-border text-muted-foreground'
+                        }`}>
+                        {app.status === 'done' ? 'Feita' :
+                          app.status === 'in_progress' ? 'Em Andamento' : 'Agendada'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-4 pl-11">
+                      <span className="font-mono text-[10px] text-muted-foreground">
+                        {app.dose} • {app.route}
+                      </span>
+                      {app.nurseAssigned && (
+                        <span className="font-mono text-[10px] text-muted-foreground flex items-center gap-1">
+                          <User className="w-3 h-3" /> {app.nurseAssigned}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </motion.div>
 
           </div>
+
+          {/* Quick Actions */}
+          <motion.div variants={itemVariants}>
+            <h2 className="font-serif text-lg font-semibold text-foreground mb-4 px-1">
+              Acesso Rápido
+            </h2>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <ActionCard icon={<Users className="w-4 h-4" />} title="Novo Paciente" description="Cadastrar ficha" href="/patients" />
+              <ActionCard icon={<Plus className="w-4 h-4" />} title="Financeiro" description="Entradas e saídas" href="/transactions" />
+              <ActionCard icon={<Activity className="w-4 h-4" />} title="CRM" description="Leads e pipeline" href="/crm" />
+              <ActionCard icon={<Syringe className="w-4 h-4" />} title="Estoque" description="Controle de insumos" href="/estoque" />
+            </div>
+          </motion.div>
         </motion.div>
       </div>
     </div>
