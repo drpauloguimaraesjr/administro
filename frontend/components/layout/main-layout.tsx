@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
-    const isPublicPage = pathname === '/login' || pathname === '/register' || pathname.startsWith('/responder');
+    const isPublicPage = pathname === '/login' || pathname === '/register' || pathname.startsWith('/responder') || pathname.startsWith('/portal');
     const isMedicalRecord = pathname.startsWith('/patients/') && pathname.split('/').length > 2;
 
     if (isPublicPage) {
