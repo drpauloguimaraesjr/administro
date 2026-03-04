@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Users, Clock, Activity, Plus, ArrowRight, Syringe, User, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Calendar, Users, Clock, Activity, Plus, ArrowRight, Syringe, User, CheckCircle2, AlertCircle, MapPin, Pill } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/components/auth/auth-provider';
 import { useRouter } from 'next/navigation';
@@ -26,6 +26,9 @@ interface Application {
   route: string;
   status: 'scheduled' | 'in_progress' | 'done';
   nurseAssigned?: string;
+  consultorio?: string;
+  arrivalTime?: string;
+  lotNumber?: string;
 }
 
 // MOCK: Consultas do dia
@@ -39,11 +42,13 @@ const mockAppointments: Appointment[] = [
 
 // MOCK: Aplicações do dia
 const mockApplications: Application[] = [
-  { id: '1', patientName: 'Fernanda Lopes', productName: 'Gestrinona 20mg', dose: '20mg', route: 'Implante SC', status: 'done', nurseAssigned: 'Enfermeira Ana' },
-  { id: '2', patientName: 'Juliana Rocha', productName: 'Testosterona 50mg', dose: '50mg', route: 'Implante SC', status: 'in_progress', nurseAssigned: 'Enfermeira Ana' },
-  { id: '3', patientName: 'Patrícia Almeida', productName: 'Oxandrolona 15mg', dose: '15mg', route: 'Implante SC', status: 'scheduled' },
-  { id: '4', patientName: 'Roberto Lima', productName: 'Testosterona 75mg', dose: '75mg', route: 'Implante Glúteo', status: 'scheduled' },
-  { id: '5', patientName: 'Cláudia Dias', productName: 'Gestrinona 10mg + Testosterona 25mg', dose: '35mg total', route: 'Implante SC', status: 'scheduled' },
+  { id: '1', patientName: 'Fernanda Lopes', productName: 'Gestrinona 20mg', dose: '20mg', route: 'Implante SC', status: 'done', nurseAssigned: 'Enfermeira Ana', consultorio: 'Sala 1', arrivalTime: '08:30', lotNumber: 'LOT-2025-0847' },
+  { id: '2', patientName: 'Juliana Rocha', productName: 'Testosterona 50mg', dose: '50mg', route: 'Implante SC', status: 'in_progress', nurseAssigned: 'Enfermeira Ana', consultorio: 'Consultório Dr. Paulo', arrivalTime: '09:15', lotNumber: 'LOT-2025-1293' },
+  { id: '3', patientName: 'João da Silveira', productName: 'Testosterona 75mg + Oxandrolona 10mg', dose: '85mg total', route: 'Implante SC', status: 'in_progress', nurseAssigned: 'Enfermeira Carla', consultorio: 'Sala 2', arrivalTime: '09:40', lotNumber: 'LOT-2025-0991' },
+  { id: '4', patientName: 'Patrícia Almeida', productName: 'Oxandrolona 15mg', dose: '15mg', route: 'Implante SC', status: 'scheduled' },
+  { id: '5', patientName: 'Roberto Lima', productName: 'Testosterona 75mg', dose: '75mg', route: 'Implante Glúteo', status: 'scheduled' },
+  { id: '6', patientName: 'Cláudia Dias', productName: 'Gestrinona 10mg + Testosterona 25mg', dose: '35mg total', route: 'Implante SC', status: 'scheduled' },
+  { id: '7', patientName: 'Marcos Pereira', productName: 'Testosterona 100mg', dose: '100mg', route: 'Implante Glúteo', status: 'scheduled' },
 ];
 
 export default function Home() {
@@ -212,9 +217,9 @@ export default function Home() {
                         </div>
                       </div>
                       <span className={`font-mono text-[10px] uppercase tracking-[0.15em] px-2.5 py-1 border ${apt.status === 'confirmed' ? 'border-[#7c9a72]/30 text-[#6b8a62]' :
-                          apt.status === 'pending' ? 'border-[#c48a3a]/30 text-[#c48a3a]' :
-                            apt.status === 'completed' ? 'border-border text-muted-foreground' :
-                              'border-destructive/30 text-destructive'
+                        apt.status === 'pending' ? 'border-[#c48a3a]/30 text-[#c48a3a]' :
+                          apt.status === 'completed' ? 'border-border text-muted-foreground' :
+                            'border-destructive/30 text-destructive'
                         }`}>
                         {apt.status === 'confirmed' ? 'Confirmado' :
                           apt.status === 'pending' ? 'Pendente' :
@@ -231,64 +236,93 @@ export default function Home() {
               <div className="flex justify-between items-center mb-6">
                 <h2 className="font-serif text-xl font-bold text-foreground flex items-center gap-2">
                   <Syringe className="w-4 h-4 text-[#7c9a72]" />
-                  Aplicações do Dia
+                  Procedimentos do Dia
                 </h2>
                 <span className="font-mono text-xs text-muted-foreground">
                   {doneApps} de {totalApps} feitas
                 </span>
               </div>
 
-              <div className="space-y-2">
-                {mockApplications.map((app) => (
-                  <div
-                    key={app.id}
-                    className={`p-4 border transition-colors duration-150 group ${app.status === 'done'
-                        ? 'border-[#7c9a72]/20 bg-[#7c9a72]/[0.02]'
-                        : app.status === 'in_progress'
-                          ? 'border-[#c48a3a]/30 bg-[#c48a3a]/[0.02]'
-                          : 'border-border hover:border-foreground/30'
-                      }`}
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 flex items-center justify-center ${app.status === 'done' ? 'text-[#7c9a72]' :
-                            app.status === 'in_progress' ? 'text-[#c48a3a]' :
-                              'text-muted-foreground'
+              {/* ── EM ATENDIMENTO ── */}
+              {mockApplications.filter(a => a.status === 'in_progress' || a.status === 'done').length > 0 && (
+                <div className="mb-6">
+                  <p className="mono-label text-[#7c9a72] mb-3 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[#7c9a72] animate-pulse" />
+                    Na Clínica Agora
+                  </p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {mockApplications.filter(a => a.status === 'in_progress' || a.status === 'done').map((app) => (
+                      <div key={app.id} className="group relative">
+                        <div className={`p-4 border transition-all duration-150 cursor-default ${app.status === 'done'
+                            ? 'border-[#7c9a72]/30 bg-[#7c9a72]/[0.04]'
+                            : 'border-[#c48a3a]/30 bg-[#c48a3a]/[0.04]'
                           }`}>
-                          {app.status === 'done' ? <CheckCircle2 className="w-5 h-5" /> :
-                            app.status === 'in_progress' ? <AlertCircle className="w-5 h-5" /> :
-                              <Syringe className="w-4 h-4" />}
+                          <div className="flex items-center justify-between mb-2">
+                            <div className={`w-6 h-6 flex items-center justify-center ${app.status === 'done' ? 'text-[#7c9a72]' : 'text-[#c48a3a]'}`}>
+                              {app.status === 'done' ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+                            </div>
+                            <span className={`font-mono text-[9px] uppercase tracking-[0.15em] px-2 py-0.5 border ${app.status === 'done' ? 'border-[#7c9a72]/30 text-[#6b8a62]' : 'border-[#c48a3a]/30 text-[#c48a3a]'
+                              }`}>
+                              {app.status === 'done' ? 'Feita' : 'Atendendo'}
+                            </span>
+                          </div>
+                          <p className="font-serif font-semibold text-foreground text-sm truncate">{app.patientName}</p>
+                          <p className="font-mono text-[10px] text-muted-foreground mt-0.5 truncate">{app.productName}</p>
+                          {app.consultorio && (
+                            <p className="font-mono text-[10px] text-[#7c9a72] mt-2 flex items-center gap-1">
+                              <MapPin className="w-3 h-3" /> {app.consultorio}
+                            </p>
+                          )}
                         </div>
-                        <div>
-                          <p className="font-serif font-semibold text-foreground text-sm">
-                            {app.patientName}
-                          </p>
-                          <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
-                            {app.productName}
-                          </p>
+                        {/* Hover Tooltip */}
+                        <div className="absolute left-0 right-0 top-full mt-1 z-30 bg-foreground text-background p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 shadow-xl">
+                          <p className="font-serif font-bold text-sm mb-2">{app.patientName}</p>
+                          <div className="space-y-1.5 font-mono text-[10px]">
+                            <div className="flex items-center gap-2"><Pill className="w-3 h-3 opacity-60" /> {app.productName}</div>
+                            <div className="flex items-center gap-2"><Syringe className="w-3 h-3 opacity-60" /> {app.dose} • {app.route}</div>
+                            {app.consultorio && <div className="flex items-center gap-2"><MapPin className="w-3 h-3 opacity-60" /> {app.consultorio}</div>}
+                            {app.nurseAssigned && <div className="flex items-center gap-2"><User className="w-3 h-3 opacity-60" /> {app.nurseAssigned}</div>}
+                            {app.arrivalTime && <div className="flex items-center gap-2"><Clock className="w-3 h-3 opacity-60" /> Chegou às {app.arrivalTime}</div>}
+                            {app.lotNumber && <div className="opacity-50 mt-1">Lote: {app.lotNumber}</div>}
+                          </div>
                         </div>
                       </div>
-                      <span className={`font-mono text-[10px] uppercase tracking-[0.15em] px-2.5 py-1 border ${app.status === 'done' ? 'border-[#7c9a72]/30 text-[#6b8a62]' :
-                          app.status === 'in_progress' ? 'border-[#c48a3a]/30 text-[#c48a3a]' :
-                            'border-border text-muted-foreground'
-                        }`}>
-                        {app.status === 'done' ? 'Feita' :
-                          app.status === 'in_progress' ? 'Em Andamento' : 'Agendada'}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-4 pl-11">
-                      <span className="font-mono text-[10px] text-muted-foreground">
-                        {app.dose} • {app.route}
-                      </span>
-                      {app.nurseAssigned && (
-                        <span className="font-mono text-[10px] text-muted-foreground flex items-center gap-1">
-                          <User className="w-3 h-3" /> {app.nurseAssigned}
-                        </span>
-                      )}
-                    </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </div>
+              )}
+
+              {/* ── AGENDADOS (ainda não chegaram) ── */}
+              {mockApplications.filter(a => a.status === 'scheduled').length > 0 && (
+                <div>
+                  <p className="mono-label text-muted-foreground mb-3 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-muted-foreground/40" />
+                    Agendados para Hoje
+                  </p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {mockApplications.filter(a => a.status === 'scheduled').map((app) => (
+                      <div key={app.id} className="group relative">
+                        <div className="p-4 border border-border hover:border-foreground/30 transition-all duration-150 cursor-default">
+                          <div className="flex items-center justify-between mb-2">
+                            <Syringe className="w-4 h-4 text-muted-foreground/50" />
+                            <span className="font-mono text-[9px] uppercase tracking-[0.15em] px-2 py-0.5 border border-border text-muted-foreground">Agendada</span>
+                          </div>
+                          <p className="font-serif font-semibold text-foreground text-sm truncate">{app.patientName}</p>
+                          <p className="font-mono text-[10px] text-muted-foreground mt-0.5 truncate">{app.productName}</p>
+                        </div>
+                        {/* Hover Tooltip */}
+                        <div className="absolute left-0 right-0 top-full mt-1 z-30 bg-foreground text-background p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 shadow-xl">
+                          <p className="font-serif font-bold text-sm mb-2">{app.patientName}</p>
+                          <div className="space-y-1.5 font-mono text-[10px]">
+                            <div className="flex items-center gap-2"><Pill className="w-3 h-3 opacity-60" /> {app.productName}</div>
+                            <div className="flex items-center gap-2"><Syringe className="w-3 h-3 opacity-60" /> {app.dose} • {app.route}</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </motion.div>
 
           </div>
