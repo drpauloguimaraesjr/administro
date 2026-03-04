@@ -93,6 +93,7 @@ export default function Home() {
   const nextAppointment = upcomingToday[0];
   const doneApps = mockApplications.filter(a => a.status === 'done').length;
   const totalApps = mockApplications.length;
+  const inClinicNow = mockApplications.filter(a => a.status === 'in_progress').length;
 
   const greetingHour = new Date().getHours();
   const greeting = greetingHour < 12 ? 'Bom dia' : greetingHour < 18 ? 'Boa tarde' : 'Boa noite';
@@ -162,15 +163,16 @@ export default function Home() {
               subtext={nextAppointment?.patientName}
             />
             <StatCard
-              icon={<Syringe className="w-4 h-4" />}
-              label="Aplicações Hoje"
-              value={`${doneApps}/${totalApps}`}
-              subtext="realizadas"
+              icon={<Users className="w-4 h-4" />}
+              label="Na Clínica Agora"
+              value={inClinicNow}
+              subtext="pacientes presentes"
             />
             <StatCard
-              icon={<Users className="w-4 h-4" />}
-              label="Pacientes Ativos"
-              value={patients.length || 1248}
+              icon={<Syringe className="w-4 h-4" />}
+              label="Procedimentos Hoje"
+              value={totalApps}
+              subtext={`${doneApps} realizados`}
             />
           </motion.div>
 
@@ -254,8 +256,8 @@ export default function Home() {
                     {mockApplications.filter(a => a.status === 'in_progress' || a.status === 'done').map((app) => (
                       <div key={app.id} className="group relative">
                         <div className={`p-4 border transition-all duration-150 cursor-default ${app.status === 'done'
-                            ? 'border-[#7c9a72]/30 bg-[#7c9a72]/[0.04]'
-                            : 'border-[#c48a3a]/30 bg-[#c48a3a]/[0.04]'
+                          ? 'border-[#7c9a72]/30 bg-[#7c9a72]/[0.04]'
+                          : 'border-[#c48a3a]/30 bg-[#c48a3a]/[0.04]'
                           }`}>
                           <div className="flex items-center justify-between mb-2">
                             <div className={`w-6 h-6 flex items-center justify-center ${app.status === 'done' ? 'text-[#7c9a72]' : 'text-[#c48a3a]'}`}>
