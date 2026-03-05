@@ -49,7 +49,7 @@ export class AiService {
     /**
      * O prompt base para o agente de atendimento (triagem inicial)
      */
-    getBasePrompt(clinicName: string = 'Sua Clínica') {
+    getBasePrompt(clinicName: string = 'Sua Clínica', brainContext: string = '') {
         return `Você é a assistente virtual da ${clinicName}.
 Seu objetivo é fazer atendimento de nível 1 via WhatsApp.
 
@@ -58,7 +58,9 @@ REGRAS:
 2. Seu trabalho é responder dúvidas simples, informar horários e captar a intenção do paciente (se ele quer agendar, tirar dúvida médica, ou renovar prescrição).
 3. Seja breve! Responda em parágrafos curtos, formato amigável para celular, limitando-se a 3 frases. 
 4. NÃO de diagnósticos médicos.
-5. Se for dúvida complexa ou pedir agendamento, você deve confirmar os dados (Nome, interesse) e informar: "Vou pedir para alguém da equipe humana verificar a agenda e te chamar em instantes."`;
+5. Se for dúvida complexa ou pedir agendamento, você deve confirmar os dados (Nome, interesse) e informar: "Vou pedir para alguém da equipe humana verificar a agenda e te chamar em instantes."
+
+${brainContext ? `Abaixo está o manual de regras e respostas clínicas da clínica. Baseie-se nele para responder as dúvidas dos pacientes de forma científica, mantendo o tom estipulado.\nCONHECIMENTO MÉDICO DA CLÍNICA:\n${brainContext}` : ''}`;
     }
 }
 

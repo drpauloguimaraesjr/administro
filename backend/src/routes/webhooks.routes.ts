@@ -1,9 +1,8 @@
 import { Request, Response, Router } from 'express';
-import { zApiService } from '../services/zapi.service';
-import { aiService } from '../services/ai.service';
-import admin from 'firebase-admin';
+import { zApiService } from '../services/zapi.service.js';
+import { aiService } from '../services/ai.service.js';
+import { db } from '../config/firebaseAdmin.js';
 
-const db = admin.firestore();
 const router = Router();
 
 // ============================================
@@ -41,7 +40,16 @@ router.post('/zapi/receive', async (req: Request, res: Response) => {
                 instanceId: instanceId, // Sabemos pra qual funcionario foi
             });
 
-            // 2) Puxa as ultimas mensagens desse numero pra dar contexto pra IA
+            // 2) Traz o Conhecimento da Clínica (Calyx Brain) para dar contexto à inteligência
+            // Busca apenas topicos aprovados e junta tudo como um "livro de regras médicas" pro prompt
+            const knowledgeSnap = await db.collection("knowledge_base").where("status", "==", "approved").get();
+            let brainContext = "";
+            knowledgeSnap.forEach(doc => {
+                const data = doc.data();
+                brainContext += `\nTópico: ${data.topic}\nResposta Sophia: ${data.sophiaResponse}\nAção: ${data.action}\n---`;
+            });
+
+            // 3) Puxa as ultimas mensagens desse numero pra dar contexto pra IA (historico da conversa)
             const snapshot = await db.collection('crm_chats')
                 .where('phone', '==', phone)
                 .orderBy('timestamp', 'desc')
@@ -60,9 +68,9 @@ router.post('/zapi/receive', async (req: Request, res: Response) => {
             // Ordena cronologicamente pro GPT entender a ordem correta do assunto
             history.reverse();
 
-            // 3) Monta os arrays de mensagens
+            // 4) Monta os arrays de mensagens, agora com a bagagem de conhecimento clínico
             const messages = [
-                { role: 'system', content: aiService.getBasePrompt('Sua Clínica - Atendimento AI') },
+                { role: 'system', content: aiService.getBasePrompt('Sua Clínica - Atendimento AI', brainContext) },
                 ...history,
             ];
 
