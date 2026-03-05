@@ -28,6 +28,7 @@ import applicationsRoutes from './routes/applications.routes.js';
 import settingsRoutes from './routes/settings.routes.js';
 import portalAuthRoutes from './routes/portal-auth.routes.js';
 import portalRoutes from './routes/portal.routes.js';
+import webhooksRoutes from './routes/webhooks.routes.js';
 
 const app = express();
 
@@ -86,6 +87,7 @@ app.use('/api/applications', applicationsRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/portal/auth', portalAuthRoutes);
 app.use('/api/portal', portalRoutes);
+app.use('/api/webhooks', webhooksRoutes);
 
 // Inicia servidor
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
