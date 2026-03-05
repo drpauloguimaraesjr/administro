@@ -21,6 +21,20 @@ interface Patient {
     createdAt: string;
 }
 
+// MOCK DATA
+const mockPatients: any[] = [
+    { id: 'm1', name: 'Fernanda Lopes Cardoso', cpf: '123.456.789-00', birthDate: '1985-03-15', gender: 'F', phone: '(62) 99887-6543', email: 'fernanda.lopes@email.com', city: 'Goiânia', createdAt: '2024-06-10', referredBy: 'Instagram', referralsCount: 3, grade: 'AAA', score: 95 },
+    { id: 'm2', name: 'Roberto Lima da Silva', cpf: '987.654.321-00', birthDate: '1978-11-22', gender: 'M', phone: '(62) 98765-4321', email: 'roberto.lima@email.com', city: 'Anápolis', createdAt: '2024-08-20', referredBy: 'Fernanda Lopes', referralsCount: 1, grade: 'AA', score: 78 },
+    { id: 'm3', name: 'Juliana Rocha Mendes', cpf: '456.789.123-00', birthDate: '1990-07-08', gender: 'F', phone: '(62) 99876-5432', email: 'juliana.rocha@email.com', city: 'Goiânia', createdAt: '2024-03-15', referredBy: 'Google', referralsCount: 5, grade: 'AAA', score: 98 },
+    { id: 'm4', name: 'Carlos Eduardo Mendes', cpf: '321.654.987-00', birthDate: '1972-01-30', gender: 'M', phone: '(62) 98654-3210', city: 'Goiânia', createdAt: '2025-01-10', referredBy: 'Juliana Rocha', referralsCount: 0, grade: 'A', score: 55 },
+    { id: 'm5', name: 'Patrícia Almeida Santos', cpf: '654.321.987-00', birthDate: '1988-09-12', gender: 'F', phone: '(62) 99765-4321', email: 'patricia.almeida@email.com', city: 'Aparecida de Goiânia', createdAt: '2024-11-05', referredBy: 'Roberto Lima', referralsCount: 2, grade: 'AA', score: 82 },
+    { id: 'm6', name: 'Marcos Pereira Neto', cpf: '789.123.456-00', birthDate: '1965-05-20', gender: 'M', phone: '(62) 98543-2109', city: 'Goiânia', createdAt: '2024-07-22', referredBy: 'Indicação médica', referralsCount: 0, grade: 'B', score: 42 },
+    { id: 'm7', name: 'Cláudia Dias Ferreira', cpf: '147.258.369-00', birthDate: '1992-12-03', gender: 'F', phone: '(62) 99654-3210', email: 'claudia.dias@email.com', city: 'Goiânia', createdAt: '2025-02-01', referredBy: 'Fernanda Lopes', referralsCount: 1, grade: 'A', score: 60 },
+    { id: 'm8', name: 'João da Silveira Costa', cpf: '258.369.147-00', birthDate: '1980-04-18', gender: 'M', phone: '(62) 98432-1098', email: 'joao.silveira@email.com', city: 'Trindade', createdAt: '2024-09-30', referredBy: 'Google', referralsCount: 0, grade: 'AA', score: 75 },
+    { id: 'm9', name: 'Beatriz Souza Oliveira', cpf: '369.147.258-00', birthDate: '1995-08-25', gender: 'F', phone: '(62) 99543-2109', email: 'beatriz.souza@email.com', city: 'Goiânia', createdAt: '2024-05-18', referredBy: 'Juliana Rocha', referralsCount: 4, grade: 'AAA', score: 92 },
+    { id: 'm10', name: 'Ricardo Mendes Barbosa', cpf: '951.753.852-00', birthDate: '1975-02-14', gender: 'M', phone: '(62) 98321-0987', city: 'Senador Canedo', createdAt: '2025-01-25', referredBy: 'Instagram', referralsCount: 0, grade: 'C', score: 25 },
+];
+
 export default function PatientsPage() {
     const [search, setSearch] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,13 +42,19 @@ export default function PatientsPage() {
     const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
     const queryClient = useQueryClient();
 
-    const { data: patients = [], isLoading } = useQuery({
+    const { data: apiPatients = [], isLoading } = useQuery({
         queryKey: ['patients', search],
         queryFn: async () => {
-            const res = await api.get('/patients', { params: { search } });
-            return res.data;
+            try {
+                const res = await api.get('/patients', { params: { search } });
+                return res.data;
+            } catch { return []; }
         },
     });
+
+    const patients = apiPatients.length > 0 ? apiPatients : mockPatients.filter(p =>
+        !search || p.name.toLowerCase().includes(search.toLowerCase()) || p.cpf.includes(search) || p.phone.includes(search)
+    );
 
     const deleteMutation = useMutation({
         mutationFn: (id: string) => api.delete(`/patients/${id}`),

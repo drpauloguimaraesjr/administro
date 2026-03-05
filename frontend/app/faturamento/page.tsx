@@ -84,6 +84,39 @@ const CATEGORY_LABELS: Record<string, string> = {
   other: 'Outro',
 };
 
+// MOCK DATA
+const mockBillingSummary: BillingSummary = {
+  pendingAmount: 12450.00,
+  pendingCount: 5,
+  paidAmount: 38200.00,
+  paidCount: 18,
+  totalCount: 24,
+  totalAmount: 51500.00,
+  totalCost: 14500.00,
+  totalProfit: 22150.00,
+  profitMargin: 58.0,
+  byPaymentMethod: [{ method: 'pix', count: 10, amount: 22000 }, { method: 'credit', count: 8, amount: 16200 }],
+  byCategory: [{ category: 'procedure', count: 14, amount: 39000 }, { category: 'consultation', count: 10, amount: 12500 }],
+};
+
+const mockBillingItems: any[] = [
+  { id: 'b1', patientId: 'p1', patientName: 'Fernanda Lopes', productId: 'prod1', productName: 'Implante Gestrinona 20mg', category: 'procedure', quantity: 1, unitPrice: 2800, totalPrice: 2800, discount: 0, status: 'pending', createdAt: '2026-03-04T10:00:00Z', clinicId: 'c1', createdBy: 'sys', updatedAt: '2026-03-04T10:00:00Z' },
+  { id: 'b2', patientId: 'p2', patientName: 'Juliana Rocha', productId: 'prod2', productName: 'Implante Testosterona 50mg', category: 'procedure', quantity: 1, unitPrice: 3200, totalPrice: 3200, discount: 0, status: 'pending', createdAt: '2026-03-04T11:00:00Z', clinicId: 'c1', createdBy: 'sys', updatedAt: '2026-03-04T11:00:00Z' },
+  { id: 'b3', patientId: 'p3', patientName: 'João da Silveira', productId: 'prod3', productName: 'Combo Testosterona + Oxandrolona', category: 'procedure', quantity: 1, unitPrice: 4500, totalPrice: 4500, discount: 200, status: 'pending', createdAt: '2026-03-04T14:00:00Z', clinicId: 'c1', createdBy: 'sys', updatedAt: '2026-03-04T14:00:00Z' },
+  { id: 'b4', patientId: 'p4', patientName: 'Roberto Lima', productId: 'prod5', productName: 'Consulta Retorno', category: 'consultation', quantity: 1, unitPrice: 450, totalPrice: 450, discount: 0, status: 'paid', createdAt: '2026-03-03T09:00:00Z', paymentMethod: 'pix', clinicId: 'c1', createdBy: 'sys', updatedAt: '2026-03-03T09:00:00Z' },
+  { id: 'b5', patientId: 'p5', patientName: 'Patrícia Almeida', productId: 'prod4', productName: 'Implante Oxandrolona 15mg', category: 'procedure', quantity: 1, unitPrice: 1950, totalPrice: 1950, discount: 0, status: 'pending', createdAt: '2026-03-04T15:00:00Z', clinicId: 'c1', createdBy: 'sys', updatedAt: '2026-03-04T15:00:00Z' },
+  { id: 'b6', patientId: 'p1', patientName: 'Fernanda Lopes', productId: 'prod6', productName: 'Consulta 1ª vez', category: 'consultation', quantity: 1, unitPrice: 600, totalPrice: 600, discount: 0, status: 'paid', createdAt: '2026-03-01T10:00:00Z', paymentMethod: 'credit', clinicId: 'c1', createdBy: 'sys', updatedAt: '2026-03-01T10:00:00Z' },
+  { id: 'b7', patientId: 'p2', patientName: 'Juliana Rocha', productId: 'prod7', productName: 'Hemograma Completo', category: 'exam', quantity: 1, unitPrice: 85, totalPrice: 85, discount: 0, status: 'paid', createdAt: '2026-03-02T08:00:00Z', paymentMethod: 'pix', clinicId: 'c1', createdBy: 'sys', updatedAt: '2026-03-02T08:00:00Z' },
+  { id: 'b8', patientId: 'p6', patientName: 'Marcos Pereira', productId: 'prod8', productName: 'Consulta Retorno', category: 'consultation', quantity: 1, unitPrice: 450, totalPrice: 450, discount: 0, status: 'cancelled', createdAt: '2026-02-28T14:00:00Z', clinicId: 'c1', createdBy: 'sys', updatedAt: '2026-02-28T14:00:00Z' },
+];
+
+const mockPatientsSummary: any[] = [
+  { patientId: 'p1', patientName: 'Fernanda Lopes', pendingAmount: 2800, pendingItems: 1, paidAmount: 600, paidItems: 1, totalItems: 2, totalAmount: 3400 },
+  { patientId: 'p2', patientName: 'Juliana Rocha', pendingAmount: 3200, pendingItems: 1, paidAmount: 85, paidItems: 1, totalItems: 2, totalAmount: 3285 },
+  { patientId: 'p3', patientName: 'João da Silveira', pendingAmount: 4300, pendingItems: 1, paidAmount: 0, paidItems: 0, totalItems: 1, totalAmount: 4300 },
+  { patientId: 'p5', patientName: 'Patrícia Almeida', pendingAmount: 1950, pendingItems: 1, paidAmount: 0, paidItems: 0, totalItems: 1, totalAmount: 1950 },
+];
+
 export default function FaturamentoPage() {
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
@@ -94,32 +127,44 @@ export default function FaturamentoPage() {
   const [payingItemId, setPayingItemId] = useState<string | null>(null);
 
   // Fetch summary
-  const { data: summary, isLoading: loadingSummary } = useQuery<BillingSummary>({
+  const { data: apiSummary, isLoading: loadingSummary } = useQuery<BillingSummary>({
     queryKey: ['billing-summary'],
     queryFn: async () => {
-      const res = await api.get('/billing/summary');
-      return res.data;
+      try {
+        const res = await api.get('/billing/summary');
+        return res.data;
+      } catch { return null as any; }
     },
   });
 
   // Fetch patients summary
-  const { data: patientsSummary = [] } = useQuery<PatientBillingSummary[]>({
+  const { data: apiPatientsSummary = [] } = useQuery<PatientBillingSummary[]>({
     queryKey: ['billing-patients-summary'],
     queryFn: async () => {
-      const res = await api.get('/billing/patients-summary');
-      return res.data;
+      try {
+        const res = await api.get('/billing/patients-summary');
+        return res.data;
+      } catch { return []; }
     },
   });
 
   // Fetch billing items
-  const { data: items = [], isLoading: loadingItems } = useQuery<BillingItem[]>({
+  const { data: apiItems = [], isLoading: loadingItems } = useQuery<BillingItem[]>({
     queryKey: ['billing-items', statusFilter],
     queryFn: async () => {
-      const params = statusFilter !== 'all' ? `?status=${statusFilter}` : '';
-      const res = await api.get(`/billing${params}`);
-      return res.data;
+      try {
+        const params = statusFilter !== 'all' ? `?status=${statusFilter}` : '';
+        const res = await api.get(`/billing${params}`);
+        return res.data;
+      } catch { return []; }
     },
   });
+
+  const summary = apiSummary || mockBillingSummary;
+  const patientsSummary = apiPatientsSummary.length > 0 ? apiPatientsSummary : mockPatientsSummary;
+  const items = apiItems.length > 0 ? apiItems : mockBillingItems.filter(i =>
+    statusFilter === 'all' || statusFilter === 'pending' ? true : i.status === statusFilter
+  );
 
   // Mark as paid mutation
   const markAsPaidMutation = useMutation({
