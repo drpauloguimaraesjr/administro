@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { KanbanBoard } from '@/components/crm/kanban-board';
 import { NewLeadDialog } from '@/components/crm/new-lead-dialog';
+import { AiChatInbox } from '@/components/crm/ai-chat-inbox';
 import api from '@/lib/api';
 import Link from 'next/link';
 
@@ -170,6 +171,7 @@ export default function CRMPage() {
                     <TabsList className="bg-muted">
                         <TabsTrigger value="overview">Visão Geral</TabsTrigger>
                         <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
+                        <TabsTrigger value="ai-agent" className="text-primary font-bold">🤖 Agente IA</TabsTrigger>
                         <TabsTrigger value="birthdays">Aniversariantes</TabsTrigger>
                         <TabsTrigger value="inactive">Inativos</TabsTrigger>
                     </TabsList>
@@ -413,6 +415,16 @@ export default function CRMPage() {
                                 )}
                             </CardContent>
                         </Card>
+                    </motion.div>
+                )}
+
+                {activeTab === 'ai-agent' && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.15 }}
+                    >
+                        <AiChatInbox />
                     </motion.div>
                 )}
             </div>
