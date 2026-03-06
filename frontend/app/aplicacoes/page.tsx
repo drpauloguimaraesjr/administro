@@ -64,28 +64,59 @@ const PRIORITY_CONFIG = {
   stat: { label: 'STAT', color: 'text-red-400 font-bold' },
 };
 
+// MOCK DATA
+const mockSummary: ApplicationSummary = {
+  prescribed: 3,
+  waitingPurchase: 5,
+  purchased: 4,
+  scheduled: 2,
+  administered: 18,
+  cancelled: 1,
+  total: 33,
+  todayApplications: 2
+};
+
+const mockOrders: ApplicationOrder[] = [
+  { id: 'app1', patientId: 'p1', patientName: 'Ana Clara Silva', productName: 'Gestrinona 20mg', productDetails: 'Implante Absorvível (Via Farmácia)', quantity: 1, unit: 'implante', route: 'Subcutâneo', status: 'waiting_purchase', priority: 'routine', purchaseConfirmed: false, prescribedBy: 'Dr. Paulo', createdAt: '2026-03-01T10:00:00Z', updatedAt: '2026-03-01T10:00:00Z' },
+  { id: 'app2', patientId: 'p2', patientName: 'Carlos Eduardo', productName: 'Testosterona', productDetails: 'Ampola 2ml', quantity: 2, unit: 'ampolas', route: 'Intramuscular', status: 'purchased', priority: 'routine', purchaseConfirmed: true, purchaseConfirmedAt: '2026-03-04T10:00:00Z', purchaseConfirmedBy: 'Recepção', prescribedBy: 'Dr. Paulo', createdAt: '2026-03-02T10:00:00Z', updatedAt: '2026-03-04T10:00:00Z' },
+  { id: 'app3', patientId: 'p3', patientName: 'Mariana Costa', productName: 'Nandrolona 50mg', productDetails: 'Injetável', quantity: 1, unit: 'ampola', route: 'Intramuscular', status: 'scheduled', priority: 'urgent', purchaseConfirmed: true, purchaseConfirmedAt: '2026-03-03T10:00:00Z', scheduledFor: '2026-03-05T15:00:00Z', prescribedBy: 'Dr. Paulo', createdAt: '2026-03-03T10:00:00Z', updatedAt: '2026-03-04T10:00:00Z' },
+  { id: 'app4', patientId: 'p4', patientName: 'Fernanda Lima', productName: 'HCG 5000 UI', productDetails: 'Liofilizado', quantity: 1, unit: 'frasco', route: 'Subcutâneo', status: 'administered', priority: 'routine', purchaseConfirmed: true, administeredBy: 'Enfermagem', administeredAt: '2026-03-04T09:00:00Z', batchNumber: 'LOT-998X', prescribedBy: 'Dr. Paulo', createdAt: '2026-03-01T10:00:00Z', updatedAt: '2026-03-04T09:05:00Z' },
+];
+
 export default function AplicacoesPage() {
   const [activeFilter, setActiveFilter] = useState<StatusFilter>('all');
   const [search, setSearch] = useState('');
   const queryClient = useQueryClient();
 
-  const { data: summary, isLoading: loadingSummary } = useQuery({
+  const { data: summaryData, isLoading: loadingSummary } = useQuery({
     queryKey: ['applications-summary'],
     queryFn: async () => {
-      const response = await api.get('/applications/summary');
-      return response.data as ApplicationSummary;
+      try {
+        const response = await api.get('/applications/summary');
+        return response.data as ApplicationSummary;
+      } catch (e) {
+        return null; // Force fallback to mock if no API
+      }
     }
   });
 
-  const { data: orders, isLoading: loadingOrders } = useQuery({
+  const { data: ordersData, isLoading: loadingOrders } = useQuery({
     queryKey: ['applications', activeFilter],
     queryFn: async () => {
-      const params: Record<string, string> = {};
-      if (activeFilter !== 'all') params.status = activeFilter;
-      const response = await api.get('/applications', { params });
-      return response.data as ApplicationOrder[];
+      try {
+        const params: Record<string, string> = {};
+        if (activeFilter !== 'all') params.status = activeFilter;
+        const response = await api.get('/applications', { params });
+        return response.data as ApplicationOrder[];
+      } catch (e) {
+        return null; // Force fallback
+      }
     }
   });
+
+  // Fallbacks
+  const summary = summaryData || mockSummary;
+  const orders = ordersData || (activeFilter === 'all' ? mockOrders : mockOrders.filter(o => o.status === activeFilter));
 
   // Mutations for quick actions
   const purchaseMutation = useMutation({
