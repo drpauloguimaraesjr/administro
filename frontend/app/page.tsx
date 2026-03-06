@@ -254,7 +254,7 @@ export default function Home() {
                   </p>
                   <div className="grid grid-cols-2 gap-3">
                     {mockApplications.filter(a => a.status === 'in_progress' || a.status === 'done').map((app) => (
-                      <div key={app.id} className="group relative">
+                      <div key={app.id} className="group relative overflow-hidden rounded-sm">
                         <div className={`p-4 border transition-all duration-150 cursor-default h-[120px] flex flex-col justify-between ${app.status === 'done'
                           ? 'border-[#7c9a72]/30 bg-[#7c9a72]/[0.04]'
                           : 'border-[#c48a3a]/30 bg-[#c48a3a]/[0.04]'
@@ -280,7 +280,7 @@ export default function Home() {
                         </div>
                         {/* Overlay Animação */}
                         <div className="absolute inset-0 bg-[#7c9a72] text-[#f7f5f0] p-4 opacity-0 flex flex-col justify-center translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none rounded-sm">
-                          <p className="font-serif font-bold text-sm mb-2 text-center text-[#f7f5f0] drop-shadow-sm">Previsão Clínica</p>
+                          <p className="font-serif font-bold text-sm mb-2 text-center text-[#f7f5f0] drop-shadow-sm">{app.patientName}</p>
                           <div className="space-y-1.5 font-mono text-[10px] drop-shadow-sm">
                             <div className="flex items-center gap-2"><Pill className="w-3 h-3 opacity-80" /> {app.productName}</div>
                             <div className="flex items-center gap-2"><Syringe className="w-3 h-3 opacity-80" /> {app.dose} • {app.route}</div>
@@ -303,7 +303,7 @@ export default function Home() {
                   </p>
                   <div className="grid grid-cols-2 gap-3">
                     {mockApplications.filter(a => a.status === 'scheduled').map((app) => (
-                      <div key={app.id} className="group relative">
+                      <div key={app.id} className="group relative overflow-hidden rounded-sm">
                         <div className="p-4 border border-border h-[120px] flex flex-col justify-between hover:border-foreground/30 transition-all duration-150 cursor-default">
                           <div>
                             <div className="flex items-center justify-between mb-2">
@@ -316,7 +316,7 @@ export default function Home() {
                         </div>
                         {/* Overlay Animação */}
                         <div className="absolute inset-0 bg-foreground text-background p-4 opacity-0 flex flex-col justify-center translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none rounded-sm">
-                          <p className="font-serif font-bold text-sm mb-2 text-center drop-shadow-sm">Previsão de Agenda</p>
+                          <p className="font-serif font-bold text-sm mb-2 text-center drop-shadow-sm">{app.patientName}</p>
                           <div className="space-y-1.5 font-mono text-[10px] drop-shadow-sm">
                             <div className="flex items-center gap-2"><Pill className="w-3 h-3 opacity-80" /> {app.productName}</div>
                             <div className="flex items-center gap-2"><Syringe className="w-3 h-3 opacity-80" /> {app.dose} • {app.route}</div>
