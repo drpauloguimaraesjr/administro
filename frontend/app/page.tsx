@@ -24,7 +24,7 @@ interface Application {
   productName: string;
   dose: string;
   route: string;
-  status: 'scheduled' | 'in_progress' | 'done';
+  status: 'scheduled' | 'in_progress' | 'done' | 'processing';
   nurseAssigned?: string;
   consultorio?: string;
   arrivalTime?: string;
@@ -44,7 +44,7 @@ const mockAppointments: Appointment[] = [
 const mockApplications: Application[] = [
   { id: '1', patientName: 'Fernanda Lopes', productName: 'Gestrinona 20mg', dose: '20mg', route: 'Implante SC', status: 'done', nurseAssigned: 'Enfermeira Ana', consultorio: 'Sala 1', arrivalTime: '08:30', lotNumber: 'LOT-2025-0847' },
   { id: '2', patientName: 'Juliana Rocha', productName: 'Testosterona 50mg', dose: '50mg', route: 'Implante SC', status: 'in_progress', nurseAssigned: 'Enfermeira Ana', consultorio: 'Consultório Dr. Paulo', arrivalTime: '09:15', lotNumber: 'LOT-2025-1293' },
-  { id: '3', patientName: 'João da Silveira', productName: 'Testosterona 75mg + Oxandrolona 10mg', dose: '85mg total', route: 'Implante SC', status: 'in_progress', nurseAssigned: 'Enfermeira Carla', consultorio: 'Sala 2', arrivalTime: '09:40', lotNumber: 'LOT-2025-0991' },
+  { id: '3', patientName: 'João da Silveira', productName: 'PRP (Plasma Rico em Plaquetas)', dose: 'Coleta de Sangue', route: 'Centrifugação 30min', status: 'processing', nurseAssigned: 'Enfermeira Carla', consultorio: 'Sala de Repouso', arrivalTime: '09:40', lotNumber: 'Tubo Citrato' },
   { id: '4', patientName: 'Patrícia Almeida', productName: 'Oxandrolona 15mg', dose: '15mg', route: 'Implante SC', status: 'scheduled' },
   { id: '5', patientName: 'Roberto Lima', productName: 'Testosterona 75mg', dose: '75mg', route: 'Implante Glúteo', status: 'scheduled' },
   { id: '6', patientName: 'Cláudia Dias', productName: 'Gestrinona 10mg + Testosterona 25mg', dose: '35mg total', route: 'Implante SC', status: 'scheduled' },
@@ -283,6 +283,51 @@ export default function Home() {
                           <p className="font-serif font-bold text-sm mb-2 text-center text-[#f7f5f0] drop-shadow-sm">{app.patientName}</p>
                           <div className="space-y-1.5 font-mono text-[10px] drop-shadow-sm">
                             <div className="flex items-center gap-2"><Pill className="w-3 h-3 opacity-80" /> {app.productName}</div>
+                            <div className="flex items-center gap-2"><Syringe className="w-3 h-3 opacity-80" /> {app.dose} • {app.route}</div>
+                            {app.consultorio && <div className="flex items-center gap-2"><MapPin className="w-3 h-3 opacity-80" /> {app.consultorio}</div>}
+                            {app.nurseAssigned && <div className="flex items-center gap-2"><User className="w-3 h-3 opacity-80" /> {app.nurseAssigned}</div>}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* ── PROCEDIMENTO EM CURSO / PROCESSAMENTO ── */}
+              {mockApplications.filter(a => a.status === 'processing').length > 0 && (
+                <div className="mb-6">
+                  <p className="mono-label text-[#5282c4] mb-3 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[#5282c4] animate-pulse" />
+                    Procedimento em Curso (Processamento)
+                  </p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {mockApplications.filter(a => a.status === 'processing').map((app) => (
+                      <div key={app.id} className="group relative overflow-hidden rounded-sm">
+                        <div className={`p-4 border transition-all duration-150 cursor-default h-[120px] flex flex-col justify-between border-[#5282c4]/30 bg-[#5282c4]/[0.05]`}>
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="w-6 h-6 flex items-center justify-center text-[#5282c4]">
+                                <Activity className="w-4 h-4 animate-spin-slow" />
+                              </div>
+                              <span className="font-mono text-[9px] uppercase tracking-[0.15em] px-2 py-0.5 border border-[#5282c4]/30 text-[#4272b4]">
+                                Em Preparo
+                              </span>
+                            </div>
+                            <p className="font-serif font-semibold text-foreground text-sm truncate">{app.patientName}</p>
+                            <p className="font-mono text-[10px] text-[#4272b4] mt-0.5 truncate font-bold">{app.productName}</p>
+                          </div>
+                          {app.consultorio && (
+                            <p className="font-mono text-[10px] text-[#5282c4] flex items-center gap-1">
+                              <Clock className="w-3 h-3" /> Aguardando {app.route}
+                            </p>
+                          )}
+                        </div>
+                        {/* Overlay Animação */}
+                        <div className="absolute inset-0 bg-[#5282c4] text-[#f7f5f0] p-4 opacity-0 flex flex-col justify-center translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none rounded-sm">
+                          <p className="font-serif font-bold text-sm mb-2 text-center text-[#f7f5f0] drop-shadow-sm">{app.patientName}</p>
+                          <div className="space-y-1.5 font-mono text-[10px] drop-shadow-sm">
+                            <div className="flex items-center gap-2"><Activity className="w-3 h-3 opacity-80" /> {app.productName}</div>
                             <div className="flex items-center gap-2"><Syringe className="w-3 h-3 opacity-80" /> {app.dose} • {app.route}</div>
                             {app.consultorio && <div className="flex items-center gap-2"><MapPin className="w-3 h-3 opacity-80" /> {app.consultorio}</div>}
                             {app.nurseAssigned && <div className="flex items-center gap-2"><User className="w-3 h-3 opacity-80" /> {app.nurseAssigned}</div>}
