@@ -29,6 +29,8 @@ interface Application {
   consultorio?: string;
   arrivalTime?: string;
   lotNumber?: string;
+  themeColor?: string;
+  themeText?: string;
 }
 
 // MOCK: Consultas do dia
@@ -40,15 +42,15 @@ const mockAppointments: Appointment[] = [
   { id: '5', patientName: 'Carla Menezes', date: new Date().toISOString().split('T')[0], startTime: '17:00', status: 'pending', type: 'first_visit' },
 ];
 
-// MOCK: Aplicações do dia
+// MOCK: Aplicações do dia (agora com cores que virão da configuração)
 const mockApplications: Application[] = [
-  { id: '1', patientName: 'Fernanda Lopes', productName: 'Gestrinona 20mg', dose: '20mg', route: 'Implante SC', status: 'done', nurseAssigned: 'Enfermeira Ana', consultorio: 'Sala 1', arrivalTime: '08:30', lotNumber: 'LOT-2025-0847' },
-  { id: '2', patientName: 'Juliana Rocha', productName: 'Testosterona 50mg', dose: '50mg', route: 'Implante SC', status: 'in_progress', nurseAssigned: 'Enfermeira Ana', consultorio: 'Consultório Dr. Paulo', arrivalTime: '09:15', lotNumber: 'LOT-2025-1293' },
-  { id: '3', patientName: 'João da Silveira', productName: 'PRP (Plasma Rico em Plaquetas)', dose: 'Coleta de Sangue', route: 'Centrifugação 30min', status: 'processing', nurseAssigned: 'Enfermeira Carla', consultorio: 'Sala de Repouso', arrivalTime: '09:40', lotNumber: 'Tubo Citrato' },
-  { id: '4', patientName: 'Patrícia Almeida', productName: 'Oxandrolona 15mg', dose: '15mg', route: 'Implante SC', status: 'scheduled' },
-  { id: '5', patientName: 'Roberto Lima', productName: 'Testosterona 75mg', dose: '75mg', route: 'Implante Glúteo', status: 'scheduled' },
-  { id: '6', patientName: 'Cláudia Dias', productName: 'Gestrinona 10mg + Testosterona 25mg', dose: '35mg total', route: 'Implante SC', status: 'scheduled' },
-  { id: '7', patientName: 'Marcos Pereira', productName: 'Testosterona 100mg', dose: '100mg', route: 'Implante Glúteo', status: 'scheduled' },
+  { id: '1', patientName: 'Fernanda Lopes', productName: 'Gestrinona 20mg', dose: '20mg', route: 'Implante SC', status: 'done', nurseAssigned: 'Enfermeira Ana', consultorio: 'Sala 1', arrivalTime: '08:30', lotNumber: 'LOT-2025-0847', themeColor: '#0f766e', themeText: '#f0fdfa' },
+  { id: '2', patientName: 'Juliana Rocha', productName: 'Testosterona 50mg', dose: '50mg', route: 'Implante SC', status: 'in_progress', nurseAssigned: 'Enfermeira Ana', consultorio: 'Consultório Dr. Paulo', arrivalTime: '09:15', lotNumber: 'LOT-2025-1293', themeColor: '#be185d', themeText: '#fdf2f8' },
+  { id: '3', patientName: 'João da Silveira', productName: 'PRP (Plasma Rico em Plaquetas)', dose: 'Coleta de Sangue', route: 'Centrifugação 30min', status: 'processing', nurseAssigned: 'Enfermeira Carla', consultorio: 'Sala de Repouso', arrivalTime: '09:40', lotNumber: 'Tubo Citrato', themeColor: '#1d4ed8', themeText: '#eff6ff' },
+  { id: '4', patientName: 'Patrícia Almeida', productName: 'Oxandrolona 15mg', dose: '15mg', route: 'Implante SC', status: 'scheduled', themeColor: '#b45309', themeText: '#fff7ed' },
+  { id: '5', patientName: 'Roberto Lima', productName: 'Testosterona 75mg', dose: '75mg', route: 'Implante Glúteo', status: 'scheduled', themeColor: '#be185d', themeText: '#fdf2f8' },
+  { id: '6', patientName: 'Cláudia Dias', productName: 'Gestrinona 10mg + Testosterona 25mg', dose: '35mg total', route: 'Implante SC', status: 'scheduled', themeColor: '#0f766e', themeText: '#f0fdfa' },
+  { id: '7', patientName: 'Marcos Pereira', productName: 'Testosterona 100mg', dose: '100mg', route: 'Implante Glúteo', status: 'scheduled', themeColor: '#be185d', themeText: '#fdf2f8' },
 ];
 
 export default function Home() {
@@ -255,17 +257,23 @@ export default function Home() {
                   <div className="grid grid-cols-2 gap-3">
                     {mockApplications.filter(a => a.status === 'in_progress' || a.status === 'done').map((app) => (
                       <div key={app.id} className="group relative overflow-hidden rounded-sm">
-                        <div className={`p-4 border transition-all duration-150 cursor-default h-[120px] flex flex-col justify-between ${app.status === 'done'
-                          ? 'border-[#7c9a72]/30 bg-[#7c9a72]/[0.04]'
-                          : 'border-[#c48a3a]/30 bg-[#c48a3a]/[0.04]'
-                          }`}>
+                        <div className={`p-4 border transition-all duration-150 cursor-default h-[120px] flex flex-col justify-between`}
+                          style={{
+                            borderColor: app.themeColor ? `${app.themeColor}50` : (app.status === 'done' ? '#7c9a7240' : '#c48a3a40'),
+                            backgroundColor: app.themeColor ? `${app.themeColor}10` : (app.status === 'done' ? '#7c9a7210' : '#c48a3a10')
+                          }}
+                        >
                           <div>
                             <div className="flex items-center justify-between mb-2">
-                              <div className={`w-6 h-6 flex items-center justify-center ${app.status === 'done' ? 'text-[#7c9a72]' : 'text-[#c48a3a]'}`}>
+                              <div className={`w-6 h-6 flex items-center justify-center`} style={{ color: app.themeColor || (app.status === 'done' ? '#7c9a72' : '#c48a3a') }}>
                                 {app.status === 'done' ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
                               </div>
-                              <span className={`font-mono text-[9px] uppercase tracking-[0.15em] px-2 py-0.5 border ${app.status === 'done' ? 'border-[#7c9a72]/30 text-[#6b8a62]' : 'border-[#c48a3a]/30 text-[#c48a3a]'
-                                }`}>
+                              <span className={`font-mono text-[9px] uppercase tracking-[0.15em] px-2 py-0.5 border`}
+                                style={{
+                                  borderColor: app.themeColor ? `${app.themeColor}50` : (app.status === 'done' ? '#7c9a7250' : '#c48a3a50'),
+                                  color: app.themeColor || (app.status === 'done' ? '#6b8a62' : '#c48a3a')
+                                }}
+                              >
                                 {app.status === 'done' ? 'Feita' : 'Atendendo'}
                               </span>
                             </div>
@@ -273,14 +281,16 @@ export default function Home() {
                             <p className="font-mono text-[10px] text-muted-foreground mt-0.5 truncate">{app.productName}</p>
                           </div>
                           {app.consultorio && (
-                            <p className="font-mono text-[10px] text-[#7c9a72] flex items-center gap-1">
+                            <p className="font-mono text-[10px] flex items-center gap-1" style={{ color: app.themeColor || '#7c9a72' }}>
                               <MapPin className="w-3 h-3" /> {app.consultorio}
                             </p>
                           )}
                         </div>
-                        {/* Overlay Animação */}
-                        <div className="absolute inset-0 bg-[#7c9a72] text-[#f7f5f0] p-4 opacity-0 flex flex-col justify-center translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none rounded-sm">
-                          <p className="font-serif font-bold text-sm mb-2 text-center text-[#f7f5f0] drop-shadow-sm">{app.patientName}</p>
+                        {/* Overlay Animação usando Configuração */}
+                        <div className="absolute inset-0 p-4 opacity-0 flex flex-col justify-center translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none rounded-sm"
+                          style={{ backgroundColor: app.themeColor || '#7c9a72', color: app.themeText || '#f7f5f0' }}
+                        >
+                          <p className="font-serif font-bold text-sm mb-2 text-center drop-shadow-sm">{app.patientName}</p>
                           <div className="space-y-1.5 font-mono text-[10px] drop-shadow-sm">
                             <div className="flex items-center gap-2"><Pill className="w-3 h-3 opacity-80" /> {app.productName}</div>
                             <div className="flex items-center gap-2"><Syringe className="w-3 h-3 opacity-80" /> {app.dose} • {app.route}</div>
@@ -304,27 +314,39 @@ export default function Home() {
                   <div className="grid grid-cols-2 gap-3">
                     {mockApplications.filter(a => a.status === 'processing').map((app) => (
                       <div key={app.id} className="group relative overflow-hidden rounded-sm">
-                        <div className={`p-4 border transition-all duration-150 cursor-default h-[120px] flex flex-col justify-between border-[#5282c4]/30 bg-[#5282c4]/[0.05]`}>
+                        <div className={`p-4 border transition-all duration-150 cursor-default h-[120px] flex flex-col justify-between`}
+                          style={{
+                            borderColor: app.themeColor ? `${app.themeColor}40` : '#5282c440',
+                            backgroundColor: app.themeColor ? `${app.themeColor}10` : '#5282c410'
+                          }}
+                        >
                           <div>
                             <div className="flex items-center justify-between mb-2">
-                              <div className="w-6 h-6 flex items-center justify-center text-[#5282c4]">
+                              <div className="w-6 h-6 flex items-center justify-center" style={{ color: app.themeColor || '#5282c4' }}>
                                 <Activity className="w-4 h-4 animate-spin-slow" />
                               </div>
-                              <span className="font-mono text-[9px] uppercase tracking-[0.15em] px-2 py-0.5 border border-[#5282c4]/30 text-[#4272b4]">
+                              <span className="font-mono text-[9px] uppercase tracking-[0.15em] px-2 py-0.5 border"
+                                style={{
+                                  borderColor: app.themeColor ? `${app.themeColor}40` : '#5282c440',
+                                  color: app.themeColor || '#4272b4'
+                                }}
+                              >
                                 Em Preparo
                               </span>
                             </div>
                             <p className="font-serif font-semibold text-foreground text-sm truncate">{app.patientName}</p>
-                            <p className="font-mono text-[10px] text-[#4272b4] mt-0.5 truncate font-bold">{app.productName}</p>
+                            <p className="font-mono text-[10px] mt-0.5 truncate font-bold" style={{ color: app.themeColor || '#4272b4' }}>{app.productName}</p>
                           </div>
                           {app.consultorio && (
-                            <p className="font-mono text-[10px] text-[#5282c4] flex items-center gap-1">
+                            <p className="font-mono text-[10px] flex items-center gap-1" style={{ color: app.themeColor || '#5282c4' }}>
                               <Clock className="w-3 h-3" /> Aguardando {app.route}
                             </p>
                           )}
                         </div>
                         {/* Overlay Animação */}
-                        <div className="absolute inset-0 bg-[#5282c4] text-[#f7f5f0] p-4 opacity-0 flex flex-col justify-center translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none rounded-sm">
+                        <div className="absolute inset-0 p-4 opacity-0 flex flex-col justify-center translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none rounded-sm"
+                          style={{ backgroundColor: app.themeColor || '#5282c4', color: app.themeText || '#f7f5f0' }}
+                        >
                           <p className="font-serif font-bold text-sm mb-2 text-center text-[#f7f5f0] drop-shadow-sm">{app.patientName}</p>
                           <div className="space-y-1.5 font-mono text-[10px] drop-shadow-sm">
                             <div className="flex items-center gap-2"><Activity className="w-3 h-3 opacity-80" /> {app.productName}</div>
@@ -349,18 +371,29 @@ export default function Home() {
                   <div className="grid grid-cols-2 gap-3">
                     {mockApplications.filter(a => a.status === 'scheduled').map((app) => (
                       <div key={app.id} className="group relative overflow-hidden rounded-sm">
-                        <div className="p-4 border border-border h-[120px] flex flex-col justify-between hover:border-foreground/30 transition-all duration-150 cursor-default">
+                        <div className="p-4 border h-[120px] flex flex-col justify-between hover:border-foreground/30 transition-all duration-150 cursor-default"
+                          style={{
+                            borderColor: app.themeColor ? `${app.themeColor}30` : 'var(--border)',
+                            backgroundColor: app.themeColor ? `${app.themeColor}05` : 'transparent'
+                          }}
+                        >
                           <div>
                             <div className="flex items-center justify-between mb-2">
-                              <Syringe className="w-4 h-4 text-muted-foreground/50" />
-                              <span className="font-mono text-[9px] uppercase tracking-[0.15em] px-2 py-0.5 border border-border text-muted-foreground">Agendada</span>
+                              <Syringe className="w-4 h-4" style={{ color: app.themeColor || 'currentColor', opacity: app.themeColor ? 0.8 : 0.5 }} />
+                              <span className="font-mono text-[9px] uppercase tracking-[0.15em] px-2 py-0.5 border text-muted-foreground"
+                                style={{ borderColor: app.themeColor ? `${app.themeColor}30` : 'var(--border)' }}
+                              >
+                                Agendada
+                              </span>
                             </div>
                             <p className="font-serif font-semibold text-foreground text-sm truncate">{app.patientName}</p>
                             <p className="font-mono text-[10px] text-muted-foreground mt-0.5 truncate">{app.productName}</p>
                           </div>
                         </div>
                         {/* Overlay Animação */}
-                        <div className="absolute inset-0 bg-foreground text-background p-4 opacity-0 flex flex-col justify-center translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none rounded-sm">
+                        <div className="absolute inset-0 p-4 opacity-0 flex flex-col justify-center translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none rounded-sm"
+                          style={{ backgroundColor: app.themeColor || 'var(--foreground)', color: app.themeText || 'var(--background)' }}
+                        >
                           <p className="font-serif font-bold text-sm mb-2 text-center drop-shadow-sm">{app.patientName}</p>
                           <div className="space-y-1.5 font-mono text-[10px] drop-shadow-sm">
                             <div className="flex items-center gap-2"><Pill className="w-3 h-3 opacity-80" /> {app.productName}</div>
