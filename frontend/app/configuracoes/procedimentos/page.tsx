@@ -8,6 +8,7 @@ import {
   Trash2,
   Stethoscope,
   DollarSign,
+  Palette,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -55,6 +56,8 @@ interface Procedimento extends BaseDocument {
   precoParticular: number;
   precoConvenio: number;
   duracaoMinutos: number;
+  corFundo?: string;
+  corTexto?: string;
   ativo: boolean;
 }
 
@@ -79,6 +82,8 @@ const emptyProcedimento: Omit<Procedimento, 'id' | 'createdAt' | 'updatedAt'> = 
   precoParticular: 0,
   precoConvenio: 0,
   duracaoMinutos: 30,
+  corFundo: '#e2e8f0',
+  corTexto: '#0f172a',
   ativo: true,
 };
 
@@ -113,6 +118,8 @@ export default function ProcedimentosPage() {
         precoParticular: item.precoParticular,
         precoConvenio: item.precoConvenio,
         duracaoMinutos: item.duracaoMinutos,
+        corFundo: item.corFundo || '#e2e8f0',
+        corTexto: item.corTexto || '#0f172a',
         ativo: item.ativo,
       });
     } else {
@@ -231,6 +238,7 @@ export default function ProcedimentosPage() {
                     <TableHead>Procedimento</TableHead>
                     <TableHead>Código TUSS</TableHead>
                     <TableHead>Categoria</TableHead>
+                    <TableHead className="text-center">Tag Visual</TableHead>
                     <TableHead className="text-right">Particular</TableHead>
                     <TableHead className="text-right">Convênio</TableHead>
                     <TableHead className="text-center">Duração</TableHead>
@@ -256,6 +264,14 @@ export default function ProcedimentosPage() {
                       </TableCell>
                       <TableCell>
                         <Badge variant="secondary">{proc.categoria}</Badge>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <div
+                          className="inline-block px-2 py-1 rounded text-xs font-mono font-medium border"
+                          style={{ backgroundColor: proc.corFundo || '#e2e8f0', color: proc.corTexto || '#0f172a', borderColor: `${proc.corFundo}80` }}
+                        >
+                          TAG
+                        </div>
                       </TableCell>
                       <TableCell className="text-right font-medium text-primary">
                         {formatCurrency(proc.precoParticular)}
@@ -401,6 +417,48 @@ export default function ProcedimentosPage() {
                     value={formData.duracaoMinutos}
                     onChange={(e) => setFormData({ ...formData, duracaoMinutos: parseInt(e.target.value) || 30 })}
                   />
+                </div>
+              </div>
+            </div>
+            <div className="border-t pt-4">
+              <h3 className="font-medium mb-3 flex items-center gap-2">
+                <Palette className="w-4 h-4 text-primary" />
+                Configuração Visual (Dashboard / Agenda)
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Cor de Fundo da Tag</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      value={formData.corFundo || '#e2e8f0'}
+                      onChange={(e) => setFormData({ ...formData, corFundo: e.target.value })}
+                      className="w-12 h-10 p-1 cursor-pointer"
+                    />
+                    <Input
+                      value={formData.corFundo || '#e2e8f0'}
+                      onChange={(e) => setFormData({ ...formData, corFundo: e.target.value })}
+                      placeholder="#e2e8f0"
+                      className="font-mono"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Cor do Texto da Tag</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      value={formData.corTexto || '#0f172a'}
+                      onChange={(e) => setFormData({ ...formData, corTexto: e.target.value })}
+                      className="w-12 h-10 p-1 cursor-pointer"
+                    />
+                    <Input
+                      value={formData.corTexto || '#0f172a'}
+                      onChange={(e) => setFormData({ ...formData, corTexto: e.target.value })}
+                      placeholder="#0f172a"
+                      className="font-mono"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
