@@ -255,37 +255,37 @@ export default function Home() {
                   <div className="grid grid-cols-2 gap-3">
                     {mockApplications.filter(a => a.status === 'in_progress' || a.status === 'done').map((app) => (
                       <div key={app.id} className="group relative">
-                        <div className={`p-4 border transition-all duration-150 cursor-default ${app.status === 'done'
+                        <div className={`p-4 border transition-all duration-150 cursor-default h-[120px] flex flex-col justify-between ${app.status === 'done'
                           ? 'border-[#7c9a72]/30 bg-[#7c9a72]/[0.04]'
                           : 'border-[#c48a3a]/30 bg-[#c48a3a]/[0.04]'
                           }`}>
-                          <div className="flex items-center justify-between mb-2">
-                            <div className={`w-6 h-6 flex items-center justify-center ${app.status === 'done' ? 'text-[#7c9a72]' : 'text-[#c48a3a]'}`}>
-                              {app.status === 'done' ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <div className={`w-6 h-6 flex items-center justify-center ${app.status === 'done' ? 'text-[#7c9a72]' : 'text-[#c48a3a]'}`}>
+                                {app.status === 'done' ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+                              </div>
+                              <span className={`font-mono text-[9px] uppercase tracking-[0.15em] px-2 py-0.5 border ${app.status === 'done' ? 'border-[#7c9a72]/30 text-[#6b8a62]' : 'border-[#c48a3a]/30 text-[#c48a3a]'
+                                }`}>
+                                {app.status === 'done' ? 'Feita' : 'Atendendo'}
+                              </span>
                             </div>
-                            <span className={`font-mono text-[9px] uppercase tracking-[0.15em] px-2 py-0.5 border ${app.status === 'done' ? 'border-[#7c9a72]/30 text-[#6b8a62]' : 'border-[#c48a3a]/30 text-[#c48a3a]'
-                              }`}>
-                              {app.status === 'done' ? 'Feita' : 'Atendendo'}
-                            </span>
+                            <p className="font-serif font-semibold text-foreground text-sm truncate">{app.patientName}</p>
+                            <p className="font-mono text-[10px] text-muted-foreground mt-0.5 truncate">{app.productName}</p>
                           </div>
-                          <p className="font-serif font-semibold text-foreground text-sm truncate">{app.patientName}</p>
-                          <p className="font-mono text-[10px] text-muted-foreground mt-0.5 truncate">{app.productName}</p>
                           {app.consultorio && (
-                            <p className="font-mono text-[10px] text-[#7c9a72] mt-2 flex items-center gap-1">
+                            <p className="font-mono text-[10px] text-[#7c9a72] flex items-center gap-1">
                               <MapPin className="w-3 h-3" /> {app.consultorio}
                             </p>
                           )}
                         </div>
-                        {/* Hover Tooltip */}
-                        <div className="absolute left-0 right-0 top-full mt-1 z-30 bg-foreground text-background p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 shadow-xl">
-                          <p className="font-serif font-bold text-sm mb-2">{app.patientName}</p>
-                          <div className="space-y-1.5 font-mono text-[10px]">
-                            <div className="flex items-center gap-2"><Pill className="w-3 h-3 opacity-60" /> {app.productName}</div>
-                            <div className="flex items-center gap-2"><Syringe className="w-3 h-3 opacity-60" /> {app.dose} • {app.route}</div>
-                            {app.consultorio && <div className="flex items-center gap-2"><MapPin className="w-3 h-3 opacity-60" /> {app.consultorio}</div>}
-                            {app.nurseAssigned && <div className="flex items-center gap-2"><User className="w-3 h-3 opacity-60" /> {app.nurseAssigned}</div>}
-                            {app.arrivalTime && <div className="flex items-center gap-2"><Clock className="w-3 h-3 opacity-60" /> Chegou às {app.arrivalTime}</div>}
-                            {app.lotNumber && <div className="opacity-50 mt-1">Lote: {app.lotNumber}</div>}
+                        {/* Overlay Animação */}
+                        <div className="absolute inset-0 bg-[#7c9a72] text-[#f7f5f0] p-4 opacity-0 flex flex-col justify-center translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none rounded-sm">
+                          <p className="font-serif font-bold text-sm mb-2 text-center text-[#f7f5f0] drop-shadow-sm">Previsão Clínica</p>
+                          <div className="space-y-1.5 font-mono text-[10px] drop-shadow-sm">
+                            <div className="flex items-center gap-2"><Pill className="w-3 h-3 opacity-80" /> {app.productName}</div>
+                            <div className="flex items-center gap-2"><Syringe className="w-3 h-3 opacity-80" /> {app.dose} • {app.route}</div>
+                            {app.consultorio && <div className="flex items-center gap-2"><MapPin className="w-3 h-3 opacity-80" /> {app.consultorio}</div>}
+                            {app.nurseAssigned && <div className="flex items-center gap-2"><User className="w-3 h-3 opacity-80" /> {app.nurseAssigned}</div>}
                           </div>
                         </div>
                       </div>
@@ -304,20 +304,22 @@ export default function Home() {
                   <div className="grid grid-cols-2 gap-3">
                     {mockApplications.filter(a => a.status === 'scheduled').map((app) => (
                       <div key={app.id} className="group relative">
-                        <div className="p-4 border border-border hover:border-foreground/30 transition-all duration-150 cursor-default">
-                          <div className="flex items-center justify-between mb-2">
-                            <Syringe className="w-4 h-4 text-muted-foreground/50" />
-                            <span className="font-mono text-[9px] uppercase tracking-[0.15em] px-2 py-0.5 border border-border text-muted-foreground">Agendada</span>
+                        <div className="p-4 border border-border h-[120px] flex flex-col justify-between hover:border-foreground/30 transition-all duration-150 cursor-default">
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <Syringe className="w-4 h-4 text-muted-foreground/50" />
+                              <span className="font-mono text-[9px] uppercase tracking-[0.15em] px-2 py-0.5 border border-border text-muted-foreground">Agendada</span>
+                            </div>
+                            <p className="font-serif font-semibold text-foreground text-sm truncate">{app.patientName}</p>
+                            <p className="font-mono text-[10px] text-muted-foreground mt-0.5 truncate">{app.productName}</p>
                           </div>
-                          <p className="font-serif font-semibold text-foreground text-sm truncate">{app.patientName}</p>
-                          <p className="font-mono text-[10px] text-muted-foreground mt-0.5 truncate">{app.productName}</p>
                         </div>
-                        {/* Hover Tooltip */}
-                        <div className="absolute left-0 right-0 top-full mt-1 z-30 bg-foreground text-background p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 shadow-xl">
-                          <p className="font-serif font-bold text-sm mb-2">{app.patientName}</p>
-                          <div className="space-y-1.5 font-mono text-[10px]">
-                            <div className="flex items-center gap-2"><Pill className="w-3 h-3 opacity-60" /> {app.productName}</div>
-                            <div className="flex items-center gap-2"><Syringe className="w-3 h-3 opacity-60" /> {app.dose} • {app.route}</div>
+                        {/* Overlay Animação */}
+                        <div className="absolute inset-0 bg-foreground text-background p-4 opacity-0 flex flex-col justify-center translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none rounded-sm">
+                          <p className="font-serif font-bold text-sm mb-2 text-center drop-shadow-sm">Previsão de Agenda</p>
+                          <div className="space-y-1.5 font-mono text-[10px] drop-shadow-sm">
+                            <div className="flex items-center gap-2"><Pill className="w-3 h-3 opacity-80" /> {app.productName}</div>
+                            <div className="flex items-center gap-2"><Syringe className="w-3 h-3 opacity-80" /> {app.dose} • {app.route}</div>
                           </div>
                         </div>
                       </div>
