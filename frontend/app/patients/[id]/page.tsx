@@ -14,11 +14,13 @@ import { MedicalToolbar } from '@/components/medical-record/medical-toolbar';
 import { ImportantData } from '@/components/medical-record/important-data';
 import { Timeline } from '@/components/medical-record/timeline';
 import { RichEditor } from '@/components/medical-record/rich-editor';
+import { EntradaAvulsaModal } from '@/components/billing/entrada-avulsa-modal';
 
 export default function PatientProntuarioPage() {
     const params = useParams();
     const router = useRouter();
     const patientId = params.id as string;
+    const [isAvulsaModalOpen, setIsAvulsaModalOpen] = useState(false);
 
     const { data: patient, isLoading } = useQuery({
         queryKey: ['patient', patientId],
@@ -119,7 +121,15 @@ export default function PatientProntuarioPage() {
             </div>
 
             {/* Toolbar Inferior Fixa */}
-            <MedicalToolbar />
+            <MedicalToolbar onAvulsaClick={() => setIsAvulsaModalOpen(true)} />
+
+            {/* Modal de Entrada Avulsa */}
+            <EntradaAvulsaModal
+                isOpen={isAvulsaModalOpen}
+                onClose={() => setIsAvulsaModalOpen(false)}
+                patientId={patientId}
+                patientName={patient.name || patient.fullName || 'Paciente'}
+            />
         </div>
     );
 }

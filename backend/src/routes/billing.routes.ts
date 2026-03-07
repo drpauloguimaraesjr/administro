@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { BillingService } from '../services/billing.service.js';
 import { BillingFilters } from '../shared/types/billing.js';
+import { matchProduct, createMovement } from '../services/inventory.service.js';
+import { zApiService } from '../services/zapi.service.js';
 
 const router = Router();
 
@@ -71,7 +73,7 @@ router.get('/', async (req, res) => {
 // GET /api/billing/patient/:patientId
 router.get('/patient/:patientId', async (req, res) => {
   try {
-    const status = req.query.status 
+    const status = req.query.status
       ? (req.query.status as string).split(',') as any[]
       : undefined;
     const items = await BillingService.getByPatient(req.params.patientId, status);
@@ -105,7 +107,54 @@ router.post('/', async (req, res) => {
   try {
     const userId = getUserId(req);
     const item = await BillingService.create(req.body, userId);
-    res.status(201).json(item);
+
+    // Auto-mark as paid if payment details are provided
+    let finalItem = item;
+    if (req.body.paymentMethod) {
+      const paidItem = await BillingService.markAsPaid(item.id, {
+        paymentMethod: req.body.paymentMethod,
+        paymentNotes: req.body.notes
+      });
+      if (paidItem) finalItem = paidItem;
+    }
+
+    // 1. WhatsApp Notification for Entrada Avulsa
+    if (req.body.source === 'avulsa' || req.body.notes?.includes('avulsa')) {
+      // Find doctor's phone (hardcoded for demo/MVP, usually from user DB)
+      const doctorPhone = process.env.DOCTOR_PHONE || '5511999999999';
+      try {
+        await zApiService.sendMessage(
+          doctorPhone,
+          `*NOVA ENTRADA AVULSA*\nPaciente: *${item.patientName}*\nItem adquirido: ${item.productName}\nRecepcionista já faturou o item.`
+        );
+      } catch (err) {
+        console.error('Failed to notify doctor via Z-API:', err);
+      }
+    }
+
+    // 2. Auto-Deduct Inventory for Procedures / Avulsa 
+    if (req.body.category === 'procedure' || req.body.source === 'avulsa' || req.body.notes?.includes('procedimento')) {
+      try {
+        const match = await matchProduct(item.productName);
+        if (match.found && match.product) {
+          await createMovement({
+            itemId: match.product.id,
+            itemName: match.product.name,
+            batchId: match.suggestedBatch?.id,
+            type: 'saída',
+            reason: 'Faturamento de Paciente',
+            quantity: item.quantity,
+            patientId: item.patientId,
+            patientName: item.patientName,
+            performedBy: userId
+          });
+        }
+      } catch (err) {
+        console.error('Failed to deduct from inventory:', err);
+      }
+    }
+
+    res.status(201).json(finalItem);
   } catch (error: any) {
     console.error('Error creating billing item:', error);
     res.status(500).json({ error: error.message });
