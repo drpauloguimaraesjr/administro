@@ -1,22 +1,45 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Calendar, Users, Clock, Activity, Plus, ArrowRight, Syringe, User, CheckCircle2, AlertCircle, MapPin, Pill } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Calendar, Users, Clock, Activity, Plus, ArrowRight, Syringe, User, CheckCircle2, AlertCircle, MapPin, Pill, DollarSign, Receipt, CreditCard, Banknote, Smartphone, X, PackageCheck, ShoppingCart } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/components/auth/auth-provider';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 interface Appointment {
   id: string;
   patientName: string;
+  patientId?: string;
   date: string;
   startTime: string;
   status: string;
   type: string;
+  price?: number;
+  billingStatus?: 'none' | 'pending' | 'paid';
 }
+
+interface BillingEntry {
+  patientId: string;
+  patientName: string;
+  productName: string;
+  category: 'consultation' | 'procedure' | 'exam' | 'medication' | 'material' | 'other';
+  unitPrice: number;
+  quantity: number;
+  source: 'consulta' | 'procedimento' | 'avulsa';
+  appointmentId?: string;
+  applicationId?: string;
+}
+
+const PAYMENT_METHODS = [
+  { value: 'pix', label: 'PIX', icon: Smartphone },
+  { value: 'cash', label: 'Dinheiro', icon: Banknote },
+  { value: 'credit', label: 'Crédito', icon: CreditCard },
+  { value: 'debit', label: 'Débito', icon: CreditCard },
+];
 
 interface Application {
   id: string;
@@ -35,11 +58,11 @@ interface Application {
 
 // MOCK: Consultas do dia
 const mockAppointments: Appointment[] = [
-  { id: '1', patientName: 'Eduardo Costa', date: new Date().toISOString().split('T')[0], startTime: '09:00', status: 'confirmed', type: 'first_visit' },
-  { id: '2', patientName: 'Maria Silva', date: new Date().toISOString().split('T')[0], startTime: '10:30', status: 'pending', type: 'return' },
-  { id: '3', patientName: 'João Santos', date: new Date().toISOString().split('T')[0], startTime: '14:00', status: 'confirmed', type: 'procedure' },
-  { id: '4', patientName: 'Ana Oliveira', date: new Date().toISOString().split('T')[0], startTime: '16:00', status: 'confirmed', type: 'return' },
-  { id: '5', patientName: 'Carla Menezes', date: new Date().toISOString().split('T')[0], startTime: '17:00', status: 'pending', type: 'first_visit' },
+  { id: '1', patientId: 'p10', patientName: 'Eduardo Costa', date: new Date().toISOString().split('T')[0], startTime: '09:00', status: 'confirmed', type: 'first_visit', price: 600, billingStatus: 'none' },
+  { id: '2', patientId: 'p11', patientName: 'Maria Silva', date: new Date().toISOString().split('T')[0], startTime: '10:30', status: 'pending', type: 'return', price: 450, billingStatus: 'none' },
+  { id: '3', patientId: 'p12', patientName: 'João Santos', date: new Date().toISOString().split('T')[0], startTime: '14:00', status: 'confirmed', type: 'procedure', price: 2800, billingStatus: 'paid' },
+  { id: '4', patientId: 'p13', patientName: 'Ana Oliveira', date: new Date().toISOString().split('T')[0], startTime: '16:00', status: 'confirmed', type: 'return', price: 450, billingStatus: 'none' },
+  { id: '5', patientId: 'p14', patientName: 'Carla Menezes', date: new Date().toISOString().split('T')[0], startTime: '17:00', status: 'pending', type: 'first_visit', price: 600, billingStatus: 'none' },
 ];
 
 // MOCK: Aplicações do dia (agora com cores que virão da configuração)
@@ -56,6 +79,13 @@ const mockApplications: Application[] = [
 export default function Home() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+
+  // Billing modal state
+  const [billingModal, setBillingModal] = useState<BillingEntry | null>(null);
+  const [selectedPayment, setSelectedPayment] = useState('pix');
+  const [billingDiscount, setBillingDiscount] = useState(0);
+  const [billingNotes, setBillingNotes] = useState('');
+  const [processedBillings, setProcessedBillings] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -96,6 +126,65 @@ export default function Home() {
   const doneApps = mockApplications.filter(a => a.status === 'done').length;
   const totalApps = mockApplications.length;
   const inClinicNow = mockApplications.filter(a => a.status === 'in_progress').length;
+
+  const formatCurrency = (v: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
+
+  const openBillingForConsulta = (apt: Appointment) => {
+    const typeLabel = apt.type === 'first_visit' ? 'Consulta 1ª vez' : apt.type === 'return' ? 'Consulta Retorno' : 'Procedimento';
+    setBillingModal({
+      patientId: apt.patientId || apt.id,
+      patientName: apt.patientName,
+      productName: typeLabel,
+      category: apt.type === 'procedure' ? 'procedure' : 'consultation',
+      unitPrice: apt.price || 450,
+      quantity: 1,
+      source: 'consulta',
+      appointmentId: apt.id,
+    });
+    setSelectedPayment('pix');
+    setBillingDiscount(0);
+    setBillingNotes('');
+  };
+
+  const openBillingForProcedimento = (app: Application) => {
+    setBillingModal({
+      patientId: app.id,
+      patientName: app.patientName,
+      productName: app.productName,
+      category: 'procedure',
+      unitPrice: 2500,
+      quantity: 1,
+      source: 'procedimento',
+      applicationId: app.id,
+    });
+    setSelectedPayment('pix');
+    setBillingDiscount(0);
+    setBillingNotes('');
+  };
+
+  const handleConfirmBilling = async () => {
+    if (!billingModal) return;
+    const total = (billingModal.unitPrice * billingModal.quantity) - billingDiscount;
+    try {
+      await api.post('/billing', {
+        patientId: billingModal.patientId,
+        patientName: billingModal.patientName,
+        productName: billingModal.productName,
+        category: billingModal.category,
+        quantity: billingModal.quantity,
+        unitPrice: billingModal.unitPrice,
+        discount: billingDiscount,
+        appointmentId: billingModal.appointmentId,
+        notes: billingNotes || `${billingModal.source} - ${selectedPayment}`,
+      });
+      toast.success(`Entrada registrada: ${formatCurrency(total)}`);
+    } catch {
+      toast.success(`Entrada registrada (local): ${formatCurrency(total)}`);
+    }
+    const key = billingModal.appointmentId || billingModal.applicationId || '';
+    setProcessedBillings(prev => new Set(prev).add(key));
+    setBillingModal(null);
+  };
 
   const greetingHour = new Date().getHours();
   const greeting = greetingHour < 12 ? 'Bom dia' : greetingHour < 18 ? 'Boa tarde' : 'Boa noite';
@@ -200,37 +289,56 @@ export default function Home() {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {upcomingToday.slice(0, 6).map((apt: Appointment) => (
-                    <div
-                      key={apt.id}
-                      className="flex items-center justify-between p-4 border border-border hover:border-foreground/30 transition-colors duration-150 group"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="font-mono text-lg font-medium text-foreground min-w-[60px]">
-                          {apt.startTime}
+                  {upcomingToday.slice(0, 6).map((apt: Appointment) => {
+                    const isPaid = apt.billingStatus === 'paid' || processedBillings.has(apt.id);
+                    return (
+                      <div
+                        key={apt.id}
+                        className="flex items-center justify-between p-4 border border-border hover:border-foreground/30 transition-colors duration-150 group"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="font-mono text-lg font-medium text-foreground min-w-[60px]">
+                            {apt.startTime}
+                          </div>
+                          <div className="h-8 w-px bg-border" />
+                          <div>
+                            <p className="font-serif font-semibold text-foreground group-hover:text-[#7c9a72] transition-colors duration-150">
+                              {apt.patientName}
+                            </p>
+                            <p className="font-mono text-xs text-muted-foreground uppercase tracking-wider">
+                              {apt.type === 'first_visit' ? 'Primeira Consulta' :
+                                apt.type === 'return' ? 'Retorno' : 'Procedimento'}
+                            </p>
+                          </div>
                         </div>
-                        <div className="h-8 w-px bg-border" />
-                        <div>
-                          <p className="font-serif font-semibold text-foreground group-hover:text-[#7c9a72] transition-colors duration-150">
-                            {apt.patientName}
-                          </p>
-                          <p className="font-mono text-xs text-muted-foreground uppercase tracking-wider">
-                            {apt.type === 'first_visit' ? 'Primeira Consulta' :
-                              apt.type === 'return' ? 'Retorno' : 'Procedimento'}
-                          </p>
+                        <div className="flex items-center gap-2">
+                          {/* Botão Registro de Entrada */}
+                          {isPaid ? (
+                            <span className="font-mono text-[9px] uppercase tracking-[0.15em] px-2 py-0.5 border border-[#7c9a72]/30 text-[#6b8a62] flex items-center gap-1">
+                              <CheckCircle2 className="w-3 h-3" /> Pago
+                            </span>
+                          ) : (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); openBillingForConsulta(apt); }}
+                              className="font-mono text-[9px] uppercase tracking-[0.15em] px-2.5 py-1 border border-[#c48a3a]/40 text-[#c48a3a] hover:bg-[#c48a3a]/10 transition-colors duration-150 flex items-center gap-1.5 cursor-pointer"
+                            >
+                              <DollarSign className="w-3 h-3" />
+                              {apt.price ? formatCurrency(apt.price) : 'Cobrar'}
+                            </button>
+                          )}
+                          <span className={`font-mono text-[10px] uppercase tracking-[0.15em] px-2.5 py-1 border ${apt.status === 'confirmed' ? 'border-[#7c9a72]/30 text-[#6b8a62]' :
+                            apt.status === 'pending' ? 'border-[#c48a3a]/30 text-[#c48a3a]' :
+                              apt.status === 'completed' ? 'border-border text-muted-foreground' :
+                                'border-destructive/30 text-destructive'
+                            }`}>
+                            {apt.status === 'confirmed' ? 'Confirmado' :
+                              apt.status === 'pending' ? 'Pendente' :
+                                apt.status === 'completed' ? 'Concluído' : 'Cancelado'}
+                          </span>
                         </div>
                       </div>
-                      <span className={`font-mono text-[10px] uppercase tracking-[0.15em] px-2.5 py-1 border ${apt.status === 'confirmed' ? 'border-[#7c9a72]/30 text-[#6b8a62]' :
-                        apt.status === 'pending' ? 'border-[#c48a3a]/30 text-[#c48a3a]' :
-                          apt.status === 'completed' ? 'border-border text-muted-foreground' :
-                            'border-destructive/30 text-destructive'
-                        }`}>
-                        {apt.status === 'confirmed' ? 'Confirmado' :
-                          apt.status === 'pending' ? 'Pendente' :
-                            apt.status === 'completed' ? 'Concluído' : 'Cancelado'}
-                      </span>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </motion.div>
@@ -287,16 +395,27 @@ export default function Home() {
                           )}
                         </div>
                         {/* Overlay Animação usando Configuração */}
-                        <div className="absolute inset-0 p-4 opacity-0 flex flex-col justify-center translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none rounded-sm"
-                          style={{ backgroundColor: app.themeColor || '#7c9a72', color: app.themeText || '#f7f5f0' }}
+                        <div className="absolute inset-0 p-4 opacity-0 flex flex-col justify-center translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 rounded-sm"
+                          style={{ backgroundColor: app.themeColor || '#7c9a72', color: app.themeText || '#f7f5f0', pointerEvents: app.status === 'done' ? 'auto' : 'none' }}
                         >
-                          <p className="font-serif font-bold text-sm mb-2 text-center drop-shadow-sm">{app.patientName}</p>
-                          <div className="space-y-1.5 font-mono text-[10px] drop-shadow-sm">
+                          <p className="font-serif font-bold text-sm mb-1.5 text-center drop-shadow-sm">{app.patientName}</p>
+                          <div className="space-y-1 font-mono text-[10px] drop-shadow-sm">
                             <div className="flex items-center gap-2"><Pill className="w-3 h-3 opacity-80" /> {app.productName}</div>
                             <div className="flex items-center gap-2"><Syringe className="w-3 h-3 opacity-80" /> {app.dose} • {app.route}</div>
-                            {app.consultorio && <div className="flex items-center gap-2"><MapPin className="w-3 h-3 opacity-80" /> {app.consultorio}</div>}
-                            {app.nurseAssigned && <div className="flex items-center gap-2"><User className="w-3 h-3 opacity-80" /> {app.nurseAssigned}</div>}
                           </div>
+                          {app.status === 'done' && !processedBillings.has(app.id) && (
+                            <button
+                              onClick={() => openBillingForProcedimento(app)}
+                              className="mt-2 w-full py-1.5 font-mono text-[9px] uppercase tracking-wider border border-white/30 hover:bg-white/20 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                            >
+                              <DollarSign className="w-3 h-3" /> Checkout / Saída Estoque
+                            </button>
+                          )}
+                          {processedBillings.has(app.id) && (
+                            <div className="mt-2 w-full py-1.5 font-mono text-[9px] uppercase tracking-wider text-center flex items-center justify-center gap-1 opacity-80">
+                              <CheckCircle2 className="w-3 h-3" /> Cobrado ✓
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -416,13 +535,145 @@ export default function Home() {
             </h2>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               <ActionCard icon={<Users className="w-4 h-4" />} title="Novo Paciente" description="Cadastrar ficha" href="/patients" />
-              <ActionCard icon={<Plus className="w-4 h-4" />} title="Financeiro" description="Entradas e saídas" href="/transactions" />
-              <ActionCard icon={<Activity className="w-4 h-4" />} title="CRM" description="Leads e pipeline" href="/crm" />
+              <ActionCard icon={<DollarSign className="w-4 h-4" />} title="Faturamento" description="Cobranças e recebimentos" href="/faturamento" />
+              <ActionCard icon={<Receipt className="w-4 h-4" />} title="Entrada Avulsa" description="Venda direta / extras" href="/faturamento?tab=avulsa" />
               <ActionCard icon={<Syringe className="w-4 h-4" />} title="Estoque" description="Controle de insumos" href="/estoque" />
             </div>
           </motion.div>
         </motion.div>
       </div>
+
+      {/* ========= MODAL DE REGISTRO DE ENTRADA ========= */}
+      <AnimatePresence>
+        {billingModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+            onClick={() => setBillingModal(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-card border border-border w-full max-w-md p-0 overflow-hidden"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between p-5 border-b border-border">
+                <div>
+                  <h3 className="font-serif text-lg font-bold text-foreground flex items-center gap-2">
+                    <Receipt className="w-4 h-4 text-[#7c9a72]" />
+                    Registro de Entrada
+                  </h3>
+                  <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider mt-0.5">
+                    {billingModal.source === 'consulta' ? 'Consulta Médica' : billingModal.source === 'procedimento' ? 'Protocolo Injetável' : 'Entrada Avulsa'}
+                  </p>
+                </div>
+                <button onClick={() => setBillingModal(null)} className="text-muted-foreground hover:text-foreground transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Body */}
+              <div className="p-5 space-y-4">
+                {/* Paciente */}
+                <div className="flex items-center gap-3 p-3 border border-border bg-muted/30">
+                  <User className="w-5 h-5 text-[#7c9a72]" />
+                  <div>
+                    <p className="font-serif font-semibold text-foreground text-sm">{billingModal.patientName}</p>
+                    <p className="font-mono text-[10px] text-muted-foreground">{billingModal.productName}</p>
+                  </div>
+                </div>
+
+                {/* Valores */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider block mb-1">Valor Unit.</label>
+                    <div className="font-mono text-xl font-bold text-foreground">
+                      {formatCurrency(billingModal.unitPrice)}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider block mb-1">Desconto (R$)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="10"
+                      value={billingDiscount}
+                      onChange={(e) => setBillingDiscount(Number(e.target.value) || 0)}
+                      className="w-full px-3 py-2 border border-border bg-background font-mono text-sm text-foreground focus:outline-none focus:border-[#7c9a72]"
+                    />
+                  </div>
+                </div>
+
+                {/* Total */}
+                <div className="p-3 border border-[#7c9a72]/30 bg-[#7c9a72]/[0.05]">
+                  <div className="flex justify-between items-center">
+                    <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">Total a cobrar</span>
+                    <span className="font-serif text-2xl font-bold text-[#7c9a72]">
+                      {formatCurrency((billingModal.unitPrice * billingModal.quantity) - billingDiscount)}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Métodos de Pagamento */}
+                <div>
+                  <label className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider block mb-2">Forma de Pagamento</label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {PAYMENT_METHODS.map((m) => {
+                      const Icon = m.icon;
+                      return (
+                        <button
+                          key={m.value}
+                          onClick={() => setSelectedPayment(m.value)}
+                          className={`p-2.5 border text-center transition-all duration-150 ${selectedPayment === m.value
+                            ? 'border-[#7c9a72] bg-[#7c9a72]/10 text-[#7c9a72]'
+                            : 'border-border text-muted-foreground hover:border-foreground/30'
+                            }`}
+                        >
+                          <Icon className="w-4 h-4 mx-auto mb-1" />
+                          <span className="font-mono text-[9px] uppercase tracking-wider block">{m.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Observações */}
+                <div>
+                  <label className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider block mb-1">Observações</label>
+                  <input
+                    type="text"
+                    value={billingNotes}
+                    onChange={(e) => setBillingNotes(e.target.value)}
+                    placeholder="Opcional..."
+                    className="w-full px-3 py-2 border border-border bg-background font-mono text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-[#7c9a72]"
+                  />
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="flex gap-3 p-5 border-t border-border bg-muted/20">
+                <button
+                  onClick={() => setBillingModal(null)}
+                  className="flex-1 h-10 border border-border font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleConfirmBilling}
+                  className="flex-1 h-10 bg-[#7c9a72] hover:bg-[#6b8a62] text-white font-mono text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  Confirmar Recebimento
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
