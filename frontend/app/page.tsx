@@ -1,14 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, Users, Clock, Activity, Plus, ArrowRight, Syringe, User, CheckCircle2, AlertCircle, MapPin, Pill, DollarSign, Receipt, CreditCard, Banknote, Smartphone, X, PackageCheck, ShoppingCart } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Calendar, Users, Clock, Activity, Plus, ArrowRight, Syringe, User, CheckCircle2, AlertCircle, MapPin, Pill, DollarSign, Receipt, PackageCheck, ShoppingCart } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/components/auth/auth-provider';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { BillingModal, BillingEntry } from '@/components/billing/billing-modal';
 
 interface Appointment {
   id: string;
@@ -21,25 +22,6 @@ interface Appointment {
   price?: number;
   billingStatus?: 'none' | 'pending' | 'paid';
 }
-
-interface BillingEntry {
-  patientId: string;
-  patientName: string;
-  productName: string;
-  category: 'consultation' | 'procedure' | 'exam' | 'medication' | 'material' | 'other';
-  unitPrice: number;
-  quantity: number;
-  source: 'consulta' | 'procedimento' | 'avulsa';
-  appointmentId?: string;
-  applicationId?: string;
-}
-
-const PAYMENT_METHODS = [
-  { value: 'pix', label: 'PIX', icon: Smartphone },
-  { value: 'cash', label: 'Dinheiro', icon: Banknote },
-  { value: 'credit', label: 'Crédito', icon: CreditCard },
-  { value: 'debit', label: 'Débito', icon: CreditCard },
-];
 
 interface Application {
   id: string;
@@ -82,9 +64,6 @@ export default function Home() {
 
   // Billing modal state
   const [billingModal, setBillingModal] = useState<BillingEntry | null>(null);
-  const [selectedPayment, setSelectedPayment] = useState('pix');
-  const [billingDiscount, setBillingDiscount] = useState(0);
-  const [billingNotes, setBillingNotes] = useState('');
   const [processedBillings, setProcessedBillings] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -141,9 +120,6 @@ export default function Home() {
       source: 'consulta',
       appointmentId: apt.id,
     });
-    setSelectedPayment('pix');
-    setBillingDiscount(0);
-    setBillingNotes('');
   };
 
   const openBillingForProcedimento = (app: Application) => {
@@ -157,31 +133,26 @@ export default function Home() {
       source: 'procedimento',
       applicationId: app.id,
     });
-    setSelectedPayment('pix');
-    setBillingDiscount(0);
-    setBillingNotes('');
   };
 
-  const handleConfirmBilling = async () => {
-    if (!billingModal) return;
-    const total = (billingModal.unitPrice * billingModal.quantity) - billingDiscount;
+  const handleConfirmBilling = async (data: { entry: BillingEntry; paymentMethod: string; discount: number; notes: string; total: number }) => {
     try {
       await api.post('/billing', {
-        patientId: billingModal.patientId,
-        patientName: billingModal.patientName,
-        productName: billingModal.productName,
-        category: billingModal.category,
-        quantity: billingModal.quantity,
-        unitPrice: billingModal.unitPrice,
-        discount: billingDiscount,
-        appointmentId: billingModal.appointmentId,
-        notes: billingNotes || `${billingModal.source} - ${selectedPayment}`,
+        patientId: data.entry.patientId,
+        patientName: data.entry.patientName,
+        productName: data.entry.productName,
+        category: data.entry.category,
+        quantity: data.entry.quantity,
+        unitPrice: data.entry.unitPrice,
+        discount: data.discount,
+        appointmentId: data.entry.appointmentId,
+        notes: data.notes,
       });
-      toast.success(`Entrada registrada: ${formatCurrency(total)}`);
+      toast.success(`Entrada registrada: ${formatCurrency(data.total)}`);
     } catch {
-      toast.success(`Entrada registrada (local): ${formatCurrency(total)}`);
+      toast.success(`Entrada registrada (local): ${formatCurrency(data.total)}`);
     }
-    const key = billingModal.appointmentId || billingModal.applicationId || '';
+    const key = data.entry.appointmentId || data.entry.applicationId || '';
     setProcessedBillings(prev => new Set(prev).add(key));
     setBillingModal(null);
   };
@@ -552,136 +523,11 @@ export default function Home() {
       </div>
 
       {/* ========= MODAL DE REGISTRO DE ENTRADA ========= */}
-      <AnimatePresence>
-        {billingModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-            onClick={() => setBillingModal(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-card border border-border w-full max-w-md p-0 overflow-hidden"
-            >
-              {/* Header */}
-              <div className="flex items-center justify-between p-5 border-b border-border">
-                <div>
-                  <h3 className="font-serif text-lg font-bold text-foreground flex items-center gap-2">
-                    <Receipt className="w-4 h-4 text-[#7c9a72]" />
-                    Registro de Entrada
-                  </h3>
-                  <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider mt-0.5">
-                    {billingModal.source === 'consulta' ? 'Consulta Médica' : billingModal.source === 'procedimento' ? 'Protocolo Injetável' : 'Entrada Avulsa'}
-                  </p>
-                </div>
-                <button onClick={() => setBillingModal(null)} className="text-muted-foreground hover:text-foreground transition-colors">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Body */}
-              <div className="p-5 space-y-4">
-                {/* Paciente */}
-                <div className="flex items-center gap-3 p-3 border border-border bg-muted/30">
-                  <User className="w-5 h-5 text-[#7c9a72]" />
-                  <div>
-                    <p className="font-serif font-semibold text-foreground text-sm">{billingModal.patientName}</p>
-                    <p className="font-mono text-[10px] text-muted-foreground">{billingModal.productName}</p>
-                  </div>
-                </div>
-
-                {/* Valores */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider block mb-1">Valor Unit.</label>
-                    <div className="font-mono text-xl font-bold text-foreground">
-                      {formatCurrency(billingModal.unitPrice)}
-                    </div>
-                  </div>
-                  <div>
-                    <label className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider block mb-1">Desconto (R$)</label>
-                    <input
-                      type="number"
-                      min="0"
-                      step="10"
-                      value={billingDiscount}
-                      onChange={(e) => setBillingDiscount(Number(e.target.value) || 0)}
-                      className="w-full px-3 py-2 border border-border bg-background font-mono text-sm text-foreground focus:outline-none focus:border-[#7c9a72]"
-                    />
-                  </div>
-                </div>
-
-                {/* Total */}
-                <div className="p-3 border border-[#7c9a72]/30 bg-[#7c9a72]/[0.05]">
-                  <div className="flex justify-between items-center">
-                    <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">Total a cobrar</span>
-                    <span className="font-serif text-2xl font-bold text-[#7c9a72]">
-                      {formatCurrency((billingModal.unitPrice * billingModal.quantity) - billingDiscount)}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Métodos de Pagamento */}
-                <div>
-                  <label className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider block mb-2">Forma de Pagamento</label>
-                  <div className="grid grid-cols-4 gap-2">
-                    {PAYMENT_METHODS.map((m) => {
-                      const Icon = m.icon;
-                      return (
-                        <button
-                          key={m.value}
-                          onClick={() => setSelectedPayment(m.value)}
-                          className={`p-2.5 border text-center transition-all duration-150 ${selectedPayment === m.value
-                            ? 'border-[#7c9a72] bg-[#7c9a72]/10 text-[#7c9a72]'
-                            : 'border-border text-muted-foreground hover:border-foreground/30'
-                            }`}
-                        >
-                          <Icon className="w-4 h-4 mx-auto mb-1" />
-                          <span className="font-mono text-[9px] uppercase tracking-wider block">{m.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Observações */}
-                <div>
-                  <label className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider block mb-1">Observações</label>
-                  <input
-                    type="text"
-                    value={billingNotes}
-                    onChange={(e) => setBillingNotes(e.target.value)}
-                    placeholder="Opcional..."
-                    className="w-full px-3 py-2 border border-border bg-background font-mono text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-[#7c9a72]"
-                  />
-                </div>
-              </div>
-
-              {/* Footer */}
-              <div className="flex gap-3 p-5 border-t border-border bg-muted/20">
-                <button
-                  onClick={() => setBillingModal(null)}
-                  className="flex-1 h-10 border border-border font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleConfirmBilling}
-                  className="flex-1 h-10 bg-[#7c9a72] hover:bg-[#6b8a62] text-white font-mono text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
-                >
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  Confirmar Recebimento
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <BillingModal
+        entry={billingModal}
+        onClose={() => setBillingModal(null)}
+        onConfirm={handleConfirmBilling}
+      />
     </div>
   );
 }
