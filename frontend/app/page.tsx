@@ -404,12 +404,20 @@ export default function Home() {
                             <div className="flex items-center gap-2"><Syringe className="w-3 h-3 opacity-80" /> {app.dose} • {app.route}</div>
                           </div>
                           {app.status === 'done' && !processedBillings.has(app.id) && (
-                            <button
-                              onClick={() => openBillingForProcedimento(app)}
-                              className="mt-2 w-full py-1.5 font-mono text-[9px] uppercase tracking-wider border border-white/30 hover:bg-white/20 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
-                            >
-                              <DollarSign className="w-3 h-3" /> Checkout / Saída Estoque
-                            </button>
+                            <div className="mt-2 flex gap-2">
+                              <Link
+                                href={`/sala-procedimentos?patient=${app.id}&name=${encodeURIComponent(app.patientName)}&product=${encodeURIComponent(app.productName)}`}
+                                className="flex-1 py-1.5 font-mono text-[9px] uppercase tracking-wider bg-white/10 border border-white/30 hover:bg-white/30 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                              >
+                                <Syringe className="w-3 h-3" /> Procedimento
+                              </Link>
+                              <button
+                                onClick={() => openBillingForProcedimento(app)}
+                                className="flex-1 py-1.5 font-mono text-[9px] uppercase tracking-wider border border-white/30 hover:bg-white/20 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                              >
+                                <DollarSign className="w-3 h-3" /> Checkout
+                              </button>
+                            </div>
                           )}
                           {processedBillings.has(app.id) && (
                             <div className="mt-2 w-full py-1.5 font-mono text-[9px] uppercase tracking-wider text-center flex items-center justify-center gap-1 opacity-80">
