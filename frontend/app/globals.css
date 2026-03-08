@@ -3,153 +3,167 @@
 @tailwind utilities;
 
 /* ========================================
-   CALYX — BOTANICAL BRUTALISM
-   Charcoal + Sage + Bone | Zero Radius | No Shadows
-   Typography-driven. Every pixel earns its place.
+   CALYX — GLASS NEUTRAL
+   Warm Bone + Charcoal + Glassmorphism
+   Tags & status colors pop on neutral canvas.
    ======================================== */
 
 @layer base {
   :root {
     /* ===== BACKGROUND & FOREGROUND ===== */
-    --background: 30 20% 95%; /* #f5f0eb — Warm Bone */
-    --foreground: 0 0% 10%; /* #1a1a1a — Deep Charcoal */
+    --background: 30 15% 96%;      /* #f6f3f0 — Warm Bone */
+    --foreground: 0 0% 12%;        /* #1f1f1f — Rich Charcoal */
 
-    /* ===== CARD SURFACES ===== */
-    --card: 30 20% 97%; /* #f8f4f0 — Slightly lighter bone */
-    --card-foreground: 0 0% 10%; /* #1a1a1a */
+    /* ===== CARD SURFACES (Glass) ===== */
+    --card: 0 0% 100% / 0.55;      /* Semi-transparent white for glass */
+    --card-solid: 0 0% 99%;        /* Fallback solid for non-glass areas */
+    --card-foreground: 0 0% 12%;   /* #1f1f1f */
 
     /* ===== POPOVER/DROPDOWN ===== */
-    --popover: 30 20% 97%; /* #f8f4f0 */
-    --popover-foreground: 0 0% 10%;
+    --popover: 0 0% 100% / 0.75;   /* Frosted popover */
+    --popover-foreground: 0 0% 12%;
 
-    /* ===== PRIMARY (Sage Green) ===== */
-    --primary: 105 15% 53%; /* #7c9a72 — Sage */
-    --primary-foreground: 0 0% 100%; /* White */
+    /* ===== PRIMARY (Charcoal — neutral action) ===== */
+    --primary: 0 0% 15%;           /* #262626 — Deep charcoal */
+    --primary-foreground: 0 0% 98%; /* Near-white */
 
     /* ===== SECONDARY ===== */
-    --secondary: 30 10% 90%; /* #e8e2dc — Warm gray */
-    --secondary-foreground: 0 0% 13%; /* #212121 */
+    --secondary: 30 8% 92%;        /* #ebe7e3 — Warm light gray */
+    --secondary-foreground: 0 0% 15%;
 
     /* ===== MUTED ===== */
-    --muted: 30 10% 90%; /* #e8e2dc */
-    --muted-foreground: 0 0% 45%; /* #737373 — Medium gray */
+    --muted: 30 6% 93%;            /* #edeae7 */
+    --muted-foreground: 0 0% 45%;  /* #737373 — Medium gray */
 
-    /* ===== ACCENT ===== */
-    --accent: 105 10% 90%; /* Light sage tint */
-    --accent-foreground: 0 0% 13%; /* #212121 */
+    /* ===== ACCENT (Subtle warm tint) ===== */
+    --accent: 30 8% 94%;           /* Very light warm */
+    --accent-foreground: 0 0% 15%;
 
     /* ===== DESTRUCTIVE ===== */
-    --destructive: 0 45% 55%; /* Muted rose — not screaming red */
+    --destructive: 0 55% 52%;      /* #c94444 — Clear red */
     --destructive-foreground: 0 0% 100%;
 
     /* ===== BORDERS & INPUTS ===== */
-    --border: 30 8% 82%; /* #d4cec8 — Warm border */
-    --input: 30 8% 82%; /* #d4cec8 */
-    --ring: 105 15% 53%; /* Sage focus ring */
+    --border: 30 6% 85%;           /* #d9d5d1 — Warm border */
+    --input: 30 6% 85%;
+    --ring: 0 0% 25%;              /* Charcoal focus ring */
 
-    /* ===== RADIUS — ZERO. Brutal. ===== */
-    --radius: 0px;
+    /* ===== RADIUS — Soft glass edges ===== */
+    --radius: 12px;
 
-    /* ===== CHART COLORS ===== */
-    --chart-1: 105 15% 53%; /* Sage */
-    --chart-2: 35 50% 55%; /* Warm amber */
-    --chart-3: 0 0% 30%; /* Charcoal mid */
-    --chart-4: 180 12% 50%; /* Muted teal */
-    --chart-5: 0 35% 55%; /* Dusty rose */
+    /* ===== CHART COLORS (Neutral-friendly palette) ===== */
+    --chart-1: 210 45% 55%;        /* Steel blue */
+    --chart-2: 35 55% 55%;         /* Warm amber */
+    --chart-3: 0 0% 35%;           /* Charcoal mid */
+    --chart-4: 160 30% 48%;        /* Muted teal */
+    --chart-5: 350 40% 55%;        /* Dusty rose */
 
     /* ===== SIDEBAR ===== */
-    --sidebar-background: 0 0% 10%; /* #1a1a1a — Charcoal */
-    --sidebar-foreground: 30 10% 75%; /* #c2b9ae — Warm light */
-    --sidebar-primary: 105 15% 53%; /* Sage */
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 16%; /* #292929 — Slightly lighter */
-    --sidebar-accent-foreground: 30 10% 90%;
-    --sidebar-border: 0 0% 20%; /* #333333 */
-    --sidebar-ring: 105 15% 53%; /* Sage */
+    --sidebar-background: 0 0% 100% / 0.45;  /* Glassmorphic sidebar */
+    --sidebar-foreground: 0 0% 40%;
+    --sidebar-primary: 0 0% 15%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 30 8% 94%;
+    --sidebar-accent-foreground: 0 0% 15%;
+    --sidebar-border: 30 6% 85%;
+    --sidebar-ring: 0 0% 25%;
 
-    /* ===== SEMANTIC COLORS ===== */
-    --success: 105 25% 45%; /* Deep sage-green */
+    /* ===== SEMANTIC COLORS (For tags & status) ===== */
+    --success: 152 45% 42%;        /* Emerald green */
     --success-foreground: 0 0% 100%;
-    --warning: 35 70% 50%; /* Warm amber */
+    --warning: 38 75% 52%;         /* Amber */
     --warning-foreground: 0 0% 10%;
-    --info: 200 15% 50%; /* Muted blue-gray */
+    --info: 210 50% 55%;           /* Sky blue */
     --info-foreground: 0 0% 100%;
 
     /* ===== BRAND ===== */
-    --brand-sage: 105 15% 53%; /* #7c9a72 */
-    --brand-charcoal: 0 0% 10%; /* #1a1a1a */
-    --brand-bone: 30 20% 95%; /* #f5f0eb */
-    --brand-amber: 35 50% 55%; /* Warm accent */
+    --brand-charcoal: 0 0% 12%;
+    --brand-bone: 30 15% 96%;
+    --brand-amber: 38 75% 52%;
+
+    /* ===== GLASS TOKENS ===== */
+    --glass-bg: rgba(255, 255, 255, 0.55);
+    --glass-bg-hover: rgba(255, 255, 255, 0.72);
+    --glass-border: rgba(255, 255, 255, 0.45);
+    --glass-blur: 16px;
+    --glass-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
   }
 
   .dark {
     /* ===== BACKGROUND & FOREGROUND ===== */
-    --background: 0 0% 7%; /* #121212 — Near black */
-    --foreground: 30 10% 85%; /* #dbd4cc — Warm off-white */
+    --background: 0 0% 7%;         /* #121212 */
+    --foreground: 30 8% 88%;       /* #e2ddd8 */
 
     /* ===== CARD SURFACES ===== */
-    --card: 0 0% 10%; /* #1a1a1a */
-    --card-foreground: 30 10% 85%; /* #dbd4cc */
+    --card: 0 0% 12% / 0.6;
+    --card-solid: 0 0% 11%;
+    --card-foreground: 30 8% 88%;
 
     /* ===== POPOVER/DROPDOWN ===== */
-    --popover: 0 0% 10%; /* #1a1a1a */
-    --popover-foreground: 30 10% 85%;
+    --popover: 0 0% 12% / 0.75;
+    --popover-foreground: 30 8% 88%;
 
-    /* ===== PRIMARY (Sage — slightly brighter) ===== */
-    --primary: 105 20% 58%; /* Brighter sage */
-    --primary-foreground: 0 0% 7%; /* Dark text on sage */
+    /* ===== PRIMARY ===== */
+    --primary: 0 0% 92%;
+    --primary-foreground: 0 0% 8%;
 
     /* ===== SECONDARY ===== */
-    --secondary: 0 0% 15%; /* #262626 */
-    --secondary-foreground: 30 10% 85%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 30 8% 88%;
 
     /* ===== MUTED ===== */
-    --muted: 0 0% 15%; /* #262626 */
-    --muted-foreground: 30 5% 55%; /* #918a82 */
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 50%;
 
     /* ===== ACCENT ===== */
-    --accent: 0 0% 15%; /* #262626 */
-    --accent-foreground: 30 10% 85%;
+    --accent: 0 0% 16%;
+    --accent-foreground: 30 8% 88%;
 
     /* ===== DESTRUCTIVE ===== */
-    --destructive: 0 45% 50%; /* Muted rose */
-    --destructive-foreground: 30 10% 90%;
+    --destructive: 0 50% 50%;
+    --destructive-foreground: 30 8% 92%;
 
     /* ===== BORDERS & INPUTS ===== */
-    --border: 0 0% 20%; /* #333333 */
-    --input: 0 0% 20%; /* #333333 */
-    --ring: 105 20% 58%; /* Sage */
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 0 0% 75%;
 
     /* ===== CHART COLORS ===== */
-    --chart-1: 105 20% 58%; /* Sage bright */
-    --chart-2: 35 55% 60%; /* Amber bright */
-    --chart-3: 0 0% 60%; /* Light gray */
-    --chart-4: 180 15% 55%; /* Teal bright */
-    --chart-5: 0 40% 60%; /* Rose bright */
+    --chart-1: 210 40% 60%;
+    --chart-2: 38 55% 58%;
+    --chart-3: 0 0% 55%;
+    --chart-4: 160 28% 52%;
+    --chart-5: 350 38% 58%;
 
     /* ===== SIDEBAR ===== */
-    --sidebar-background: 0 0% 5%; /* #0d0d0d — Deepest black */
-    --sidebar-foreground: 30 5% 60%; /* Warm gray */
-    --sidebar-primary: 105 20% 58%;
-    --sidebar-primary-foreground: 0 0% 7%;
-    --sidebar-accent: 0 0% 12%; /* #1f1f1f */
-    --sidebar-accent-foreground: 30 10% 85%;
-    --sidebar-border: 0 0% 15%; /* #262626 */
-    --sidebar-ring: 105 20% 58%;
+    --sidebar-background: 0 0% 6% / 0.75;
+    --sidebar-foreground: 0 0% 55%;
+    --sidebar-primary: 0 0% 88%;
+    --sidebar-primary-foreground: 0 0% 8%;
+    --sidebar-accent: 0 0% 13%;
+    --sidebar-accent-foreground: 30 8% 88%;
+    --sidebar-border: 0 0% 18%;
+    --sidebar-ring: 0 0% 75%;
 
-    /* ===== SEMANTIC COLORS ===== */
-    --success: 105 25% 50%;
-    --success-foreground: 0 0% 7%;
-    --warning: 35 70% 55%;
-    --warning-foreground: 0 0% 7%;
-    --info: 200 18% 55%;
-    --info-foreground: 0 0% 7%;
+    /* ===== SEMANTIC ===== */
+    --success: 152 40% 48%;
+    --success-foreground: 0 0% 8%;
+    --warning: 38 68% 55%;
+    --warning-foreground: 0 0% 8%;
+    --info: 210 45% 58%;
+    --info-foreground: 0 0% 8%;
 
     /* ===== BRAND ===== */
-    --brand-sage: 105 20% 58%;
-    --brand-charcoal: 0 0% 7%;
-    --brand-bone: 30 10% 85%;
-    --brand-amber: 35 55% 60%;
+    --brand-charcoal: 0 0% 8%;
+    --brand-bone: 30 8% 88%;
+    --brand-amber: 38 55% 58%;
+
+    /* ===== GLASS TOKENS (DARK) ===== */
+    --glass-bg: rgba(30, 30, 30, 0.55);
+    --glass-bg-hover: rgba(40, 40, 40, 0.72);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-blur: 16px;
+    --glass-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.2);
   }
 
   /* ===== BASE STYLES ===== */
@@ -159,14 +173,12 @@
 
   html {
     scroll-behavior: smooth;
-    font-size: 13.5px; /* Refined base — 1-2 steps smaller than 16px default */
+    font-size: 13.5px;
   }
 
   body {
     @apply bg-background text-foreground;
-    font-feature-settings:
-      "rlig" 1,
-      "calt" 1;
+    font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     line-height: 1.65;
@@ -174,15 +186,15 @@
     font-weight: 400;
   }
 
-  /* ===== SELECTION — Sage highlight ===== */
+  /* ===== SELECTION — Neutral highlight ===== */
   ::selection {
-    background: hsl(105 15% 53% / 0.25);
+    background: hsl(0 0% 15% / 0.15);
     color: hsl(0 0% 10%);
   }
 
   .dark ::selection {
-    background: hsl(105 20% 58% / 0.3);
-    color: hsl(30 10% 90%);
+    background: hsl(0 0% 85% / 0.2);
+    color: hsl(30 8% 92%);
   }
 }
 
@@ -190,12 +202,7 @@
    TYPOGRAPHY — Playfair Display + DM Mono
    ======================================== */
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-playfair), Georgia, "Times New Roman", serif;
   font-weight: 600;
   letter-spacing: -0.015em;
@@ -211,26 +218,47 @@ h6 {
     text-wrap: balance;
   }
 
-  /* ===== BRUTAL CARD — no fill, border-only ===== */
+  /* ===== GLASS CARD — Frosted translucent ===== */
   .glass-card {
-    @apply bg-transparent border border-border;
-    @apply transition-colors duration-150;
-    @apply hover:border-foreground/30;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    box-shadow: var(--glass-shadow);
+    transition: all 0.2s ease;
   }
 
-  /* ===== PANEL ===== */
+  .glass-card:hover {
+    background: var(--glass-bg-hover);
+    box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.04);
+  }
+
+  /* ===== GLASS CARD (Solid fallback) ===== */
+  .glass-card-solid {
+    @apply bg-card border border-border;
+    border-radius: var(--radius);
+    box-shadow: var(--glass-shadow);
+    @apply transition-all duration-200;
+    @apply hover:shadow-lg;
+  }
+
+  /* ===== GLASS PANEL — Sidebar / navigation ===== */
   .glass-panel {
-    @apply bg-background border-r border-border;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-right: 1px solid var(--glass-border);
   }
 
   /* ===== SKELETON LOADING ===== */
   .skeleton {
-    @apply animate-pulse bg-muted;
+    @apply animate-pulse bg-muted rounded-lg;
   }
 
   /* ===== FOCUS RING ===== */
   .focus-ring {
-    @apply focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-1 focus:ring-offset-background;
+    @apply focus:outline-none focus:ring-2 focus:ring-ring/30 focus:ring-offset-1 focus:ring-offset-background;
   }
 
   /* ===== MONO LABEL — uppercase micro text ===== */
@@ -240,6 +268,47 @@ h6 {
     letter-spacing: 0.12em;
     font-size: 0.65rem;
     font-weight: 400;
+  }
+
+  /* ===== TAG SYSTEM — Pop on neutral canvas ===== */
+  .tag {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 text-xs font-mono font-medium;
+    border-radius: 6px;
+  }
+
+  .tag-success {
+    @apply tag;
+    background: hsl(var(--success) / 0.12);
+    color: hsl(var(--success));
+    border: 1px solid hsl(var(--success) / 0.25);
+  }
+
+  .tag-warning {
+    @apply tag;
+    background: hsl(var(--warning) / 0.12);
+    color: hsl(var(--warning));
+    border: 1px solid hsl(var(--warning) / 0.25);
+  }
+
+  .tag-danger {
+    @apply tag;
+    background: hsl(var(--destructive) / 0.12);
+    color: hsl(var(--destructive));
+    border: 1px solid hsl(var(--destructive) / 0.25);
+  }
+
+  .tag-info {
+    @apply tag;
+    background: hsl(var(--info) / 0.12);
+    color: hsl(var(--info));
+    border: 1px solid hsl(var(--info) / 0.25);
+  }
+
+  .tag-neutral {
+    @apply tag;
+    background: hsl(0 0% 50% / 0.08);
+    color: hsl(var(--muted-foreground));
+    border: 1px solid hsl(0 0% 50% / 0.15);
   }
 }
 
@@ -258,6 +327,7 @@ h6 {
 
 ::-webkit-scrollbar-thumb {
   background: hsl(var(--border));
+  border-radius: 99px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -297,69 +367,56 @@ h6 {
 }
 
 /* ========================================
-   ANIMATIONS — sharp, fast, intentional
+   ANIMATIONS — smooth, purposeful
    ======================================== */
 
 @keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes scale-in {
-  from {
-    opacity: 0;
-    transform: scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes slide-in-right {
-  from {
-    opacity: 0;
-    transform: translateX(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateX(10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
 }
 
 .animate-fade-in {
-  animation: fade-in 0.15s ease-out;
+  animation: fade-in 0.2s ease-out;
 }
 
 .animate-fade-in-up {
-  animation: fade-in-up 0.2s ease-out;
+  animation: fade-in-up 0.25s ease-out;
 }
 
 .animate-scale-in {
-  animation: scale-in 0.15s ease-out;
+  animation: scale-in 0.2s ease-out;
 }
 
 .animate-slide-in-right {
-  animation: slide-in-right 0.2s ease-out;
+  animation: slide-in-right 0.25s ease-out;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
 }
 
 /* ========================================
-   FORM INPUTS — underline-style brutal
+   FORM INPUTS
    ======================================== */
 
 input[type="text"],
@@ -374,9 +431,9 @@ select {
   @apply bg-transparent text-foreground;
   @apply border border-input;
   @apply placeholder:text-muted-foreground;
-  @apply focus:outline-none focus:ring-1 focus:ring-ring focus:border-foreground/50;
-  @apply transition-colors duration-150;
-  border-radius: 0;
+  @apply focus:outline-none focus:ring-2 focus:ring-ring/20 focus:border-foreground/40;
+  @apply transition-all duration-200;
+  border-radius: 8px;
 }
 
 /* ========================================
@@ -386,16 +443,16 @@ select {
 button:focus-visible,
 a:focus-visible,
 [role="button"]:focus-visible {
-  @apply outline-none ring-1 ring-ring ring-offset-1 ring-offset-background;
+  @apply outline-none ring-2 ring-ring/30 ring-offset-1 ring-offset-background;
 }
 
 /* ========================================
-   CARD HOVER — subtle border shift
+   CARD HOVER
    ======================================== */
 
 .card-hover {
-  @apply transition-colors duration-150;
-  @apply hover:border-foreground/40;
+  @apply transition-all duration-200;
+  @apply hover:shadow-lg;
 }
 
 /* ========================================
@@ -428,15 +485,13 @@ a:focus-visible,
 
 .page-enter {
   opacity: 0;
-  transform: translateY(4px);
+  transform: translateY(6px);
 }
 
 .page-enter-active {
   opacity: 1;
   transform: translateY(0);
-  transition:
-    opacity 0.15s ease-out,
-    transform 0.15s ease-out;
+  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
 }
 
 /* ========================================

@@ -4,7 +4,7 @@ import React, { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-    Home, DollarSign, Smartphone, Calendar, Users, 
+    Home, DollarSign, Smartphone, Calendar, Users,
     Share2, ClipboardList, Target, Settings, Brain, Activity,
     Pin, PinOff, Syringe, Building2, PackageCheck
 } from 'lucide-react';
@@ -50,22 +50,30 @@ export function Sidebar() {
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             className={cn(
-                "flex flex-col h-full bg-[#1a1a1a] border-r border-[#333] relative z-50",
-                "transition-[width] duration-150",
+                "flex flex-col h-full relative z-50",
+                "transition-[width] duration-200 ease-out",
                 isExpanded ? "w-[220px]" : "w-[56px]"
             )}
+            style={{
+                background: 'var(--glass-bg)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                borderRight: '1px solid var(--glass-border)',
+            }}
         >
             {/* Brand */}
             <div className={cn(
-                "h-14 flex items-center border-b border-[#333] overflow-hidden",
+                "h-14 flex items-center overflow-hidden",
                 isExpanded ? "px-4 justify-between" : "px-0 justify-center"
-            )}>
+            )}
+              style={{ borderBottom: '1px solid var(--glass-border)' }}
+            >
                 <Link href="/" className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-8 h-8 bg-[#7c9a72] flex items-center justify-center text-white font-mono text-[10px] font-medium tracking-wider shrink-0">
+                    <div className="w-8 h-8 bg-foreground flex items-center justify-center text-background font-mono text-[10px] font-medium tracking-wider shrink-0 rounded-lg">
                         CX
                     </div>
                     {isExpanded && (
-                        <span className="font-serif text-lg font-bold text-[#f5f0eb] tracking-tight animate-fade-in">
+                        <span className="font-serif text-lg font-bold text-foreground tracking-tight animate-fade-in">
                             CALYX
                         </span>
                     )}
@@ -75,7 +83,7 @@ export function Sidebar() {
                 {isExpanded && (
                     <button
                         onClick={() => setIsPinned(!isPinned)}
-                        className="text-[#918a82] hover:text-[#f5f0eb] transition-colors duration-150 p-1 animate-fade-in"
+                        className="text-muted-foreground hover:text-foreground transition-colors duration-200 p-1 animate-fade-in"
                         title={isPinned ? 'Desafixar sidebar' : 'Fixar sidebar'}
                     >
                         {isPinned ? (
@@ -90,7 +98,7 @@ export function Sidebar() {
             {/* Navigation */}
             <nav className="flex-1 py-3 space-y-0.5 overflow-y-auto overflow-x-hidden">
                 {isExpanded && (
-                    <div className="mb-3 px-4 mono-label text-[#918a82] animate-fade-in">
+                    <div className="mb-3 px-4 mono-label text-muted-foreground animate-fade-in">
                         Menu
                     </div>
                 )}
@@ -105,21 +113,21 @@ export function Sidebar() {
                             href={item.href}
                             title={!isExpanded ? item.label : undefined}
                             className={cn(
-                                "flex items-center gap-3 relative transition-colors duration-150",
-                                isExpanded ? "px-4 py-2.5" : "px-0 py-2.5 justify-center",
+                                "flex items-center gap-3 relative transition-all duration-200",
+                                isExpanded ? "px-4 py-2.5 mx-2 rounded-lg" : "px-0 py-2.5 justify-center",
                                 isActive
-                                    ? "text-[#f5f0eb]"
-                                    : "text-[#918a82] hover:text-[#d4cec8] hover:bg-[#292929]"
+                                    ? "text-foreground bg-foreground/[0.06]"
+                                    : "text-muted-foreground hover:text-foreground hover:bg-foreground/[0.04]"
                             )}
                         >
-                            {/* Active Indicator — vertical sage bar */}
+                            {/* Active Indicator */}
                             {isActive && (
-                                <span className="absolute left-0 top-1 bottom-1 w-[2px] bg-[#7c9a72]" />
+                                <span className="absolute left-0 top-2 bottom-2 w-[2px] bg-foreground rounded-full" />
                             )}
 
                             <Icon className={cn(
-                                "w-[18px] h-[18px] shrink-0 transition-colors duration-150",
-                                isActive ? "text-[#7c9a72]" : ""
+                                "w-[18px] h-[18px] shrink-0 transition-colors duration-200",
+                                isActive ? "text-foreground" : ""
                             )} />
 
                             {isExpanded && (
@@ -133,21 +141,21 @@ export function Sidebar() {
             </nav>
 
             {/* Footer / User Profile */}
-            <div className="border-t border-[#333] overflow-hidden">
+            <div style={{ borderTop: '1px solid var(--glass-border)' }} className="overflow-hidden">
                 <div className={cn(
                     "flex items-center gap-3 py-3",
                     isExpanded ? "px-4" : "justify-center px-0"
                 )}>
-                    <div className="w-8 h-8 bg-[#292929] border border-[#333] flex items-center justify-center text-[11px] text-[#d4cec8] font-mono font-medium shrink-0">
+                    <div className="w-8 h-8 bg-foreground/[0.08] border border-border flex items-center justify-center text-[11px] text-foreground font-mono font-medium shrink-0 rounded-full">
                         {user?.displayName?.charAt(0) || user?.email?.charAt(0) || 'D'}
                     </div>
 
                     {isExpanded && (
                         <div className="overflow-hidden min-w-0 animate-fade-in">
-                            <p className="text-[13px] font-serif font-medium text-[#f5f0eb] truncate">
+                            <p className="text-[13px] font-serif font-medium text-foreground truncate">
                                 {user?.displayName || 'Dr. Usuario'}
                             </p>
-                            <p className="text-[10px] font-mono text-[#918a82] truncate tracking-wide">
+                            <p className="text-[10px] font-mono text-muted-foreground truncate tracking-wide">
                                 {user?.email || 'admin@calyx.med'}
                             </p>
                         </div>

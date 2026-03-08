@@ -80,7 +80,7 @@ export function BillingModal({ entry, onClose, onConfirm }: BillingModalProps) {
           <div className="flex items-center justify-between p-5 border-b border-border">
             <div>
               <h3 className="font-serif text-lg font-bold text-foreground flex items-center gap-2">
-                <Receipt className="w-4 h-4 text-[#7c9a72]" />
+                <Receipt className="w-4 h-4 text-foreground" />
                 Registro de Entrada
               </h3>
               <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider mt-0.5">
@@ -96,7 +96,7 @@ export function BillingModal({ entry, onClose, onConfirm }: BillingModalProps) {
           <div className="p-5 space-y-4">
             {/* Paciente */}
             <div className="flex items-center gap-3 p-3 border border-border bg-muted/30">
-              <User className="w-5 h-5 text-[#7c9a72]" />
+              <User className="w-5 h-5 text-foreground" />
               <div>
                 <p className="font-serif font-semibold text-foreground text-sm">{entry.patientName}</p>
                 <p className="font-mono text-[10px] text-muted-foreground">{entry.productName}</p>
@@ -119,16 +119,16 @@ export function BillingModal({ entry, onClose, onConfirm }: BillingModalProps) {
                   step="10"
                   value={discount}
                   onChange={(e) => setDiscount(Number(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-border bg-background font-mono text-sm text-foreground focus:outline-none focus:border-[#7c9a72]"
+                  className="w-full px-3 py-2 border border-border bg-background font-mono text-sm text-foreground focus:outline-none focus:border-foreground"
                 />
               </div>
             </div>
 
             {/* Total */}
-            <div className="p-3 border border-[#7c9a72]/30 bg-[#7c9a72]/[0.05]">
+            <div className="p-3 border border-foreground/30 bg-foreground/[0.05]">
               <div className="flex justify-between items-center">
                 <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">Total a cobrar</span>
-                <span className="font-serif text-2xl font-bold text-[#7c9a72]">
+                <span className="font-serif text-2xl font-bold text-foreground">
                   {formatCurrency(total)}
                 </span>
               </div>
@@ -145,7 +145,7 @@ export function BillingModal({ entry, onClose, onConfirm }: BillingModalProps) {
                       key={m.value}
                       onClick={() => setSelectedPayment(m.value)}
                       className={`p-2.5 border text-center transition-all duration-150 ${selectedPayment === m.value
-                        ? 'border-[#7c9a72] bg-[#7c9a72]/10 text-[#7c9a72]'
+                        ? 'border-foreground bg-foreground/10 text-foreground'
                         : 'border-border text-muted-foreground hover:border-foreground/30'
                         }`}
                     >
@@ -165,7 +165,7 @@ export function BillingModal({ entry, onClose, onConfirm }: BillingModalProps) {
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Opcional..."
-                className="w-full px-3 py-2 border border-border bg-background font-mono text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-[#7c9a72]"
+                className="w-full px-3 py-2 border border-border bg-background font-mono text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-foreground"
               />
             </div>
           </div>
@@ -180,7 +180,7 @@ export function BillingModal({ entry, onClose, onConfirm }: BillingModalProps) {
             </button>
             <button
               onClick={handleConfirm}
-              className="flex-1 h-10 bg-[#7c9a72] hover:bg-[#6b8a62] text-white font-mono text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
+              className="flex-1 h-10 bg-foreground hover:bg-foreground/90 text-white font-mono text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
             >
               <CheckCircle2 className="w-3.5 h-3.5" />
               Confirmar Recebimento
