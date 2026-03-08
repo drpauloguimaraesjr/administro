@@ -1,16 +1,21 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Package, AlertTriangle, Plus, Search,
   RefreshCw, Box, Pill, Droplet, ShieldAlert, Bell, TrendingUp,
-  TrendingDown, Minus, ChevronDown, ChevronUp, Calendar, Truck,
-  ArrowUpRight, ArrowDownRight, Clock, Syringe, X
+  TrendingDown, Truck, Clock, X, ArrowLeft, BarChart3,
+  Calendar as CalendarIcon
 } from 'lucide-react';
 import Link from 'next/link';
 import api from '@/lib/api';
+import {
+  LineChart, Line, AreaChart, Area, BarChart, Bar,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  ReferenceLine, Legend, ComposedChart
+} from 'recharts';
 
 // ─── TYPES ───
 interface InventorySummary {
@@ -49,7 +54,84 @@ interface Supplier {
   contact?: string;
 }
 
-// ─── MOCK DATA (Rich, realistic) ───
+// ─── SPARKLINE DATA GENERATOR ───
+function generateSparklineData(item: InventoryItem, days: number = 15) {
+  const data: { day: number; stock: number; consumption: number }[] = [];
+  const avgConsumption = item.avgDailyConsumption || 1;
+  const maxStock = item.maxStock || item.currentQuantity * 2;
+  let stock = Math.min(item.currentQuantity + avgConsumption * days * 0.8, maxStock);
+
+  for (let i = 0; i < days; i++) {
+    const dailyVariation = 0.5 + Math.random() * 1.0;
+    const consumption = Math.max(0, avgConsumption * dailyVariation);
+    stock = Math.max(0, stock - consumption);
+    data.push({
+      day: i + 1,
+      stock: Math.round(stock * 10) / 10,
+      consumption: Math.round(consumption * 10) / 10,
+    });
+  }
+  return data;
+}
+
+// ─── DETAIL CHART DATA GENERATOR ───
+function generateDetailData(item: InventoryItem, periodDays: number) {
+  const today = new Date();
+  const historyData: { date: string; stock: number; consumption: number; label: string }[] = [];
+  const projectionData: { date: string; stock: number; projected: number; criticalLevel: number; label: string }[] = [];
+
+  const avgConsumption = item.avgDailyConsumption || 1;
+  const maxStock = item.maxStock || item.currentQuantity * 2;
+
+  // History (past periodDays)
+  let histStock = Math.min(item.currentQuantity + avgConsumption * periodDays * 0.7, maxStock);
+  for (let i = periodDays; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const variation = 0.4 + Math.random() * 1.2;
+    const consumed = avgConsumption * variation;
+    histStock = Math.max(0, histStock - consumed);
+    const dateLabel = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+    historyData.push({
+      date: dateLabel,
+      stock: Math.round(histStock * 10) / 10,
+      consumption: Math.round(consumed * 10) / 10,
+      label: dateLabel,
+    });
+  }
+
+  // Projection (next 30 days)
+  let projStock = item.currentQuantity;
+  for (let i = 0; i <= 30; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() + i);
+    const dateLabel = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+    projectionData.push({
+      date: dateLabel,
+      stock: i === 0 ? item.currentQuantity : 0,
+      projected: Math.round(Math.max(0, projStock) * 10) / 10,
+      criticalLevel: item.minStock,
+      label: dateLabel,
+    });
+    projStock -= avgConsumption * (0.7 + Math.random() * 0.6);
+  }
+
+  // Consumption bars (last periodDays grouped by 3-day periods)
+  const consumptionBars: { period: string; amount: number }[] = [];
+  const groupSize = periodDays <= 15 ? 3 : 5;
+  for (let i = 0; i < historyData.length; i += groupSize) {
+    const slice = historyData.slice(i, i + groupSize);
+    const total = slice.reduce((s, d) => s + d.consumption, 0);
+    consumptionBars.push({
+      period: slice[0]?.date || '',
+      amount: Math.round(total * 10) / 10,
+    });
+  }
+
+  return { historyData, projectionData, consumptionBars };
+}
+
+// ─── MOCK DATA ───
 const mockSummary: InventorySummary = {
   totalItems: 32,
   totalValue: 127450.00,
@@ -62,28 +144,21 @@ const mockSummary: InventorySummary = {
 };
 
 const mockItems: InventoryItem[] = [
-  // Tirzepatida / GLP-1
   { id: '1', name: 'Tirzepatida 2.5mg (Mounjaro)', genericName: 'Tirzepatida', category: 'medicamento', unit: 'caneta', currentQuantity: 8, minStock: 10, maxStock: 40, costPrice: 1850.00, sellPrice: 2800.00, avgDailyConsumption: 1.2, daysUntilStockout: 7, lastRestock: '2026-02-28', supplier: 'Eli Lilly Brasil' },
   { id: '2', name: 'Tirzepatida 5mg (Mounjaro)', genericName: 'Tirzepatida', category: 'medicamento', unit: 'caneta', currentQuantity: 15, minStock: 10, maxStock: 40, costPrice: 1950.00, sellPrice: 3000.00, avgDailyConsumption: 0.8, daysUntilStockout: 19, lastRestock: '2026-03-01', supplier: 'Eli Lilly Brasil' },
   { id: '3', name: 'Tirzepatida 7.5mg (Mounjaro)', genericName: 'Tirzepatida', category: 'medicamento', unit: 'caneta', currentQuantity: 6, minStock: 8, maxStock: 30, costPrice: 2100.00, sellPrice: 3200.00, avgDailyConsumption: 0.5, daysUntilStockout: 12, lastRestock: '2026-02-20', supplier: 'Eli Lilly Brasil' },
   { id: '4', name: 'Tirzepatida 10mg (Mounjaro)', genericName: 'Tirzepatida', category: 'medicamento', unit: 'caneta', currentQuantity: 3, minStock: 5, maxStock: 20, costPrice: 2250.00, sellPrice: 3400.00, avgDailyConsumption: 0.3, daysUntilStockout: 10, lastRestock: '2026-02-15', supplier: 'Eli Lilly Brasil' },
-
-  // Hormônios / Implantes
   { id: '5', name: 'Testosterona Base Micronizada', genericName: 'Testosterona', category: 'medicamento', unit: 'g', currentQuantity: 180, minStock: 50, maxStock: 500, costPrice: 42.00, sellPrice: 85.00, avgDailyConsumption: 8.5, daysUntilStockout: 21, lastRestock: '2026-03-05' },
   { id: '6', name: 'Gestrinona', category: 'medicamento', unit: 'g', currentQuantity: 45, minStock: 30, maxStock: 200, costPrice: 95.00, sellPrice: 190.00, avgDailyConsumption: 3.2, daysUntilStockout: 14, lastRestock: '2026-02-25' },
   { id: '7', name: 'Oxandrolona', category: 'medicamento', unit: 'g', currentQuantity: 12, minStock: 25, maxStock: 150, costPrice: 120.00, sellPrice: 250.00, avgDailyConsumption: 2.0, daysUntilStockout: 6, lastRestock: '2026-02-18' },
   { id: '8', name: 'DHEA', category: 'medicamento', unit: 'g', currentQuantity: 90, minStock: 40, maxStock: 200, costPrice: 38.00, sellPrice: 75.00, avgDailyConsumption: 1.5, daysUntilStockout: 60, lastRestock: '2026-03-02' },
   { id: '9', name: 'Pregnenolona', category: 'medicamento', unit: 'g', currentQuantity: 60, minStock: 20, maxStock: 150, costPrice: 55.00, sellPrice: 110.00, avgDailyConsumption: 0.8, daysUntilStockout: 75 },
   { id: '10', name: 'Anastrozol', category: 'medicamento', unit: 'g', currentQuantity: 25, minStock: 10, maxStock: 60, costPrice: 85.00, sellPrice: 170.00, avgDailyConsumption: 0.3, daysUntilStockout: 83 },
-
-  // Materiais
   { id: '11', name: 'Trocarte 10G (Implante)', category: 'material', unit: 'un', currentQuantity: 150, minStock: 50, maxStock: 500, costPrice: 8.50, sellPrice: 15.00, avgDailyConsumption: 4.0, daysUntilStockout: 37 },
   { id: '12', name: 'Trocarte 8G (Implante)', category: 'material', unit: 'un', currentQuantity: 85, minStock: 30, maxStock: 300, costPrice: 9.00, sellPrice: 16.00, avgDailyConsumption: 2.5, daysUntilStockout: 34 },
   { id: '13', name: 'Agulha Hipodérmica 40x12', category: 'material', unit: 'un', currentQuantity: 500, minStock: 100, maxStock: 2000, costPrice: 0.35, sellPrice: 0.80, avgDailyConsumption: 12.0, daysUntilStockout: 42 },
   { id: '14', name: 'Luva Procedimento M', category: 'material', unit: 'cx', currentQuantity: 8, minStock: 10, maxStock: 50, costPrice: 28.00, sellPrice: 45.00, avgDailyConsumption: 1.5, daysUntilStockout: 5 },
   { id: '15', name: 'Lidocaína 2% s/ Vaso', category: 'medicamento', unit: 'amp', currentQuantity: 0, minStock: 20, maxStock: 100, costPrice: 4.50, sellPrice: 12.00, avgDailyConsumption: 3.0, daysUntilStockout: 0 },
-
-  // Cosméticos / Soroterapia
   { id: '16', name: 'Vitamina C Injetável (500mg/ml)', category: 'medicamento', unit: 'amp', currentQuantity: 40, minStock: 20, maxStock: 100, costPrice: 12.00, sellPrice: 35.00, avgDailyConsumption: 2.0, daysUntilStockout: 20 },
   { id: '17', name: 'Complexo B Injetável', category: 'medicamento', unit: 'amp', currentQuantity: 55, minStock: 15, maxStock: 80, costPrice: 8.00, sellPrice: 22.00, avgDailyConsumption: 1.0, daysUntilStockout: 55 },
   { id: '18', name: 'Clorexidina Alcoólica 0,5%', category: 'cosmético', unit: 'L', currentQuantity: 5, minStock: 3, maxStock: 15, costPrice: 22.00, sellPrice: 40.00, avgDailyConsumption: 0.2, daysUntilStockout: 25 },
@@ -100,10 +175,255 @@ const mockSuppliers: Supplier[] = [
 
 type TabFilter = 'all' | 'critical' | 'medicamento' | 'material' | 'cosmético';
 
+// ─── MINI SPARKLINE COMPONENT ───
+function MiniSparkline({ item }: { item: InventoryItem }) {
+  const data = useMemo(() => generateSparklineData(item, 15), [item]);
+  const maxStock = Math.max(...data.map(d => d.stock), 1);
+  const maxConsumption = Math.max(...data.map(d => d.consumption), 1);
+  const daysLeft = item.daysUntilStockout ?? 999;
+  const consumptionColor = daysLeft <= 7 ? '#ef4444' : daysLeft <= 14 ? 'hsl(var(--warning))' : '#22c55e';
+
+  const w = 80;
+  const h = 24;
+
+  const stockPoints = data.map((d, i) => {
+    const x = (i / (data.length - 1)) * w;
+    const y = h - (d.stock / maxStock) * h * 0.85;
+    return `${x},${y}`;
+  }).join(' ');
+
+  const consumptionPoints = data.map((d, i) => {
+    const x = (i / (data.length - 1)) * w;
+    const y = h - (d.consumption / maxConsumption) * h * 0.6 - 2;
+    return `${x},${y}`;
+  }).join(' ');
+
+  return (
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="overflow-visible">
+      {/* Stock decline line */}
+      <polyline
+        points={stockPoints}
+        fill="none"
+        stroke="currentColor"
+        className="text-foreground/40"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Consumption curve */}
+      <polyline
+        points={consumptionPoints}
+        fill="none"
+        stroke={consumptionColor}
+        strokeWidth="1"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeDasharray="2,2"
+        opacity="0.7"
+      />
+    </svg>
+  );
+}
+
+// ─── DETAIL MODAL ───
+function ItemDetailModal({
+  item,
+  onClose,
+  suppliers,
+}: {
+  item: InventoryItem;
+  onClose: () => void;
+  suppliers: Supplier[];
+}) {
+  const [detailPeriod, setDetailPeriod] = useState<number>(30);
+  const { historyData, projectionData, consumptionBars } = useMemo(
+    () => generateDetailData(item, detailPeriod),
+    [item, detailPeriod]
+  );
+
+  const daysLeft = item.daysUntilStockout ?? 999;
+  const statusColor = daysLeft <= 7 ? 'text-destructive' : daysLeft <= 14 ? 'text-warning' : 'text-foreground';
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="bg-background border border-border w-full max-w-5xl max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="px-6 py-5 border-b border-border flex items-center justify-between sticky top-0 bg-background z-10">
+          <div className="flex items-center gap-4">
+            <button onClick={onClose} className="w-8 h-8 border border-border flex items-center justify-center hover:border-foreground/40 transition-colors">
+              <ArrowLeft className="w-4 h-4" />
+            </button>
+            <div>
+              <h2 className="font-serif text-xl font-bold text-foreground">{item.name}</h2>
+              <div className="flex items-center gap-3 mt-1">
+                <span className="font-mono text-xs text-muted-foreground capitalize">{item.category}</span>
+                {item.supplier && (
+                  <>
+                    <span className="text-border">•</span>
+                    <span className="font-mono text-xs text-muted-foreground">{item.supplier}</span>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+          <button onClick={onClose} className="w-8 h-8 border border-border flex items-center justify-center hover:border-foreground/40 transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Summary Row */}
+        <div className="px-6 py-4 grid grid-cols-2 md:grid-cols-4 gap-4 border-b border-border">
+          <div className="glass-card-solid border border-border p-4">
+            <p className="font-mono text-2xl font-bold text-foreground">{item.currentQuantity} <span className="text-sm text-muted-foreground">{item.unit}</span></p>
+            <p className="mono-label text-muted-foreground">Estoque Atual</p>
+          </div>
+          <div className="glass-card-solid border border-border p-4">
+            <p className={`font-mono text-2xl font-bold ${statusColor}`}>{daysLeft > 0 ? `${daysLeft}d` : 'Esgotado'}</p>
+            <p className="mono-label text-muted-foreground">Dias de Estoque</p>
+          </div>
+          <div className="glass-card-solid border border-border p-4">
+            <p className="font-mono text-2xl font-bold text-foreground">{item.avgDailyConsumption || 0}</p>
+            <p className="mono-label text-muted-foreground">{item.unit}/dia (média)</p>
+          </div>
+          <div className="glass-card-solid border border-border p-4">
+            <p className="font-mono text-2xl font-bold text-foreground">{item.minStock} <span className="text-sm text-muted-foreground">{item.unit}</span></p>
+            <p className="mono-label text-muted-foreground">Nível Crítico</p>
+          </div>
+        </div>
+
+        {/* Charts */}
+        <div className="px-6 py-6">
+          {/* Period Selector */}
+          <div className="flex items-center justify-end mb-4 gap-2">
+            {[15, 30, 60].map(p => (
+              <button
+                key={p}
+                onClick={() => setDetailPeriod(p)}
+                className={`font-mono text-[10px] uppercase tracking-[0.15em] px-3 py-1.5 border transition-colors ${
+                  detailPeriod === p
+                    ? 'border-foreground/40 text-foreground bg-foreground/[0.05]'
+                    : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+                }`}
+              >
+                {p} dias
+              </button>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Projeção de Estoque */}
+            <div className="border border-border glass-card-solid p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-mono text-xs uppercase tracking-[0.15em] text-muted-foreground font-medium">Projeção de Estoque</h3>
+                <div className="flex items-center gap-4">
+                  <span className="flex items-center gap-1.5 font-mono text-[9px] text-muted-foreground">
+                    <span className="w-2 h-2 rounded-full bg-foreground/60" /> Histórico
+                  </span>
+                  <span className="flex items-center gap-1.5 font-mono text-[9px] text-muted-foreground">
+                    <span className="w-2 h-2 rounded-full bg-warning" /> Projeção
+                  </span>
+                  <span className="flex items-center gap-1.5 font-mono text-[9px] text-muted-foreground">
+                    <span className="w-2 h-0.5 bg-destructive" /> Nível Crítico
+                  </span>
+                </div>
+              </div>
+              <ResponsiveContainer width="100%" height={240}>
+                <ComposedChart data={[...historyData.slice(-10), ...projectionData.slice(1)]}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.5} />
+                  <XAxis dataKey="label" tick={{ fontSize: 9, fontFamily: 'monospace', fill: 'hsl(var(--muted-foreground))' }} interval="preserveStartEnd" />
+                  <YAxis tick={{ fontSize: 9, fontFamily: 'monospace', fill: 'hsl(var(--muted-foreground))' }} tickFormatter={(v) => `${v} ${item.unit}`} width={60} />
+                  <Tooltip
+                    contentStyle={{ background: 'hsl(var(--background))', border: '1px solid hsl(var(--border))', fontFamily: 'monospace', fontSize: 11 }}
+                    labelStyle={{ fontFamily: 'var(--font-serif)', fontWeight: 600 }}
+                  />
+                  <ReferenceLine y={item.minStock} stroke="hsl(var(--destructive))" strokeDasharray="6 3" strokeWidth={1.5} label={{ value: 'Nível Crítico', position: 'right', fontSize: 9, fill: 'hsl(var(--destructive))' }} />
+                  <Area dataKey="stock" fill="hsl(var(--foreground))" fillOpacity={0.06} stroke="hsl(var(--foreground))" strokeWidth={2} dot={false} name="Histórico" />
+                  <Line dataKey="projected" stroke="hsl(var(--warning))" strokeWidth={2} strokeDasharray="5 3" dot={false} name="Projeção" connectNulls />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Consumo por Período */}
+            <div className="border border-border glass-card-solid p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-mono text-xs uppercase tracking-[0.15em] text-muted-foreground font-medium">Consumo por Período</h3>
+                <span className="font-mono text-[9px] text-muted-foreground">Últimos {detailPeriod} dias</span>
+              </div>
+              <ResponsiveContainer width="100%" height={240}>
+                <BarChart data={consumptionBars}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.5} />
+                  <XAxis dataKey="period" tick={{ fontSize: 9, fontFamily: 'monospace', fill: 'hsl(var(--muted-foreground))' }} />
+                  <YAxis tick={{ fontSize: 9, fontFamily: 'monospace', fill: 'hsl(var(--muted-foreground))' }} tickFormatter={(v) => `${v} ${item.unit}`} width={60} />
+                  <Tooltip
+                    contentStyle={{ background: 'hsl(var(--background))', border: '1px solid hsl(var(--border))', fontFamily: 'monospace', fontSize: 11 }}
+                    labelStyle={{ fontFamily: 'var(--font-serif)', fontWeight: 600 }}
+                  />
+                  <Bar dataKey="amount" fill="hsl(var(--foreground))" fillOpacity={0.25} stroke="hsl(var(--foreground))" strokeWidth={1} radius={[2, 2, 0, 0]} name="Consumido" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Row: Actions + Suppliers */}
+        <div className="px-6 pb-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Ações Rápidas */}
+          <div className="border border-border glass-card-solid p-5">
+            <h3 className="font-serif text-base font-bold text-foreground mb-4">Ações Rápidas</h3>
+            <div className="space-y-2">
+              <button className="w-full py-2.5 bg-foreground hover:bg-foreground/90 text-background font-mono text-xs uppercase tracking-[0.15em] transition-colors flex items-center justify-center gap-2">
+                <Plus className="w-3.5 h-3.5" /> Entrada de Estoque
+              </button>
+              <button className="w-full py-2.5 border border-border text-foreground font-mono text-xs uppercase tracking-[0.15em] hover:border-foreground/40 transition-colors flex items-center justify-center gap-2">
+                <TrendingDown className="w-3.5 h-3.5" /> Registrar Saída
+              </button>
+            </div>
+          </div>
+
+          {/* Recomendação de Pedido */}
+          <div className="border border-border glass-card-solid p-5">
+            <h3 className="font-serif text-base font-bold text-foreground mb-4">Recomendação de Pedido</h3>
+            <div className="space-y-3">
+              {suppliers.slice(0, 3).map(s => (
+                <div key={s.id} className="flex items-center justify-between p-2.5 border border-border hover:border-foreground/30 transition-colors">
+                  <div>
+                    <p className="font-serif text-xs font-semibold text-foreground">{s.name}</p>
+                    <p className="font-mono text-[9px] text-muted-foreground">
+                      Entrega em {s.deliveryDays} dias • R$ {s.pricePerUnit.toFixed(2)}/{item.unit}
+                    </p>
+                  </div>
+                  <span className="font-mono text-[9px] text-warning font-medium">
+                    Pedir até
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// ─── MAIN PAGE ───
 export default function EstoquePage() {
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState<TabFilter>('all');
   const [showReorderPanel, setShowReorderPanel] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
   const queryClient = useQueryClient();
 
   const { data: apiSummary } = useQuery({
@@ -140,7 +460,6 @@ export default function EstoquePage() {
     }
   });
 
-  // Filter & Search
   const filteredItems = useMemo(() => {
     let filtered = items;
     if (activeTab === 'critical') {
@@ -158,7 +477,6 @@ export default function EstoquePage() {
     return filtered;
   }, [items, activeTab, search]);
 
-  // Computed stats
   const criticalItems = items.filter(item => (item.daysUntilStockout ?? 999) <= 7 && item.currentQuantity > 0);
 
   const getCategoryIcon = (category: string) => {
@@ -232,8 +550,6 @@ export default function EstoquePage() {
 
         {/* Top Row: Stats + Critical Alert */}
         <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-
-          {/* Summary Stats */}
           <div className="lg:col-span-5 grid grid-cols-3 gap-4">
             <StatCard icon={<AlertTriangle className="w-4 h-4" />} label="Estoque Baixo" value={summary.lowStockCount} subtext={`${summary.outOfStockCount} esgotado(s)`} />
             <StatCard icon={<ShieldAlert className="w-4 h-4" />} label="Vencendo (30d)" value={summary.expiringCount} subtext={`${summary.expiredCount} vencido(s)`} />
@@ -241,7 +557,7 @@ export default function EstoquePage() {
           </div>
 
           {/* Critical Alerts Preview */}
-          <div className="lg:col-span-4 border border-border glass-card-solid p-5">
+          <div className="lg:col-span-7 border border-border glass-card-solid p-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-serif text-base font-bold text-foreground flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-destructive" />
@@ -260,7 +576,7 @@ export default function EstoquePage() {
             ) : (
               <div className="space-y-2.5">
                 {criticalItems.slice(0, 4).map(item => (
-                  <div key={item.id} className="flex items-center justify-between p-2.5 border border-destructive/15 bg-destructive/[0.03] group hover:border-destructive/30 transition-colors">
+                  <div key={item.id} className="flex items-center justify-between p-2.5 border border-destructive/15 bg-destructive/[0.03] group hover:border-destructive/30 transition-colors cursor-pointer" onClick={() => setSelectedItem(item)}>
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div className="text-destructive/60">
                         {getCategoryIcon(item.category)}
@@ -278,7 +594,6 @@ export default function EstoquePage() {
               </div>
             )}
 
-            {/* Supplier Recommendation (inline) */}
             {criticalItems.length > 0 && (
               <div className="mt-4 pt-3 border-t border-border">
                 <p className="font-mono text-[9px] text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
@@ -379,7 +694,8 @@ export default function EstoquePage() {
                   <tr className="border-b border-border">
                     <th className="text-left py-3 px-6 mono-label text-muted-foreground">Produto</th>
                     <th className="text-left py-3 px-4 mono-label text-muted-foreground">Cat.</th>
-                    <th className="text-left py-3 px-4 mono-label text-muted-foreground w-40">Nível</th>
+                    <th className="text-left py-3 px-4 mono-label text-muted-foreground w-32">Nível</th>
+                    <th className="text-center py-3 px-2 mono-label text-muted-foreground w-24">Tendência</th>
                     <th className="text-right py-3 px-4 mono-label text-muted-foreground">Qtd</th>
                     <th className="text-right py-3 px-4 mono-label text-muted-foreground">Custo</th>
                     <th className="text-center py-3 px-4 mono-label text-muted-foreground">Dias Rest.</th>
@@ -394,6 +710,7 @@ export default function EstoquePage() {
                       <tr
                         key={item.id}
                         className="border-b border-border/50 hover:bg-muted/30 transition-colors duration-150 cursor-pointer group"
+                        onClick={() => setSelectedItem(item)}
                       >
                         <td className="py-3 px-6">
                           <div className="flex items-center gap-3">
@@ -418,6 +735,9 @@ export default function EstoquePage() {
                               style={{ width: `${pct}%` }}
                             />
                           </div>
+                        </td>
+                        <td className="py-3 px-2 text-center">
+                          <MiniSparkline item={item} />
                         </td>
                         <td className="py-3 px-4 text-right font-mono text-sm font-medium text-foreground">
                           {item.currentQuantity} <span className="text-muted-foreground text-[10px]">{item.unit}</span>
@@ -468,7 +788,6 @@ export default function EstoquePage() {
                     <X className="w-4 h-4" />
                   </button>
                 </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   {mockSuppliers.map(supplier => (
                     <div key={supplier.id} className="p-4 border border-border hover:border-foreground/30 transition-colors">
@@ -488,6 +807,17 @@ export default function EstoquePage() {
           )}
         </AnimatePresence>
       </motion.div>
+
+      {/* Detail Modal */}
+      <AnimatePresence>
+        {selectedItem && (
+          <ItemDetailModal
+            item={selectedItem}
+            onClose={() => setSelectedItem(null)}
+            suppliers={mockSuppliers}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
