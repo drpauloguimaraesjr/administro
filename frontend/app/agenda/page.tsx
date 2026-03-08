@@ -99,6 +99,24 @@ const typeLabel: Record<string, string> = {
     evaluation: 'Avaliação',
 };
 
+// ─── CONFIGURABLE TAGS (will come from settings later) ───
+const SLOTS_PER_DAY = 8;
+
+const APPOINTMENT_TAGS = {
+    first_visit: { color: '#FF1493', label: '1ª Consulta' },       // hot pink
+    return:      { color: '#8B5CF6', label: 'Retorno' },            // purple
+    procedure:   { color: '#3B82F6', label: 'Procedimento' },       // blue
+    evaluation:  { color: '#F59E0B', label: 'Avaliação' },          // amber
+} as const;
+
+const PROCEDURE_TAGS = {
+    'Implante SC':      { color: '#06B6D4', label: 'Implante SC' },       // cyan
+    'Implante Glúteo':  { color: '#8B5CF6', label: 'Implante Glúteo' },   // purple
+    'Subcutânea':       { color: '#10B981', label: 'Subcutânea' },        // emerald
+    'Intravenosa':      { color: '#F59E0B', label: 'Intravenosa' },       // amber
+    default:            { color: '#6B7280', label: 'Procedimento' },      // gray
+} as const;
+
 // ─── HELPERS ───
 function getDaysInMonth(year: number, month: number) {
     return new Date(year, month + 1, 0).getDate();
@@ -266,6 +284,7 @@ export default function AgendaPage() {
                                     >
                                         {day && (
                                             <>
+                                                {/* Day number */}
                                                 <span className={`font-mono text-sm font-medium ${isSelected ? 'text-foreground font-bold' :
                                                         dayIsToday ? 'text-foreground' :
                                                             'text-foreground'
@@ -273,38 +292,66 @@ export default function AgendaPage() {
                                                     {day}
                                                 </span>
 
-                                                {/* Appointment dots */}
+                                                {/* Doctor name + slot circles */}
                                                 {(dayAppts.length > 0 || dayProcs.length > 0) && (
-                                                    <div className="flex flex-wrap gap-1 mt-1.5">
-                                                        {dayAppts.slice(0, 3).map((a: Appointment) => (
-                                                            <div
-                                                                key={a.id}
-                                                                className={`w-1.5 h-1.5 rounded-full ${a.status === 'confirmed' ? 'bg-foreground' :
-                                                                        a.status === 'pending' ? 'bg-[#c48a3a]' :
-                                                                            a.status === 'completed' ? 'bg-muted-foreground/40' :
-                                                                                'bg-destructive/60'
-                                                                    }`}
-                                                                title={a.patientName}
-                                                            />
-                                                        ))}
-                                                        {dayProcs.slice(0, 2).map((p: Procedure) => (
-                                                            <div
-                                                                key={p.id}
-                                                                className="w-1.5 h-1.5 rounded-sm bg-blue-400/60"
-                                                                title={`${p.patientName} - ${p.productName}`}
-                                                            />
-                                                        ))}
-                                                        {(dayAppts.length + dayProcs.length) > 5 && (
-                                                            <span className="font-mono text-[8px] text-muted-foreground">+{dayAppts.length + dayProcs.length - 5}</span>
+                                                    <div className="mt-1.5 space-y-1">
+                                                        {/* Doctor label */}
+                                                        <p className="font-mono text-[7px] text-muted-foreground uppercase tracking-wider leading-none truncate">Dr. Paulo</p>
+
+                                                        {/* Consultation slots (8 total) */}
+                                                        <div className="flex gap-[3px] items-center">
+                                                            {Array.from({ length: SLOTS_PER_DAY }).map((_, slotIdx) => {
+                                                                const appt = dayAppts[slotIdx] as Appointment | undefined;
+                                                                if (appt) {
+                                                                    const tagColor = APPOINTMENT_TAGS[appt.type as keyof typeof APPOINTMENT_TAGS] || APPOINTMENT_TAGS.return;
+                                                                    return (
+                                                                        <div
+                                                                            key={slotIdx}
+                                                                            className="w-[6px] h-[6px] rounded-full shrink-0"
+                                                                            style={{ backgroundColor: tagColor.color }}
+                                                                            title={`${appt.startTime} - ${appt.patientName} (${tagColor.label})`}
+                                                                        />
+                                                                    );
+                                                                }
+                                                                return (
+                                                                    <div
+                                                                        key={slotIdx}
+                                                                        className="w-[6px] h-[6px] rounded-full shrink-0 border border-border/60 bg-transparent"
+                                                                        title="Horário livre"
+                                                                    />
+                                                                );
+                                                            })}
+                                                        </div>
+
+                                                        {/* Procedure dots (smaller) */}
+                                                        {dayProcs.length > 0 && (
+                                                            <div className="flex gap-[3px] items-center">
+                                                                {dayProcs.map((p: Procedure, pIdx: number) => {
+                                                                    const pTag = PROCEDURE_TAGS[p.route as keyof typeof PROCEDURE_TAGS] || PROCEDURE_TAGS.default;
+                                                                    return (
+                                                                        <div
+                                                                            key={pIdx}
+                                                                            className="w-[5px] h-[5px] rounded-sm shrink-0"
+                                                                            style={{ backgroundColor: pTag.color }}
+                                                                            title={`${p.patientName} - ${p.productName} (${pTag.label})`}
+                                                                        />
+                                                                    );
+                                                                })}
+                                                            </div>
                                                         )}
                                                     </div>
                                                 )}
 
-                                                {/* Count label */}
-                                                {dayAppts.length > 0 && (
-                                                    <p className="font-mono text-[9px] text-muted-foreground mt-1">
-                                                        {dayAppts.length} consult{dayAppts.length > 1 ? 'as' : 'a'}
-                                                    </p>
+                                                {/* Empty day - just show ghost slots so user knows capacity */}
+                                                {dayAppts.length === 0 && dayProcs.length === 0 && (
+                                                    <div className="mt-1.5 space-y-1 opacity-30">
+                                                        <p className="font-mono text-[7px] text-muted-foreground uppercase tracking-wider leading-none">Dr. Paulo</p>
+                                                        <div className="flex gap-[3px] items-center">
+                                                            {Array.from({ length: SLOTS_PER_DAY }).map((_, i) => (
+                                                                <div key={i} className="w-[6px] h-[6px] rounded-full border border-border/40 bg-transparent shrink-0" />
+                                                            ))}
+                                                        </div>
+                                                    </div>
                                                 )}
                                             </>
                                         )}
