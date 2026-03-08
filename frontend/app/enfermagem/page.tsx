@@ -53,40 +53,40 @@ type StatusFilter = 'all' | 'pending' | 'preparing' | 'ready' | 'administered' |
 const STATUS_CONFIG = {
   pending: {
     label: 'Pendente',
-    color: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+    color: 'bg-warning/10 text-warning border-warning/20',
     icon: Clock,
-    dotColor: 'bg-amber-400',
+    dotColor: 'bg-warning',
   },
   preparing: {
     label: 'Preparando',
-    color: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+    color: 'bg-info/10 text-info border-info/20',
     icon: Activity,
-    dotColor: 'bg-blue-400',
+    dotColor: 'bg-info',
   },
   ready: {
     label: 'Pronto',
-    color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+    color: 'bg-success/10 text-success border-success/20',
     icon: CheckCircle2,
-    dotColor: 'bg-emerald-400',
+    dotColor: 'bg-success',
   },
   administered: {
     label: 'Aplicado',
-    color: 'bg-[#7c9a72]/20 text-[#a8c49e] border-[#7c9a72]/30',
+    color: 'bg-muted/30 text-muted-foreground border-border/50',
     icon: Syringe,
-    dotColor: 'bg-[#7c9a72]',
+    dotColor: 'bg-muted-foreground',
   },
   cancelled: {
     label: 'Cancelado',
-    color: 'bg-red-500/20 text-red-400 border-red-500/30',
+    color: 'bg-destructive/10 text-destructive border-destructive/20',
     icon: XCircle,
-    dotColor: 'bg-red-400',
+    dotColor: 'bg-destructive',
   },
 };
 
 const PRIORITY_CONFIG = {
-  routine: { label: 'Rotina', color: 'text-[#918a82]' },
-  urgent: { label: 'Urgente', color: 'text-amber-400' },
-  stat: { label: 'STAT', color: 'text-red-400 font-bold' },
+  routine: { label: 'Rotina', color: 'text-muted-foreground' },
+  urgent: { label: 'Urgente', color: 'text-warning' },
+  stat: { label: 'STAT', color: 'text-destructive font-bold' },
 };
 
 // MOCK DATA
@@ -176,23 +176,23 @@ export default function EnfermagemPage() {
   };
 
   const summaryCards = [
-    { key: 'pending', label: 'Pendentes', value: summary?.pending || 0, color: 'text-amber-400', bgColor: 'bg-amber-500/10', icon: Clock },
-    { key: 'preparing', label: 'Preparando', value: summary?.preparing || 0, color: 'text-blue-400', bgColor: 'bg-blue-500/10', icon: Activity },
-    { key: 'ready', label: 'Prontos', value: summary?.ready || 0, color: 'text-emerald-400', bgColor: 'bg-emerald-500/10', icon: CheckCircle2 },
-    { key: 'administered', label: 'Aplicados', value: summary?.administered || 0, color: 'text-[#a8c49e]', bgColor: 'bg-[#7c9a72]/10', icon: Syringe },
+    { key: 'pending', label: 'Pendentes', value: summary?.pending || 0, color: 'text-warning', bgColor: 'bg-warning/10', icon: Clock },
+    { key: 'preparing', label: 'Preparando', value: summary?.preparing || 0, color: 'text-info', bgColor: 'bg-info/10', icon: Activity },
+    { key: 'ready', label: 'Prontos', value: summary?.ready || 0, color: 'text-success', bgColor: 'bg-success/10', icon: CheckCircle2 },
+    { key: 'administered', label: 'Aplicados', value: summary?.administered || 0, color: 'text-muted-foreground', bgColor: 'bg-muted/20', icon: Syringe },
   ];
 
   return (
-    <div className="min-h-screen bg-background text-white">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-transparent text-foreground">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-[#f5f0eb] flex items-center gap-3">
-              <Syringe className="w-8 h-8 text-[#7c9a72]" />
+            <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
+              <Syringe className="w-8 h-8 text-muted-foreground" />
               Enfermagem
             </h1>
-            <p className="text-[#918a82] mt-1 font-mono text-sm tracking-wide">
+            <p className="text-muted-foreground mt-1 font-mono text-sm tracking-wide">
               Pedidos de administração — {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
             </p>
           </div>
@@ -202,7 +202,7 @@ export default function EnfermagemPage() {
               queryClient.invalidateQueries({ queryKey: ['nursing-orders-today'] });
               queryClient.invalidateQueries({ queryKey: ['nursing-orders-summary'] });
             }}
-            className="border-[#333] hover:bg-[#292929] text-[#d4cec8]"
+            className="border-border hover:bg-muted text-foreground transition-colors"
           >
             <RefreshCw className="w-4 h-4 mr-2" />
             Atualizar
@@ -220,15 +220,15 @@ export default function EnfermagemPage() {
             >
               <button
                 onClick={() => setFilter(filter === card.key as StatusFilter ? 'all' : card.key as StatusFilter)}
-                className={`w-full text-left transition-all duration-200 rounded-lg border ${filter === card.key
-                    ? 'border-[#7c9a72] bg-[#7c9a72]/5'
-                    : 'border-[#333] bg-[#1a1a1a] hover:border-[#444]'
+                className={`w-full text-left transition-all duration-200 glass-card-solid ${filter === card.key
+                    ? 'ring-1 ring-ring/50 border-ring/30 bg-card'
+                    : 'border-border bg-card/60 hover:border-ring/20'
                   }`}
               >
                 <div className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-[#918a82] text-xs font-mono tracking-wide uppercase">{card.label}</p>
+                      <p className="text-muted-foreground text-xs font-mono tracking-wide uppercase">{card.label}</p>
                       <p className={`text-3xl font-bold mt-1 ${card.color}`}>{card.value}</p>
                     </div>
                     <div className={`p-2.5 rounded-lg ${card.bgColor}`}>
@@ -254,8 +254,8 @@ export default function EnfermagemPage() {
               key={tab.key}
               onClick={() => setFilter(tab.key)}
               className={`px-4 py-2 rounded-md text-sm font-mono tracking-wide whitespace-nowrap transition-all ${filter === tab.key
-                  ? 'bg-[#7c9a72]/20 text-[#a8c49e] border border-[#7c9a72]/40'
-                  : 'bg-[#1a1a1a] text-[#918a82] border border-[#333] hover:border-[#444] hover:text-[#d4cec8]'
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'bg-transparent text-muted-foreground border border-border/50 hover:bg-muted/50 hover:text-foreground'
                 }`}
             >
               {tab.label}
@@ -269,17 +269,17 @@ export default function EnfermagemPage() {
         {/* Orders List */}
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
-            <RefreshCw className="w-6 h-6 animate-spin text-[#7c9a72]" />
-            <span className="ml-3 text-[#918a82] font-mono text-sm">Carregando pedidos...</span>
+            <RefreshCw className="w-6 h-6 animate-spin text-muted-foreground" />
+            <span className="ml-3 text-muted-foreground font-mono text-sm">Carregando pedidos...</span>
           </div>
         ) : filteredOrders.length === 0 ? (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center py-16"
+            className="text-center py-16 glass-card border-dashed p-8 max-w-md mx-auto"
           >
-            <Syringe className="w-12 h-12 text-[#333] mx-auto mb-4" />
-            <p className="text-[#918a82] font-mono text-sm">
+            <Syringe className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+            <p className="text-muted-foreground font-mono text-sm">
               {filter === 'all' ? 'Nenhum pedido de administração hoje' : `Nenhum pedido com status "${STATUS_CONFIG[filter as keyof typeof STATUS_CONFIG]?.label || filter}"`}
             </p>
           </motion.div>
@@ -302,35 +302,35 @@ export default function EnfermagemPage() {
                     exit={{ opacity: 0, x: -20 }}
                     transition={{ delay: i * 0.03 }}
                   >
-                    <Card className="bg-[#1a1a1a] border-[#333] hover:border-[#444] transition-colors">
+                    <Card className="glass-card-solid border-border transition-all hover:shadow-md">
                       <CardContent className="p-0">
                         {/* Main Row */}
                         <button
                           onClick={() => setExpandedId(isExpanded ? null : order.id)}
-                          className="w-full text-left p-4 flex items-center gap-4"
+                          className="w-full text-left p-4 flex items-center gap-4 group"
                         >
                           {/* Status Dot */}
-                          <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${statusConfig.dotColor}`} />
+                          <div className={`w-2 h-2 rounded-full shrink-0 ${statusConfig.dotColor} shadow-sm`} />
 
                           {/* Patient & Product */}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                              <span className="text-[#f5f0eb] font-medium text-sm truncate">
+                              <span className="text-foreground font-medium text-sm truncate">
                                 {order.patientName}
                               </span>
                               {order.priority !== 'routine' && (
-                                <span className={`text-[10px] font-mono font-bold uppercase tracking-wider ${priorityConfig.color}`}>
+                                <span className={`text-[10px] font-mono uppercase tracking-wider ${priorityConfig.color}`}>
                                   {priorityConfig.label}
                                 </span>
                               )}
                             </div>
-                            <div className="flex items-center gap-2 text-[#918a82] text-xs font-mono">
-                              <Package className="w-3 h-3 shrink-0" />
+                            <div className="flex items-center gap-2 text-muted-foreground text-xs font-mono">
+                              <Package className="w-3 h-3 shrink-0 opacity-70" />
                               <span className="truncate">{order.productName}</span>
-                              <span className="text-[#555]">·</span>
+                              <span className="opacity-40">·</span>
                               <span>{order.quantity} {order.unit}</span>
-                              <span className="text-[#555]">·</span>
-                              <span className="text-[#a8c49e] font-medium">{order.route}</span>
+                              <span className="opacity-40">·</span>
+                              <span className="text-foreground font-medium">{order.route}</span>
                             </div>
                           </div>
 
@@ -341,11 +341,11 @@ export default function EnfermagemPage() {
                           </Badge>
 
                           {/* Time */}
-                          <span className="text-[#555] text-xs font-mono shrink-0">
+                          <span className="text-muted-foreground/70 text-xs font-mono shrink-0 tabular-nums">
                             {formatTime(order.createdAt)}
                           </span>
 
-                          <ChevronRight className={`w-4 h-4 text-[#555] transition-transform shrink-0 ${isExpanded ? 'rotate-90' : ''}`} />
+                          <ChevronRight className={`w-4 h-4 text-muted-foreground/50 transition-transform shrink-0 group-hover:text-foreground ${isExpanded ? 'rotate-90 text-foreground' : ''}`} />
                         </button>
 
                         {/* Expanded Details */}
@@ -355,44 +355,43 @@ export default function EnfermagemPage() {
                               initial={{ height: 0, opacity: 0 }}
                               animate={{ height: 'auto', opacity: 1 }}
                               exit={{ height: 0, opacity: 0 }}
-                              className="overflow-hidden"
+                              className="overflow-hidden bg-muted/20"
                             >
-                              <div className="px-4 pb-4 pt-0 border-t border-[#292929]">
-                                <div className="pt-4 space-y-3">
+                              <div className="px-4 pb-4 pt-1 border-t border-border/50">
+                                <div className="pt-4 space-y-4">
                                   {/* Instructions */}
                                   {order.instructions && (
                                     <div>
-                                      <p className="text-[10px] font-mono text-[#555] uppercase tracking-wider mb-1">Instruções</p>
-                                      <p className="text-[#d4cec8] text-sm">{order.instructions}</p>
+                                      <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-1">Instruções</p>
+                                      <p className="text-foreground/90 text-sm">{order.instructions}</p>
                                     </div>
                                   )}
 
                                   {/* Details Grid */}
-                                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-muted/30 p-3 rounded-md border border-border/40">
                                     {order.batchNumber && (
                                       <div>
-                                        <p className="text-[10px] font-mono text-[#555] uppercase tracking-wider mb-0.5">Lote</p>
-                                        <p className="text-[#d4cec8] text-xs font-mono">{order.batchNumber}</p>
+                                        <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-0.5">Lote</p>
+                                        <p className="text-foreground/90 text-xs font-mono">{order.batchNumber}</p>
                                       </div>
                                     )}
                                     <div>
-                                      <p className="text-[10px] font-mono text-[#555] uppercase tracking-wider mb-0.5">Prescrito por</p>
-                                      <p className="text-[#d4cec8] text-xs">{order.prescribedBy}</p>
+                                      <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-0.5">Prescrito por</p>
+                                      <p className="text-foreground/90 text-xs">{order.prescribedBy}</p>
                                     </div>
                                     {order.preparedBy && (
                                       <div>
-                                        <p className="text-[10px] font-mono text-[#555] uppercase tracking-wider mb-0.5">Preparado por</p>
-                                        <p className="text-[#d4cec8] text-xs">{order.preparedBy}</p>
+                                        <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-0.5">Preparado por</p>
+                                        <p className="text-foreground/90 text-xs">{order.preparedBy}</p>
                                       </div>
                                     )}
                                     {order.administeredBy && (
                                       <div>
-                                        <p className="text-[10px] font-mono text-[#555] uppercase tracking-wider mb-0.5">Aplicado por</p>
-                                        <p className="text-[#d4cec8] text-xs">{order.administeredBy}</p>
+                                        <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-0.5">Aplicado por</p>
+                                        <p className="text-foreground/90 text-xs">{order.administeredBy}</p>
                                       </div>
                                     )}
                                   </div>
-
                                   {/* Action Buttons */}
                                   <div className="flex gap-2 pt-2">
                                     {nextAction && (
@@ -406,7 +405,7 @@ export default function EnfermagemPage() {
                                           });
                                         }}
                                         disabled={updateStatusMutation.isPending}
-                                        className="bg-[#7c9a72] hover:bg-[#6b8962] text-white text-xs font-mono"
+                                        className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-mono transition-colors"
                                       >
                                         <nextAction.icon className="w-3.5 h-3.5 mr-1.5" />
                                         {nextAction.label}
@@ -426,7 +425,7 @@ export default function EnfermagemPage() {
                                           });
                                         }}
                                         disabled={updateStatusMutation.isPending}
-                                        className="border-red-500/30 text-red-400 hover:bg-red-500/10 text-xs font-mono"
+                                        className="border-destructive/30 text-destructive hover:bg-destructive/10 text-xs font-mono transition-colors"
                                       >
                                         <XCircle className="w-3.5 h-3.5 mr-1.5" />
                                         Cancelar
@@ -445,7 +444,7 @@ export default function EnfermagemPage() {
                                           });
                                         }}
                                         disabled={updateStatusMutation.isPending}
-                                        className="border-amber-500/30 text-amber-400 hover:bg-amber-500/10 text-xs font-mono"
+                                        className="border-warning/30 text-warning hover:bg-warning/10 text-xs font-mono transition-colors"
                                       >
                                         <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
                                         Reativar
