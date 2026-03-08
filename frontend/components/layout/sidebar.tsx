@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import {
     Home, DollarSign, Smartphone, Calendar, Users,
     Share2, ClipboardList, Target, Settings, Brain, Activity,
-    Pin, PinOff, Syringe, Building2, PackageCheck
+    Pin, PinOff, Syringe, Building2, PackageCheck, Package
 } from 'lucide-react';
 import { useAuth } from '@/components/auth/auth-provider';
 import { cn } from '@/lib/utils';
@@ -30,6 +30,7 @@ export function Sidebar() {
         { href: '/transactions', label: 'Financeiro', icon: DollarSign },
         { href: '/enfermagem', label: 'Enfermagem', icon: Syringe },
         { href: '/sala-procedimentos', label: 'Sala Procedimentos', icon: PackageCheck },
+        { href: '/estoque', label: 'Estoque', icon: Package },
         { href: '/aplicacoes', label: 'Aplicações', icon: Syringe },
         { href: '/parceiros', label: 'Parceiros', icon: Building2 },
         { href: '/whatsapp', label: 'WhatsApp', icon: Smartphone },
