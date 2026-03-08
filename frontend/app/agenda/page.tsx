@@ -43,6 +43,14 @@ const mockAppointments: Appointment[] = [
     { id: 'a3', patientName: 'João Santos', date: d(today.getDate()), startTime: '14:00', endTime: '14:45', status: 'confirmed', type: 'procedure' },
     { id: 'a4', patientName: 'Ana Oliveira', date: d(today.getDate()), startTime: '16:00', endTime: '16:30', status: 'confirmed', type: 'return' },
     { id: 'a5', patientName: 'Carla Menezes', date: d(today.getDate()), startTime: '17:00', endTime: '17:45', status: 'pending', type: 'first_visit' },
+    // Day 18 - Rich Mock Data for UI Design
+    { id: 'a18_1', patientName: 'Ricardo Teixeira da Silva', date: d(18), startTime: '08:00', endTime: '08:30', status: 'confirmed', type: 'return' },
+    { id: 'a18_2', patientName: 'Laura Montenegro', date: d(18), startTime: '09:15', endTime: '10:00', status: 'pending', type: 'first_visit' },
+    { id: 'a18_3', patientName: 'Carlos Eduardo Nogueira', date: d(18), startTime: '10:30', endTime: '11:15', status: 'completed', type: 'procedure' },
+    { id: 'a18_4', patientName: 'Mariana Alves', date: d(18), startTime: '13:00', endTime: '13:30', status: 'cancelled', type: 'evaluation' },
+    { id: 'a18_5', patientName: 'Dra. Beatriz Ferraz', date: d(18), startTime: '14:30', endTime: '15:15', status: 'confirmed', type: 'return' },
+    { id: 'a18_6', patientName: 'Thiago Martins Carvalho', date: d(18), startTime: '16:00', endTime: '17:00', status: 'confirmed', type: 'first_visit' },
+    { id: 'a18_7', patientName: 'Juliana Paes', date: d(18), startTime: '17:30', endTime: '18:15', status: 'pending', type: 'evaluation' },
     // Other days
     { id: 'a6', patientName: 'Roberto Lima', date: d(Math.min(today.getDate() + 1, 28)), startTime: '09:00', endTime: '09:30', status: 'confirmed', type: 'return' },
     { id: 'a7', patientName: 'Fernanda Lopes', date: d(Math.min(today.getDate() + 1, 28)), startTime: '11:00', endTime: '11:30', status: 'confirmed', type: 'first_visit' },
@@ -68,6 +76,12 @@ const mockProcedures: Procedure[] = [
     { id: 'p5', patientName: 'Roberto Lima', productName: 'Testosterona 75mg', dose: '75mg', route: 'Implante Glúteo', status: 'scheduled', date: d(today.getDate()) },
     { id: 'p6', patientName: 'Cláudia Dias', productName: 'Gestrinona 10mg + Testosterona 25mg', dose: '35mg total', route: 'Implante SC', status: 'scheduled', date: d(today.getDate()) },
     { id: 'p7', patientName: 'Marcos Pereira', productName: 'Testosterona 100mg', dose: '100mg', route: 'Implante Glúteo', status: 'scheduled', date: d(today.getDate()) },
+    // Day 18 - Rich Mock Data for UI Design (Tirzepatida & Compounding)
+    { id: 'p18_1', patientName: 'Ricardo Teixeira da Silva', productName: 'Tirzepatida 5mg (Mounjaro)', dose: '5mg', route: 'Subcutânea', status: 'done', date: d(18), nurseAssigned: 'Enf. Júlia', consultorio: 'Sala 1', arrivalTime: '08:15', lotNumber: 'MJ2024A002' },
+    { id: 'p18_2', patientName: 'Carlos Eduardo Nogueira', productName: 'Testosterona 100mg + Anastrozol', dose: '100mg', route: 'Implante SC', status: 'in_progress', date: d(18), nurseAssigned: 'Enf. Clara', consultorio: 'Sala Botox', arrivalTime: '10:20', lotNumber: 'TST-84992-B' },
+    { id: 'p18_3', patientName: 'Amanda Rodrigues', productName: 'Tirzepatida 2.5mg', dose: '2.5mg', route: 'Subcutânea', status: 'scheduled', date: d(18) },
+    { id: 'p18_4', patientName: 'Juliana Paes', productName: 'Gestrinona 40mg', dose: '40mg', route: 'Implante Glúteo', status: 'scheduled', date: d(18) },
+    { id: 'p18_5', patientName: 'Henrique Faria', productName: 'Soroterapia Vitamina C + Zinco', dose: '250ml', route: 'Intravenosa', status: 'scheduled', date: d(18) },
     // Other days
     { id: 'p8', patientName: 'Roberto Lima', productName: 'Testosterona 75mg', dose: '75mg', route: 'Implante Glúteo', status: 'scheduled', date: d(Math.min(today.getDate() + 1, 28)) },
     { id: 'p9', patientName: 'Fernanda Lopes', productName: 'Gestrinona 20mg', dose: '20mg', route: 'Implante SC', status: 'scheduled', date: d(Math.min(today.getDate() + 1, 28)) },
@@ -245,15 +259,15 @@ export default function AgendaPage() {
                                         onClick={() => day && handleDayClick(day)}
                                         disabled={!day}
                                         className={`relative min-h-[90px] p-2 text-left border-r border-border last:border-r-0 transition-all duration-150 ${!day ? 'bg-muted/20' :
-                                                isSelected ? 'bg-[#7c9a72]/[0.06] border-[#7c9a72]/30' :
-                                                    dayIsToday ? 'bg-[#7c9a72]/[0.03]' :
+                                                isSelected ? 'bg-foreground/[0.06] border-foreground/30' :
+                                                    dayIsToday ? 'bg-foreground/[0.03]' :
                                                         'hover:bg-muted/30'
                                             }`}
                                     >
                                         {day && (
                                             <>
-                                                <span className={`font-mono text-sm font-medium ${isSelected ? 'text-[#7c9a72] font-bold' :
-                                                        dayIsToday ? 'text-[#7c9a72]' :
+                                                <span className={`font-mono text-sm font-medium ${isSelected ? 'text-foreground font-bold' :
+                                                        dayIsToday ? 'text-foreground' :
                                                             'text-foreground'
                                                     }`}>
                                                     {day}
@@ -265,7 +279,7 @@ export default function AgendaPage() {
                                                         {dayAppts.slice(0, 3).map((a: Appointment) => (
                                                             <div
                                                                 key={a.id}
-                                                                className={`w-1.5 h-1.5 rounded-full ${a.status === 'confirmed' ? 'bg-[#7c9a72]' :
+                                                                className={`w-1.5 h-1.5 rounded-full ${a.status === 'confirmed' ? 'bg-foreground' :
                                                                         a.status === 'pending' ? 'bg-[#c48a3a]' :
                                                                             a.status === 'completed' ? 'bg-muted-foreground/40' :
                                                                                 'bg-destructive/60'
@@ -308,13 +322,13 @@ export default function AgendaPage() {
                                     animate={{ height: 'auto', opacity: 1 }}
                                     exit={{ height: 0, opacity: 0 }}
                                     transition={{ duration: 0.25, ease: 'easeInOut' }}
-                                    className="overflow-hidden border-b border-[#7c9a72]/20 bg-[#7c9a72]/[0.02]"
+                                    className="overflow-hidden border-b border-foreground/20 bg-foreground/[0.02]"
                                 >
                                     <div className="p-6">
                                         {/* Detail Header */}
                                         <div className="flex items-center justify-between mb-5">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-[#7c9a72] text-white flex items-center justify-center font-mono text-lg font-bold">
+                                                <div className="w-10 h-10 bg-foreground text-white flex items-center justify-center font-mono text-lg font-bold">
                                                     {selectedDay}
                                                 </div>
                                                 <div>
@@ -337,9 +351,9 @@ export default function AgendaPage() {
                                         {/* Split Layout */}
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                             {/* LEFT: Consultas */}
-                                            <div className="border border-border bg-card p-5">
+                                            <div className="border border-border glass-card-solid p-5">
                                                 <h4 className="font-serif text-base font-bold text-foreground flex items-center gap-2 mb-4">
-                                                    <Calendar className="w-4 h-4 text-[#7c9a72]" />
+                                                    <Calendar className="w-4 h-4 text-foreground" />
                                                     Consultas
                                                 </h4>
                                                 {selectedAppts.length === 0 ? (
@@ -357,7 +371,7 @@ export default function AgendaPage() {
                                                                     </div>
                                                                     <div className="h-6 w-px bg-border" />
                                                                     <div>
-                                                                        <p className="font-serif font-semibold text-foreground text-sm group-hover:text-[#7c9a72] transition-colors">
+                                                                        <p className="font-serif font-semibold text-foreground text-sm group-hover:text-foreground transition-colors">
                                                                             {apt.patientName}
                                                                         </p>
                                                                         <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
@@ -365,8 +379,8 @@ export default function AgendaPage() {
                                                                         </p>
                                                                     </div>
                                                                 </div>
-                                                                <span className={`font-mono text-[9px] uppercase tracking-[0.15em] px-2 py-0.5 border ${apt.status === 'confirmed' ? 'border-[#7c9a72]/30 text-[#6b8a62]' :
-                                                                        apt.status === 'pending' ? 'border-[#c48a3a]/30 text-[#c48a3a]' :
+                                                                <span className={`font-mono text-[9px] uppercase tracking-[0.15em] px-2 py-0.5 border ${apt.status === 'confirmed' ? 'border-foreground/30 text-foreground/80' :
+                                                                        apt.status === 'pending' ? 'border-warning/30 text-warning' :
                                                                             apt.status === 'completed' ? 'border-border text-muted-foreground' :
                                                                                 'border-destructive/30 text-destructive'
                                                                     }`}>
@@ -381,9 +395,9 @@ export default function AgendaPage() {
                                             </div>
 
                                             {/* RIGHT: Procedimentos */}
-                                            <div className="border border-border bg-card p-5">
+                                            <div className="border border-border glass-card-solid p-5">
                                                 <h4 className="font-serif text-base font-bold text-foreground flex items-center gap-2 mb-4">
-                                                    <Syringe className="w-4 h-4 text-[#7c9a72]" />
+                                                    <Syringe className="w-4 h-4 text-foreground" />
                                                     Procedimentos
                                                 </h4>
 
@@ -394,22 +408,22 @@ export default function AgendaPage() {
                                                         {/* Em Atendimento */}
                                                         {selectedProcs.filter(p => p.status === 'in_progress' || p.status === 'done').length > 0 && (
                                                             <div className="mb-4">
-                                                                <p className="mono-label text-[#7c9a72] mb-2 flex items-center gap-1.5">
-                                                                    <span className="w-2 h-2 rounded-full bg-[#7c9a72] animate-pulse" />
+                                                                <p className="mono-label text-foreground mb-2 flex items-center gap-1.5">
+                                                                    <span className="w-2 h-2 rounded-full bg-foreground animate-pulse" />
                                                                     Na Clínica
                                                                 </p>
                                                                 <div className="grid grid-cols-2 gap-2">
                                                                     {selectedProcs.filter(p => p.status === 'in_progress' || p.status === 'done').map(app => (
                                                                         <div key={app.id} className="group relative">
                                                                             <div className={`p-3 border transition-all cursor-default ${app.status === 'done'
-                                                                                    ? 'border-[#7c9a72]/30 bg-[#7c9a72]/[0.04]'
-                                                                                    : 'border-[#c48a3a]/30 bg-[#c48a3a]/[0.04]'
+                                                                                    ? 'border-foreground/30 bg-foreground/[0.04]'
+                                                                                    : 'border-warning/30 bg-warning/[0.04]'
                                                                                 }`}>
                                                                                 <div className="flex items-center justify-between mb-1.5">
-                                                                                    <div className={`w-5 h-5 flex items-center justify-center ${app.status === 'done' ? 'text-[#7c9a72]' : 'text-[#c48a3a]'}`}>
+                                                                                    <div className={`w-5 h-5 flex items-center justify-center ${app.status === 'done' ? 'text-foreground' : 'text-warning'}`}>
                                                                                         {app.status === 'done' ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
                                                                                     </div>
-                                                                                    <span className={`font-mono text-[8px] uppercase tracking-[0.15em] px-1.5 py-0.5 border ${app.status === 'done' ? 'border-[#7c9a72]/30 text-[#6b8a62]' : 'border-[#c48a3a]/30 text-[#c48a3a]'
+                                                                                    <span className={`font-mono text-[8px] uppercase tracking-[0.15em] px-1.5 py-0.5 border ${app.status === 'done' ? 'border-foreground/30 text-foreground/80' : 'border-warning/30 text-warning'
                                                                                         }`}>
                                                                                         {app.status === 'done' ? 'Feita' : 'Atendendo'}
                                                                                     </span>
@@ -417,7 +431,7 @@ export default function AgendaPage() {
                                                                                 <p className="font-serif font-semibold text-foreground text-xs truncate">{app.patientName}</p>
                                                                                 <p className="font-mono text-[9px] text-muted-foreground mt-0.5 truncate">{app.productName}</p>
                                                                                 {app.consultorio && (
-                                                                                    <p className="font-mono text-[9px] text-[#7c9a72] mt-1.5 flex items-center gap-1">
+                                                                                    <p className="font-mono text-[9px] text-foreground mt-1.5 flex items-center gap-1">
                                                                                         <MapPin className="w-2.5 h-2.5" /> {app.consultorio}
                                                                                     </p>
                                                                                 )}
