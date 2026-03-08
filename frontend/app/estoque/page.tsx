@@ -160,11 +160,6 @@ export default function EstoquePage() {
 
   // Computed stats
   const criticalItems = items.filter(item => (item.daysUntilStockout ?? 999) <= 7 && item.currentQuantity > 0);
-  const totalStockPercent = useMemo(() => {
-    const totalCurrent = items.reduce((sum, item) => sum + item.currentQuantity, 0);
-    const totalMax = items.reduce((sum, item) => sum + (item.maxStock || item.currentQuantity * 2), 0);
-    return totalMax > 0 ? Math.round((totalCurrent / totalMax) * 100) : 0;
-  }, [items]);
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
@@ -188,9 +183,6 @@ export default function EstoquePage() {
     if (pct <= 35) return 'bg-warning';
     return 'bg-foreground/40';
   };
-
-  const gaugeOffset = 339.292 - (339.292 * totalStockPercent) / 100;
-  const gaugeColor = totalStockPercent > 60 ? 'stroke-foreground' : totalStockPercent > 30 ? 'stroke-warning' : 'stroke-destructive';
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -238,38 +230,11 @@ export default function EstoquePage() {
           </div>
         </motion.div>
 
-        {/* Top Row: Gauge + Stats + Critical Alert */}
+        {/* Top Row: Stats + Critical Alert */}
         <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-12 gap-4">
 
-          {/* Stock Gauge */}
-          <div className="lg:col-span-3 border border-border glass-card-solid p-6 flex flex-col items-center justify-center">
-            <div className="relative w-32 h-32 mb-3">
-              <svg viewBox="0 0 120 120" className="w-full h-full -rotate-90">
-                <circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" className="text-border" strokeWidth="8" />
-                <circle
-                  cx="60" cy="60" r="54"
-                  fill="none"
-                  className={gaugeColor}
-                  strokeWidth="8"
-                  strokeLinecap="round"
-                  strokeDasharray="339.292"
-                  strokeDashoffset={gaugeOffset}
-                  style={{ transition: 'stroke-dashoffset 1s ease-in-out' }}
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="font-mono text-2xl font-bold text-foreground">{totalStockPercent}%</span>
-                <span className="font-mono text-[9px] text-muted-foreground uppercase tracking-widest">Estoque</span>
-              </div>
-            </div>
-            <p className="font-mono text-xs text-muted-foreground text-center">
-              {items.length} produtos cadastrados
-            </p>
-          </div>
-
           {/* Summary Stats */}
-          <div className="lg:col-span-5 grid grid-cols-2 gap-4">
-            <StatCard icon={<Package className="w-4 h-4" />} label="Valor Total" value={`R$ ${(summary.totalValue / 1000).toFixed(1)}k`} subtext={`${summary.totalItems} itens`} />
+          <div className="lg:col-span-5 grid grid-cols-3 gap-4">
             <StatCard icon={<AlertTriangle className="w-4 h-4" />} label="Estoque Baixo" value={summary.lowStockCount} subtext={`${summary.outOfStockCount} esgotado(s)`} />
             <StatCard icon={<ShieldAlert className="w-4 h-4" />} label="Vencendo (30d)" value={summary.expiringCount} subtext={`${summary.expiredCount} vencido(s)`} />
             <StatCard icon={<Bell className="w-4 h-4" />} label="Alertas Ativos" value={summary.criticalAlerts + summary.warningAlerts} subtext={`${summary.criticalAlerts} críticos`} />
