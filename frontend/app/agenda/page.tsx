@@ -540,7 +540,7 @@ export default function AgendaPage() {
                                                         {selectedAppts.sort((a: Appointment, b: Appointment) => a.startTime.localeCompare(b.startTime)).map((apt: Appointment) => (
                                                             <div
                                                                 key={apt.id}
-                                                                className="flex items-center justify-between p-3 border border-border hover:border-foreground/30 transition-colors group"
+                                                                className="flex items-center justify-between p-3 border border-border hover:border-foreground/30 hover:shadow-md hover:scale-[1.02] hover:-translate-y-0.5 transition-all duration-200 ease-out group cursor-default"
                                                             >
                                                                 <div className="flex items-center gap-3">
                                                                     <div className="font-mono text-sm font-medium text-foreground min-w-[50px]">
@@ -592,7 +592,7 @@ export default function AgendaPage() {
                                                                 <div className="grid grid-cols-2 gap-2">
                                                                     {selectedProcs.filter(p => p.status === 'in_progress' || p.status === 'done').map(app => (
                                                                         <div key={app.id} className="group relative">
-                                                                            <div className={`p-3 border transition-all cursor-default ${app.status === 'done'
+                                                                            <div className={`p-3 border transition-all duration-200 ease-out cursor-default hover:shadow-md hover:scale-[1.03] hover:-translate-y-0.5 ${app.status === 'done'
                                                                                     ? 'border-foreground/30 bg-foreground/[0.04]'
                                                                                     : 'border-warning/30 bg-warning/[0.04]'
                                                                                 }`}>
@@ -640,7 +640,7 @@ export default function AgendaPage() {
                                                                 <div className="grid grid-cols-2 gap-2">
                                                                     {selectedProcs.filter(p => p.status === 'scheduled').map(app => (
                                                                         <div key={app.id} className="group relative">
-                                                                            <div className="p-3 border border-border hover:border-foreground/30 transition-all cursor-default">
+                                                                            <div className="p-3 border border-border hover:border-foreground/30 hover:shadow-md hover:scale-[1.03] hover:-translate-y-0.5 transition-all duration-200 ease-out cursor-default">
                                                                                 <div className="flex items-center justify-between mb-1.5">
                                                                                     <Syringe className="w-3.5 h-3.5 text-muted-foreground/50" />
                                                                                     <span className="font-mono text-[8px] uppercase tracking-[0.15em] px-1.5 py-0.5 border border-border text-muted-foreground">Agendada</span>
