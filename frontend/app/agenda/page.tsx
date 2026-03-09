@@ -29,6 +29,8 @@ interface Procedure {
     consultorio?: string;
     arrivalTime?: string;
     lotNumber?: string;
+    themeColor?: string;
+    themeText?: string;
 }
 
 // ─── MOCK DATA ───
@@ -159,60 +161,60 @@ const mockAppointments: Appointment[] = [
 
 const mockProcedures: Procedure[] = [
     // ── Today ──
-    { id: 'pt_1', patientName: 'Fernanda Lopes', productName: 'Gestrinona 20mg', dose: '20mg', route: 'Implante SC', status: 'done', date: d(today.getDate()), nurseAssigned: 'Enfermeira Ana', consultorio: 'Sala 1', arrivalTime: '08:30', lotNumber: 'LOT-2025-0847' },
-    { id: 'pt_2', patientName: 'Juliana Rocha', productName: 'Testosterona 50mg', dose: '50mg', route: 'Implante SC', status: 'in_progress', date: d(today.getDate()), nurseAssigned: 'Enfermeira Ana', consultorio: 'Consultório Dr. Paulo', arrivalTime: '09:15', lotNumber: 'LOT-2025-1293' },
-    { id: 'pt_3', patientName: 'João da Silveira', productName: 'Testosterona 75mg + Oxandrolona 10mg', dose: '85mg total', route: 'Implante SC', status: 'in_progress', date: d(today.getDate()), nurseAssigned: 'Enfermeira Carla', consultorio: 'Sala 2', arrivalTime: '09:40', lotNumber: 'LOT-2025-0991' },
-    { id: 'pt_4', patientName: 'Patrícia Almeida', productName: 'Oxandrolona 15mg', dose: '15mg', route: 'Implante SC', status: 'scheduled', date: d(today.getDate()) },
-    { id: 'pt_5', patientName: 'Roberto Lima', productName: 'Testosterona 75mg', dose: '75mg', route: 'Implante Glúteo', status: 'scheduled', date: d(today.getDate()) },
-    { id: 'pt_6', patientName: 'Cláudia Dias', productName: 'Gestrinona 10mg + Testosterona 25mg', dose: '35mg total', route: 'Implante SC', status: 'scheduled', date: d(today.getDate()) },
-    { id: 'pt_7', patientName: 'Marcos Pereira', productName: 'Testosterona 100mg', dose: '100mg', route: 'Implante Glúteo', status: 'scheduled', date: d(today.getDate()) },
+    { id: 'pt_1', patientName: 'Fernanda Lopes', productName: 'Gestrinona 20mg', dose: '20mg', route: 'Implante SC', status: 'done', date: d(today.getDate()), nurseAssigned: 'Enfermeira Ana', consultorio: 'Sala 1', arrivalTime: '08:30', lotNumber: 'LOT-2025-0847', themeColor: '#0f766e', themeText: '#f0fdfa' },
+    { id: 'pt_2', patientName: 'Juliana Rocha', productName: 'Testosterona 50mg', dose: '50mg', route: 'Implante SC', status: 'in_progress', date: d(today.getDate()), nurseAssigned: 'Enfermeira Ana', consultorio: 'Consultório Dr. Paulo', arrivalTime: '09:15', lotNumber: 'LOT-2025-1293', themeColor: '#be185d', themeText: '#fdf2f8' },
+    { id: 'pt_3', patientName: 'João da Silveira', productName: 'Testosterona 75mg + Oxandrolona 10mg', dose: '85mg total', route: 'Implante SC', status: 'in_progress', date: d(today.getDate()), nurseAssigned: 'Enfermeira Carla', consultorio: 'Sala 2', arrivalTime: '09:40', lotNumber: 'LOT-2025-0991', themeColor: '#1d4ed8', themeText: '#eff6ff' },
+    { id: 'pt_4', patientName: 'Patrícia Almeida', productName: 'Oxandrolona 15mg', dose: '15mg', route: 'Implante SC', status: 'scheduled', date: d(today.getDate()), themeColor: '#b45309', themeText: '#fff7ed' },
+    { id: 'pt_5', patientName: 'Roberto Lima', productName: 'Testosterona 75mg', dose: '75mg', route: 'Implante Glúteo', status: 'scheduled', date: d(today.getDate()), themeColor: '#be185d', themeText: '#fdf2f8' },
+    { id: 'pt_6', patientName: 'Cláudia Dias', productName: 'Gestrinona 10mg + Testosterona 25mg', dose: '35mg total', route: 'Implante SC', status: 'scheduled', date: d(today.getDate()), themeColor: '#0f766e', themeText: '#f0fdfa' },
+    { id: 'pt_7', patientName: 'Marcos Pereira', productName: 'Testosterona 100mg', dose: '100mg', route: 'Implante Glúteo', status: 'scheduled', date: d(today.getDate()), themeColor: '#be185d', themeText: '#fdf2f8' },
     // ── Day 3 ──
-    { id: 'p3_1', patientName: 'Luciana Ferreira', productName: 'Testosterona 50mg', dose: '50mg', route: 'Implante SC', status: 'done', date: d(3) },
+    { id: 'p3_1', patientName: 'Luciana Ferreira', productName: 'Testosterona 50mg', dose: '50mg', route: 'Implante SC', status: 'done', date: d(3), themeColor: '#be185d', themeText: '#fdf2f8' },
     // ── Day 5 ──
-    { id: 'p5_1', patientName: 'Paulo Henrique', productName: 'Gestrinona 30mg', dose: '30mg', route: 'Implante SC', status: 'done', date: d(5) },
-    { id: 'p5_2', patientName: 'Amanda Rodrigues', productName: 'Tirzepatida 2.5mg', dose: '2.5mg', route: 'Subcutânea', status: 'done', date: d(5) },
+    { id: 'p5_1', patientName: 'Paulo Henrique', productName: 'Gestrinona 30mg', dose: '30mg', route: 'Implante SC', status: 'done', date: d(5), themeColor: '#0f766e', themeText: '#f0fdfa' },
+    { id: 'p5_2', patientName: 'Amanda Rodrigues', productName: 'Tirzepatida 2.5mg', dose: '2.5mg', route: 'Subcutânea', status: 'done', date: d(5), themeColor: '#7c3aed', themeText: '#f5f3ff' },
     // ── Day 7 ──
-    { id: 'p7_1', patientName: 'João Santos', productName: 'Testosterona 75mg', dose: '75mg', route: 'Implante Glúteo', status: 'done', date: d(7) },
-    { id: 'p7_2', patientName: 'Maria Silva', productName: 'Soroterapia Vitamina C', dose: '500ml', route: 'Intravenosa', status: 'done', date: d(7) },
+    { id: 'p7_1', patientName: 'João Santos', productName: 'Testosterona 75mg', dose: '75mg', route: 'Implante Glúteo', status: 'done', date: d(7), themeColor: '#be185d', themeText: '#fdf2f8' },
+    { id: 'p7_2', patientName: 'Maria Silva', productName: 'Soroterapia Vitamina C', dose: '500ml', route: 'Intravenosa', status: 'done', date: d(7), themeColor: '#b45309', themeText: '#fff7ed' },
     // ── Day 10 ──
-    { id: 'p10_1', patientName: 'Sandra Alves', productName: 'Oxandrolona 10mg', dose: '10mg', route: 'Implante SC', status: 'scheduled', date: d(10) },
-    { id: 'p10_2', patientName: 'Teresa Monteiro', productName: 'Tirzepatida 5mg', dose: '5mg', route: 'Subcutânea', status: 'scheduled', date: d(10) },
-    { id: 'p10_3', patientName: 'Gabriel Nunes', productName: 'Testosterona 100mg', dose: '100mg', route: 'Implante Glúteo', status: 'scheduled', date: d(10) },
+    { id: 'p10_1', patientName: 'Sandra Alves', productName: 'Oxandrolona 10mg', dose: '10mg', route: 'Implante SC', status: 'scheduled', date: d(10), themeColor: '#b45309', themeText: '#fff7ed' },
+    { id: 'p10_2', patientName: 'Teresa Monteiro', productName: 'Tirzepatida 5mg', dose: '5mg', route: 'Subcutânea', status: 'scheduled', date: d(10), themeColor: '#7c3aed', themeText: '#f5f3ff' },
+    { id: 'p10_3', patientName: 'Gabriel Nunes', productName: 'Testosterona 100mg', dose: '100mg', route: 'Implante Glúteo', status: 'scheduled', date: d(10), themeColor: '#be185d', themeText: '#fdf2f8' },
     // ── Day 12 ──
-    { id: 'p12_1', patientName: 'Roberto Lima', productName: 'Gestrinona 20mg', dose: '20mg', route: 'Implante SC', status: 'scheduled', date: d(12) },
-    { id: 'p12_2', patientName: 'Fernanda Lopes', productName: 'Soroterapia Complexo B + Zinco', dose: '250ml', route: 'Intravenosa', status: 'scheduled', date: d(12) },
+    { id: 'p12_1', patientName: 'Roberto Lima', productName: 'Gestrinona 20mg', dose: '20mg', route: 'Implante SC', status: 'scheduled', date: d(12), themeColor: '#0f766e', themeText: '#f0fdfa' },
+    { id: 'p12_2', patientName: 'Fernanda Lopes', productName: 'Soroterapia Complexo B + Zinco', dose: '250ml', route: 'Intravenosa', status: 'scheduled', date: d(12), themeColor: '#b45309', themeText: '#fff7ed' },
     // ── Day 14 ──
-    { id: 'p14_1', patientName: 'Teresa M.', productName: 'Testosterona 50mg + DHEA', dose: '60mg', route: 'Implante SC', status: 'scheduled', date: d(14) },
-    { id: 'p14_2', patientName: 'Isabela Cruz', productName: 'Tirzepatida 5mg', dose: '5mg', route: 'Subcutânea', status: 'scheduled', date: d(14) },
-    { id: 'p14_3', patientName: 'Gabriel Nunes', productName: 'Gestrinona 40mg', dose: '40mg', route: 'Implante Glúteo', status: 'scheduled', date: d(14) },
-    { id: 'p14_4', patientName: 'Sandra Alves', productName: 'Soroterapia Vitamina C', dose: '500ml', route: 'Intravenosa', status: 'scheduled', date: d(14) },
+    { id: 'p14_1', patientName: 'Teresa M.', productName: 'Testosterona 50mg + DHEA', dose: '60mg', route: 'Implante SC', status: 'scheduled', date: d(14), themeColor: '#be185d', themeText: '#fdf2f8' },
+    { id: 'p14_2', patientName: 'Isabela Cruz', productName: 'Tirzepatida 5mg', dose: '5mg', route: 'Subcutânea', status: 'scheduled', date: d(14), themeColor: '#7c3aed', themeText: '#f5f3ff' },
+    { id: 'p14_3', patientName: 'Gabriel Nunes', productName: 'Gestrinona 40mg', dose: '40mg', route: 'Implante Glúteo', status: 'scheduled', date: d(14), themeColor: '#0f766e', themeText: '#f0fdfa' },
+    { id: 'p14_4', patientName: 'Sandra Alves', productName: 'Soroterapia Vitamina C', dose: '500ml', route: 'Intravenosa', status: 'scheduled', date: d(14), themeColor: '#b45309', themeText: '#fff7ed' },
     // ── Day 17 ──
-    { id: 'p17_1', patientName: 'Amanda Rodrigues', productName: 'Tirzepatida 2.5mg', dose: '2.5mg', route: 'Subcutânea', status: 'scheduled', date: d(17) },
-    { id: 'p17_2', patientName: 'Roberto Lima', productName: 'Testosterona 75mg', dose: '75mg', route: 'Implante Glúteo', status: 'scheduled', date: d(17) },
+    { id: 'p17_1', patientName: 'Amanda Rodrigues', productName: 'Tirzepatida 2.5mg', dose: '2.5mg', route: 'Subcutânea', status: 'scheduled', date: d(17), themeColor: '#7c3aed', themeText: '#f5f3ff' },
+    { id: 'p17_2', patientName: 'Roberto Lima', productName: 'Testosterona 75mg', dose: '75mg', route: 'Implante Glúteo', status: 'scheduled', date: d(17), themeColor: '#be185d', themeText: '#fdf2f8' },
     // ── Day 18 - Rich Tirzepatida Day ──
-    { id: 'p18_1', patientName: 'Ricardo Teixeira da Silva', productName: 'Tirzepatida 5mg (Mounjaro)', dose: '5mg', route: 'Subcutânea', status: 'done', date: d(18), nurseAssigned: 'Enf. Júlia', consultorio: 'Sala 1', arrivalTime: '08:15', lotNumber: 'MJ2024A002' },
-    { id: 'p18_2', patientName: 'Carlos Eduardo Nogueira', productName: 'Testosterona 100mg + Anastrozol', dose: '100mg', route: 'Implante SC', status: 'in_progress', date: d(18), nurseAssigned: 'Enf. Clara', consultorio: 'Sala Botox', arrivalTime: '10:20', lotNumber: 'TST-84992-B' },
-    { id: 'p18_3', patientName: 'Amanda Rodrigues', productName: 'Tirzepatida 2.5mg', dose: '2.5mg', route: 'Subcutânea', status: 'scheduled', date: d(18) },
-    { id: 'p18_4', patientName: 'Juliana Paes', productName: 'Gestrinona 40mg', dose: '40mg', route: 'Implante Glúteo', status: 'scheduled', date: d(18) },
-    { id: 'p18_5', patientName: 'Henrique Faria', productName: 'Soroterapia Vitamina C + Zinco', dose: '250ml', route: 'Intravenosa', status: 'scheduled', date: d(18) },
+    { id: 'p18_1', patientName: 'Ricardo Teixeira da Silva', productName: 'Tirzepatida 5mg (Mounjaro)', dose: '5mg', route: 'Subcutânea', status: 'done', date: d(18), nurseAssigned: 'Enf. Júlia', consultorio: 'Sala 1', arrivalTime: '08:15', lotNumber: 'MJ2024A002', themeColor: '#7c3aed', themeText: '#f5f3ff' },
+    { id: 'p18_2', patientName: 'Carlos Eduardo Nogueira', productName: 'Testosterona 100mg + Anastrozol', dose: '100mg', route: 'Implante SC', status: 'in_progress', date: d(18), nurseAssigned: 'Enf. Clara', consultorio: 'Sala Botox', arrivalTime: '10:20', lotNumber: 'TST-84992-B', themeColor: '#be185d', themeText: '#fdf2f8' },
+    { id: 'p18_3', patientName: 'Amanda Rodrigues', productName: 'Tirzepatida 2.5mg', dose: '2.5mg', route: 'Subcutânea', status: 'scheduled', date: d(18), themeColor: '#7c3aed', themeText: '#f5f3ff' },
+    { id: 'p18_4', patientName: 'Juliana Paes', productName: 'Gestrinona 40mg', dose: '40mg', route: 'Implante Glúteo', status: 'scheduled', date: d(18), themeColor: '#0f766e', themeText: '#f0fdfa' },
+    { id: 'p18_5', patientName: 'Henrique Faria', productName: 'Soroterapia Vitamina C + Zinco', dose: '250ml', route: 'Intravenosa', status: 'scheduled', date: d(18), themeColor: '#b45309', themeText: '#fff7ed' },
     // ── Day 20 ──
-    { id: 'p20_1', patientName: 'Teresa Monteiro', productName: 'Testosterona 50mg', dose: '50mg', route: 'Implante SC', status: 'scheduled', date: d(20) },
-    { id: 'p20_2', patientName: 'Sandra Alves', productName: 'Tirzepatida 7.5mg', dose: '7.5mg', route: 'Subcutânea', status: 'scheduled', date: d(20) },
-    { id: 'p20_3', patientName: 'Marcos Pereira', productName: 'Testosterona 100mg', dose: '100mg', route: 'Implante Glúteo', status: 'scheduled', date: d(20) },
+    { id: 'p20_1', patientName: 'Teresa Monteiro', productName: 'Testosterona 50mg', dose: '50mg', route: 'Implante SC', status: 'scheduled', date: d(20), themeColor: '#be185d', themeText: '#fdf2f8' },
+    { id: 'p20_2', patientName: 'Sandra Alves', productName: 'Tirzepatida 7.5mg', dose: '7.5mg', route: 'Subcutânea', status: 'scheduled', date: d(20), themeColor: '#7c3aed', themeText: '#f5f3ff' },
+    { id: 'p20_3', patientName: 'Marcos Pereira', productName: 'Testosterona 100mg', dose: '100mg', route: 'Implante Glúteo', status: 'scheduled', date: d(20), themeColor: '#be185d', themeText: '#fdf2f8' },
     // ── Day 24 ──
-    { id: 'p24_1', patientName: 'Ana Oliveira', productName: 'Gestrinona 30mg + DHEA', dose: '50mg', route: 'Implante SC', status: 'scheduled', date: d(24) },
-    { id: 'p24_2', patientName: 'Cláudia Dias', productName: 'Tirzepatida 5mg', dose: '5mg', route: 'Subcutânea', status: 'scheduled', date: d(24) },
-    { id: 'p24_3', patientName: 'Roberto Lima', productName: 'Soroterapia Vitamina C + B12', dose: '500ml', route: 'Intravenosa', status: 'scheduled', date: d(24) },
-    { id: 'p24_4', patientName: 'Juliana Rocha', productName: 'Testosterona 75mg', dose: '75mg', route: 'Implante Glúteo', status: 'scheduled', date: d(24) },
+    { id: 'p24_1', patientName: 'Ana Oliveira', productName: 'Gestrinona 30mg + DHEA', dose: '50mg', route: 'Implante SC', status: 'scheduled', date: d(24), themeColor: '#0f766e', themeText: '#f0fdfa' },
+    { id: 'p24_2', patientName: 'Cláudia Dias', productName: 'Tirzepatida 5mg', dose: '5mg', route: 'Subcutânea', status: 'scheduled', date: d(24), themeColor: '#7c3aed', themeText: '#f5f3ff' },
+    { id: 'p24_3', patientName: 'Roberto Lima', productName: 'Soroterapia Vitamina C + B12', dose: '500ml', route: 'Intravenosa', status: 'scheduled', date: d(24), themeColor: '#b45309', themeText: '#fff7ed' },
+    { id: 'p24_4', patientName: 'Juliana Rocha', productName: 'Testosterona 75mg', dose: '75mg', route: 'Implante Glúteo', status: 'scheduled', date: d(24), themeColor: '#be185d', themeText: '#fdf2f8' },
     // ── Day 25 ──
-    { id: 'p25_1', patientName: 'Isabela Cruz', productName: 'Testosterona 50mg', dose: '50mg', route: 'Implante SC', status: 'scheduled', date: d(25) },
+    { id: 'p25_1', patientName: 'Isabela Cruz', productName: 'Testosterona 50mg', dose: '50mg', route: 'Implante SC', status: 'scheduled', date: d(25), themeColor: '#be185d', themeText: '#fdf2f8' },
     // ── Day 26 ──
-    { id: 'p26_1', patientName: 'Eduardo Costa', productName: 'Tirzepatida 10mg', dose: '10mg', route: 'Subcutânea', status: 'scheduled', date: d(26) },
-    { id: 'p26_2', patientName: 'Sandra Alves', productName: 'Gestrinona 20mg', dose: '20mg', route: 'Implante SC', status: 'scheduled', date: d(26) },
+    { id: 'p26_1', patientName: 'Eduardo Costa', productName: 'Tirzepatida 10mg', dose: '10mg', route: 'Subcutânea', status: 'scheduled', date: d(26), themeColor: '#7c3aed', themeText: '#f5f3ff' },
+    { id: 'p26_2', patientName: 'Sandra Alves', productName: 'Gestrinona 20mg', dose: '20mg', route: 'Implante SC', status: 'scheduled', date: d(26), themeColor: '#0f766e', themeText: '#f0fdfa' },
     // ── Day 27 ──
-    { id: 'p27_1', patientName: 'Luciana Ferreira', productName: 'Testosterona 50mg + Pregnenolona', dose: '70mg', route: 'Implante SC', status: 'scheduled', date: d(27) },
-    { id: 'p27_2', patientName: 'Beatriz Souza', productName: 'Soroterapia Vitamina C', dose: '500ml', route: 'Intravenosa', status: 'scheduled', date: d(27) },
-    { id: 'p27_3', patientName: 'Ricardo Mendes', productName: 'Tirzepatida 7.5mg', dose: '7.5mg', route: 'Subcutânea', status: 'scheduled', date: d(27) },
+    { id: 'p27_1', patientName: 'Luciana Ferreira', productName: 'Testosterona 50mg + Pregnenolona', dose: '70mg', route: 'Implante SC', status: 'scheduled', date: d(27), themeColor: '#be185d', themeText: '#fdf2f8' },
+    { id: 'p27_2', patientName: 'Beatriz Souza', productName: 'Soroterapia Vitamina C', dose: '500ml', route: 'Intravenosa', status: 'scheduled', date: d(27), themeColor: '#b45309', themeText: '#fff7ed' },
+    { id: 'p27_3', patientName: 'Ricardo Mendes', productName: 'Tirzepatida 7.5mg', dose: '7.5mg', route: 'Subcutânea', status: 'scheduled', date: d(27), themeColor: '#7c3aed', themeText: '#f5f3ff' },
 ];
 
 const WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -592,17 +594,23 @@ export default function AgendaPage() {
                                                                 <div className="grid grid-cols-2 gap-2">
                                                                     {selectedProcs.filter(p => p.status === 'in_progress' || p.status === 'done').map(app => (
                                                                         <div key={app.id} className="group relative overflow-hidden rounded-sm">
-                                                                            <div className={`p-3 border transition-all duration-150 cursor-default h-[100px] flex flex-col justify-between ${app.status === 'done'
-                                                                                    ? 'border-foreground/30 bg-foreground/[0.04]'
-                                                                                    : 'border-warning/30 bg-warning/[0.04]'
-                                                                                }`}>
+                                                                            <div className={`p-3 border transition-all duration-150 cursor-default h-[100px] flex flex-col justify-between`}
+                                                                              style={{
+                                                                                borderColor: app.themeColor ? `${app.themeColor}50` : (app.status === 'done' ? '#1f1f1f40' : '#c48a3a40'),
+                                                                                backgroundColor: app.themeColor ? `${app.themeColor}10` : (app.status === 'done' ? '#1f1f1f10' : '#c48a3a10')
+                                                                              }}
+                                                                            >
                                                                                 <div>
                                                                                     <div className="flex items-center justify-between mb-1.5">
-                                                                                        <div className={`w-5 h-5 flex items-center justify-center ${app.status === 'done' ? 'text-foreground' : 'text-warning'}`}>
+                                                                                        <div className="w-5 h-5 flex items-center justify-center" style={{ color: app.themeColor || (app.status === 'done' ? '#1f1f1f' : '#c48a3a') }}>
                                                                                             {app.status === 'done' ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
                                                                                         </div>
-                                                                                        <span className={`font-mono text-[8px] uppercase tracking-[0.15em] px-1.5 py-0.5 border ${app.status === 'done' ? 'border-foreground/30 text-foreground/80' : 'border-warning/30 text-warning'
-                                                                                            }`}>
+                                                                                        <span className="font-mono text-[8px] uppercase tracking-[0.15em] px-1.5 py-0.5 border"
+                                                                                          style={{
+                                                                                            borderColor: app.themeColor ? `${app.themeColor}50` : (app.status === 'done' ? '#1f1f1f50' : '#c48a3a50'),
+                                                                                            color: app.themeColor || (app.status === 'done' ? '#333333' : '#c48a3a')
+                                                                                          }}
+                                                                                        >
                                                                                             {app.status === 'done' ? 'Feita' : 'Atendendo'}
                                                                                         </span>
                                                                                     </div>
@@ -610,13 +618,15 @@ export default function AgendaPage() {
                                                                                     <p className="font-mono text-[9px] text-muted-foreground mt-0.5 truncate">{app.productName}</p>
                                                                                 </div>
                                                                                 {app.consultorio && (
-                                                                                    <p className="font-mono text-[9px] text-foreground flex items-center gap-1">
+                                                                                    <p className="font-mono text-[9px] flex items-center gap-1" style={{ color: app.themeColor || '#1f1f1f' }}>
                                                                                         <MapPin className="w-2.5 h-2.5" /> {app.consultorio}
                                                                                     </p>
                                                                                 )}
                                                                             </div>
                                                                             {/* Dashboard-style overlay */}
-                                                                            <div className="absolute inset-0 p-3 opacity-0 flex flex-col justify-center translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none rounded-sm bg-foreground text-background">
+                                                                            <div className="absolute inset-0 p-3 opacity-0 flex flex-col justify-center translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none rounded-sm"
+                                                                              style={{ backgroundColor: app.themeColor || '#1f1f1f', color: app.themeText || '#f7f5f0' }}
+                                                                            >
                                                                                 <p className="font-serif font-bold text-xs mb-1.5 text-center drop-shadow-sm">{app.patientName}</p>
                                                                                 <div className="space-y-1 font-mono text-[9px] drop-shadow-sm">
                                                                                     <div className="flex items-center gap-1.5"><Pill className="w-2.5 h-2.5 opacity-80" /> {app.productName}</div>
@@ -642,18 +652,29 @@ export default function AgendaPage() {
                                                                 <div className="grid grid-cols-2 gap-2">
                                                                     {selectedProcs.filter(p => p.status === 'scheduled').map(app => (
                                                                         <div key={app.id} className="group relative overflow-hidden rounded-sm">
-                                                                            <div className="p-3 border border-border transition-all duration-150 cursor-default h-[80px] flex flex-col justify-between">
+                                                                            <div className="p-3 border transition-all duration-150 cursor-default h-[80px] flex flex-col justify-between"
+                                                                              style={{
+                                                                                borderColor: app.themeColor ? `${app.themeColor}30` : 'var(--border)',
+                                                                                backgroundColor: app.themeColor ? `${app.themeColor}05` : 'transparent'
+                                                                              }}
+                                                                            >
                                                                                 <div>
                                                                                     <div className="flex items-center justify-between mb-1.5">
-                                                                                        <Syringe className="w-3.5 h-3.5 text-muted-foreground/50" />
-                                                                                        <span className="font-mono text-[8px] uppercase tracking-[0.15em] px-1.5 py-0.5 border border-border text-muted-foreground">Agendada</span>
+                                                                                        <Syringe className="w-3.5 h-3.5" style={{ color: app.themeColor || 'currentColor', opacity: app.themeColor ? 0.8 : 0.5 }} />
+                                                                                        <span className="font-mono text-[8px] uppercase tracking-[0.15em] px-1.5 py-0.5 border text-muted-foreground"
+                                                                                          style={{ borderColor: app.themeColor ? `${app.themeColor}30` : 'var(--border)' }}
+                                                                                        >
+                                                                                            Agendada
+                                                                                        </span>
                                                                                     </div>
                                                                                     <p className="font-serif font-semibold text-foreground text-xs truncate">{app.patientName}</p>
                                                                                     <p className="font-mono text-[9px] text-muted-foreground mt-0.5 truncate">{app.productName}</p>
                                                                                 </div>
                                                                             </div>
                                                                             {/* Dashboard-style overlay */}
-                                                                            <div className="absolute inset-0 p-3 opacity-0 flex flex-col justify-center translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none rounded-sm bg-foreground text-background">
+                                                                            <div className="absolute inset-0 p-3 opacity-0 flex flex-col justify-center translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none rounded-sm"
+                                                                              style={{ backgroundColor: app.themeColor || 'var(--foreground)', color: app.themeText || 'var(--background)' }}
+                                                                            >
                                                                                 <p className="font-serif font-bold text-xs mb-1.5 text-center drop-shadow-sm">{app.patientName}</p>
                                                                                 <div className="space-y-1 font-mono text-[9px] drop-shadow-sm">
                                                                                     <div className="flex items-center gap-1.5"><Pill className="w-2.5 h-2.5 opacity-80" /> {app.productName}</div>
