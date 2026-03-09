@@ -591,36 +591,38 @@ export default function AgendaPage() {
                                                                 </p>
                                                                 <div className="grid grid-cols-2 gap-2">
                                                                     {selectedProcs.filter(p => p.status === 'in_progress' || p.status === 'done').map(app => (
-                                                                        <div key={app.id} className="group relative">
-                                                                            <div className={`p-3 border transition-all duration-200 ease-out cursor-default hover:shadow-md hover:scale-[1.03] hover:-translate-y-0.5 ${app.status === 'done'
+                                                                        <div key={app.id} className="group relative overflow-hidden rounded-sm">
+                                                                            <div className={`p-3 border transition-all duration-150 cursor-default h-[100px] flex flex-col justify-between ${app.status === 'done'
                                                                                     ? 'border-foreground/30 bg-foreground/[0.04]'
                                                                                     : 'border-warning/30 bg-warning/[0.04]'
                                                                                 }`}>
-                                                                                <div className="flex items-center justify-between mb-1.5">
-                                                                                    <div className={`w-5 h-5 flex items-center justify-center ${app.status === 'done' ? 'text-foreground' : 'text-warning'}`}>
-                                                                                        {app.status === 'done' ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
+                                                                                <div>
+                                                                                    <div className="flex items-center justify-between mb-1.5">
+                                                                                        <div className={`w-5 h-5 flex items-center justify-center ${app.status === 'done' ? 'text-foreground' : 'text-warning'}`}>
+                                                                                            {app.status === 'done' ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
+                                                                                        </div>
+                                                                                        <span className={`font-mono text-[8px] uppercase tracking-[0.15em] px-1.5 py-0.5 border ${app.status === 'done' ? 'border-foreground/30 text-foreground/80' : 'border-warning/30 text-warning'
+                                                                                            }`}>
+                                                                                            {app.status === 'done' ? 'Feita' : 'Atendendo'}
+                                                                                        </span>
                                                                                     </div>
-                                                                                    <span className={`font-mono text-[8px] uppercase tracking-[0.15em] px-1.5 py-0.5 border ${app.status === 'done' ? 'border-foreground/30 text-foreground/80' : 'border-warning/30 text-warning'
-                                                                                        }`}>
-                                                                                        {app.status === 'done' ? 'Feita' : 'Atendendo'}
-                                                                                    </span>
+                                                                                    <p className="font-serif font-semibold text-foreground text-xs truncate">{app.patientName}</p>
+                                                                                    <p className="font-mono text-[9px] text-muted-foreground mt-0.5 truncate">{app.productName}</p>
                                                                                 </div>
-                                                                                <p className="font-serif font-semibold text-foreground text-xs truncate">{app.patientName}</p>
-                                                                                <p className="font-mono text-[9px] text-muted-foreground mt-0.5 truncate">{app.productName}</p>
                                                                                 {app.consultorio && (
-                                                                                    <p className="font-mono text-[9px] text-foreground mt-1.5 flex items-center gap-1">
+                                                                                    <p className="font-mono text-[9px] text-foreground flex items-center gap-1">
                                                                                         <MapPin className="w-2.5 h-2.5" /> {app.consultorio}
                                                                                     </p>
                                                                                 )}
                                                                             </div>
-                                                                            {/* Hover tooltip */}
-                                                                            <div className="absolute left-0 right-0 top-full mt-1 z-30 bg-foreground text-background p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 shadow-xl">
-                                                                                <p className="font-serif font-bold text-xs mb-1.5">{app.patientName}</p>
-                                                                                <div className="space-y-1 font-mono text-[9px]">
-                                                                                    <div className="flex items-center gap-1.5"><Pill className="w-2.5 h-2.5 opacity-60" /> {app.productName}</div>
-                                                                                    <div className="flex items-center gap-1.5"><Syringe className="w-2.5 h-2.5 opacity-60" /> {app.dose} • {app.route}</div>
-                                                                                    {app.nurseAssigned && <div className="flex items-center gap-1.5"><User className="w-2.5 h-2.5 opacity-60" /> {app.nurseAssigned}</div>}
-                                                                                    {app.arrivalTime && <div className="flex items-center gap-1.5"><Clock className="w-2.5 h-2.5 opacity-60" /> Chegou às {app.arrivalTime}</div>}
+                                                                            {/* Dashboard-style overlay */}
+                                                                            <div className="absolute inset-0 p-3 opacity-0 flex flex-col justify-center translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none rounded-sm bg-foreground text-background">
+                                                                                <p className="font-serif font-bold text-xs mb-1.5 text-center drop-shadow-sm">{app.patientName}</p>
+                                                                                <div className="space-y-1 font-mono text-[9px] drop-shadow-sm">
+                                                                                    <div className="flex items-center gap-1.5"><Pill className="w-2.5 h-2.5 opacity-80" /> {app.productName}</div>
+                                                                                    <div className="flex items-center gap-1.5"><Syringe className="w-2.5 h-2.5 opacity-80" /> {app.dose} • {app.route}</div>
+                                                                                    {app.nurseAssigned && <div className="flex items-center gap-1.5"><User className="w-2.5 h-2.5 opacity-80" /> {app.nurseAssigned}</div>}
+                                                                                    {app.arrivalTime && <div className="flex items-center gap-1.5"><Clock className="w-2.5 h-2.5 opacity-80" /> Chegou às {app.arrivalTime}</div>}
                                                                                     {app.lotNumber && <div className="opacity-50 mt-0.5">Lote: {app.lotNumber}</div>}
                                                                                 </div>
                                                                             </div>
@@ -639,21 +641,23 @@ export default function AgendaPage() {
                                                                 </p>
                                                                 <div className="grid grid-cols-2 gap-2">
                                                                     {selectedProcs.filter(p => p.status === 'scheduled').map(app => (
-                                                                        <div key={app.id} className="group relative">
-                                                                            <div className="p-3 border border-border hover:border-foreground/30 hover:shadow-md hover:scale-[1.03] hover:-translate-y-0.5 transition-all duration-200 ease-out cursor-default">
-                                                                                <div className="flex items-center justify-between mb-1.5">
-                                                                                    <Syringe className="w-3.5 h-3.5 text-muted-foreground/50" />
-                                                                                    <span className="font-mono text-[8px] uppercase tracking-[0.15em] px-1.5 py-0.5 border border-border text-muted-foreground">Agendada</span>
+                                                                        <div key={app.id} className="group relative overflow-hidden rounded-sm">
+                                                                            <div className="p-3 border border-border transition-all duration-150 cursor-default h-[80px] flex flex-col justify-between">
+                                                                                <div>
+                                                                                    <div className="flex items-center justify-between mb-1.5">
+                                                                                        <Syringe className="w-3.5 h-3.5 text-muted-foreground/50" />
+                                                                                        <span className="font-mono text-[8px] uppercase tracking-[0.15em] px-1.5 py-0.5 border border-border text-muted-foreground">Agendada</span>
+                                                                                    </div>
+                                                                                    <p className="font-serif font-semibold text-foreground text-xs truncate">{app.patientName}</p>
+                                                                                    <p className="font-mono text-[9px] text-muted-foreground mt-0.5 truncate">{app.productName}</p>
                                                                                 </div>
-                                                                                <p className="font-serif font-semibold text-foreground text-xs truncate">{app.patientName}</p>
-                                                                                <p className="font-mono text-[9px] text-muted-foreground mt-0.5 truncate">{app.productName}</p>
                                                                             </div>
-                                                                            {/* Hover tooltip */}
-                                                                            <div className="absolute left-0 right-0 top-full mt-1 z-30 bg-foreground text-background p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 shadow-xl">
-                                                                                <p className="font-serif font-bold text-xs mb-1.5">{app.patientName}</p>
-                                                                                <div className="space-y-1 font-mono text-[9px]">
-                                                                                    <div className="flex items-center gap-1.5"><Pill className="w-2.5 h-2.5 opacity-60" /> {app.productName}</div>
-                                                                                    <div className="flex items-center gap-1.5"><Syringe className="w-2.5 h-2.5 opacity-60" /> {app.dose} • {app.route}</div>
+                                                                            {/* Dashboard-style overlay */}
+                                                                            <div className="absolute inset-0 p-3 opacity-0 flex flex-col justify-center translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none rounded-sm bg-foreground text-background">
+                                                                                <p className="font-serif font-bold text-xs mb-1.5 text-center drop-shadow-sm">{app.patientName}</p>
+                                                                                <div className="space-y-1 font-mono text-[9px] drop-shadow-sm">
+                                                                                    <div className="flex items-center gap-1.5"><Pill className="w-2.5 h-2.5 opacity-80" /> {app.productName}</div>
+                                                                                    <div className="flex items-center gap-1.5"><Syringe className="w-2.5 h-2.5 opacity-80" /> {app.dose} • {app.route}</div>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
