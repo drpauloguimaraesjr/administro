@@ -326,6 +326,8 @@ export default function AgendaPage() {
     const isToday = (day: number) =>
         day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
 
+    // Find which row the selected day is in so we can insert the detail panel after that row
+    const selectedRowIndex = selectedDay !== null ? Math.floor((firstDay + selectedDay - 1) / 7) : -1;
 
     // Build rows
     const rows: (number | null)[][] = [];
@@ -375,7 +377,7 @@ export default function AgendaPage() {
             </div>
 
             {/* Calendar Grid */}
-            <div className="relative border border-border bg-card">
+            <div className="border border-border bg-card">
                 {/* Weekday headers */}
                 <div className="grid grid-cols-7 border-b border-border">
                     {WEEKDAYS.map(wd => (
@@ -385,302 +387,290 @@ export default function AgendaPage() {
                     ))}
                 </div>
 
-                {/* Day Rows */}
+                {/* Day Rows + Expandable Detail */}
                 {rows.map((row, rowIdx) => (
-                    <div key={rowIdx} className="grid grid-cols-7 border-b border-border last:border-b-0">
-                        {row.map((day, cellIdx) => {
-                            const dateKey = day ? formatDateKey(currentYear, currentMonth, day) : '';
-                            const dayAppts = dateKey ? (apptsByDate[dateKey] || []) : [];
-                            const dayProcs = dateKey ? (procsByDate[dateKey] || []) : [];
-                            const isSelected = day === selectedDay;
-                            const dayIsToday = day ? isToday(day) : false;
+                    <React.Fragment key={rowIdx}>
+                        <div className="grid grid-cols-7 border-b border-border last:border-b-0">
+                            {row.map((day, cellIdx) => {
+                                const dateKey = day ? formatDateKey(currentYear, currentMonth, day) : '';
+                                const dayAppts = dateKey ? (apptsByDate[dateKey] || []) : [];
+                                const dayProcs = dateKey ? (procsByDate[dateKey] || []) : [];
+                                const isSelected = day === selectedDay;
+                                const dayIsToday = day ? isToday(day) : false;
 
-                            return (
-                                <button
-                                    key={cellIdx}
-                                    onClick={() => day && handleDayClick(day)}
-                                    disabled={!day}
-                                    className={`relative min-h-[90px] p-2 text-left border-r border-border last:border-r-0 transition-all duration-150 ${!day ? 'bg-muted/20' :
-                                            isSelected ? 'bg-foreground/[0.06] ring-1 ring-foreground/30 z-10' :
-                                                dayIsToday ? 'bg-foreground/[0.03]' :
-                                                    'hover:bg-muted/30'
-                                        }`}
-                                >
-                                    {day && (
-                                        <>
-                                            {/* Day number */}
-                                            <span className={`font-mono text-sm font-medium ${isSelected ? 'text-foreground font-bold' :
-                                                    dayIsToday ? 'text-foreground' :
-                                                        'text-foreground'
-                                                }`}>
-                                                {day}
-                                            </span>
+                                return (
+                                    <button
+                                        key={cellIdx}
+                                        onClick={() => day && handleDayClick(day)}
+                                        disabled={!day}
+                                        className={`relative min-h-[90px] p-2 text-left border-r border-border last:border-r-0 transition-all duration-150 ${!day ? 'bg-muted/20' :
+                                                isSelected ? 'bg-foreground/[0.06] border-foreground/30' :
+                                                    dayIsToday ? 'bg-foreground/[0.03]' :
+                                                        'hover:bg-muted/30'
+                                            }`}
+                                    >
+                                        {day && (
+                                            <>
+                                                {/* Day number */}
+                                                <span className={`font-mono text-sm font-medium ${isSelected ? 'text-foreground font-bold' :
+                                                        dayIsToday ? 'text-foreground' :
+                                                            'text-foreground'
+                                                    }`}>
+                                                    {day}
+                                                </span>
 
-                                            {/* Doctor name + slot circles */}
-                                            {(dayAppts.length > 0 || dayProcs.length > 0) && (
-                                                <div className="mt-1.5 space-y-1">
-                                                    {/* Doctor label */}
-                                                    <p className="font-mono text-[7px] text-muted-foreground uppercase tracking-wider leading-none truncate">Dr. Paulo</p>
+                                                {/* Doctor name + slot circles */}
+                                                {(dayAppts.length > 0 || dayProcs.length > 0) && (
+                                                    <div className="mt-1.5 space-y-1">
+                                                        {/* Doctor label */}
+                                                        <p className="font-mono text-[7px] text-muted-foreground uppercase tracking-wider leading-none truncate">Dr. Paulo</p>
 
-                                                    {/* Consultation slots (8 total) */}
-                                                    <div className="flex gap-[3px] items-center">
-                                                        {Array.from({ length: SLOTS_PER_DAY }).map((_, slotIdx) => {
-                                                            const appt = dayAppts[slotIdx] as Appointment | undefined;
-                                                            if (appt) {
-                                                                const tagColor = APPOINTMENT_TAGS[appt.type as keyof typeof APPOINTMENT_TAGS] || APPOINTMENT_TAGS.return;
+                                                        {/* Consultation slots (8 total) */}
+                                                        <div className="flex gap-[3px] items-center">
+                                                            {Array.from({ length: SLOTS_PER_DAY }).map((_, slotIdx) => {
+                                                                const appt = dayAppts[slotIdx] as Appointment | undefined;
+                                                                if (appt) {
+                                                                    const tagColor = APPOINTMENT_TAGS[appt.type as keyof typeof APPOINTMENT_TAGS] || APPOINTMENT_TAGS.return;
+                                                                    return (
+                                                                        <div
+                                                                            key={slotIdx}
+                                                                            className="w-[6px] h-[6px] rounded-full shrink-0"
+                                                                            style={{ backgroundColor: tagColor.color }}
+                                                                            title={`${appt.startTime} - ${appt.patientName} (${tagColor.label})`}
+                                                                        />
+                                                                    );
+                                                                }
                                                                 return (
                                                                     <div
                                                                         key={slotIdx}
-                                                                        className="w-[6px] h-[6px] rounded-full shrink-0"
-                                                                        style={{ backgroundColor: tagColor.color }}
-                                                                        title={`${appt.startTime} - ${appt.patientName} (${tagColor.label})`}
-                                                                    />
-                                                                );
-                                                            }
-                                                            return (
-                                                                <div
-                                                                    key={slotIdx}
-                                                                    className="w-[6px] h-[6px] rounded-full shrink-0 border border-border/60 bg-transparent"
-                                                                    title="Horário livre"
-                                                                />
-                                                            );
-                                                        })}
-                                                    </div>
-
-                                                    {/* Procedure dots (smaller) */}
-                                                    {dayProcs.length > 0 && (
-                                                        <>
-                                                        <p className="font-mono text-[6px] text-muted-foreground/70 uppercase tracking-wider leading-none mt-0.5">Proced.</p>
-                                                        <div className="flex gap-[3px] items-center">
-                                                            {dayProcs.map((p: Procedure, pIdx: number) => {
-                                                                const pTag = PROCEDURE_TAGS[p.route as keyof typeof PROCEDURE_TAGS] || PROCEDURE_TAGS.default;
-                                                                return (
-                                                                    <div
-                                                                        key={pIdx}
-                                                                        className="w-[5px] h-[5px] rounded-sm shrink-0"
-                                                                        style={{ backgroundColor: pTag.color }}
-                                                                        title={`${p.patientName} - ${p.productName} (${pTag.label})`}
+                                                                        className="w-[6px] h-[6px] rounded-full shrink-0 border border-border/60 bg-transparent"
+                                                                        title="Horário livre"
                                                                     />
                                                                 );
                                                             })}
                                                         </div>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            )}
 
-                                            {/* Empty day - just show ghost slots so user knows capacity */}
-                                            {dayAppts.length === 0 && dayProcs.length === 0 && (
-                                                <div className="mt-1.5 space-y-1 opacity-30">
-                                                    <p className="font-mono text-[7px] text-muted-foreground uppercase tracking-wider leading-none">Dr. Paulo</p>
-                                                    <div className="flex gap-[3px] items-center">
-                                                        {Array.from({ length: SLOTS_PER_DAY }).map((_, i) => (
-                                                            <div key={i} className="w-[6px] h-[6px] rounded-full border border-border/40 bg-transparent shrink-0" />
+                                                        {/* Procedure dots (smaller) */}
+                                                        {dayProcs.length > 0 && (
+                                                            <>
+                                                            <p className="font-mono text-[6px] text-muted-foreground/70 uppercase tracking-wider leading-none mt-0.5">Proced.</p>
+                                                            <div className="flex gap-[3px] items-center">
+                                                                {dayProcs.map((p: Procedure, pIdx: number) => {
+                                                                    const pTag = PROCEDURE_TAGS[p.route as keyof typeof PROCEDURE_TAGS] || PROCEDURE_TAGS.default;
+                                                                    return (
+                                                                        <div
+                                                                            key={pIdx}
+                                                                            className="w-[5px] h-[5px] rounded-sm shrink-0"
+                                                                            style={{ backgroundColor: pTag.color }}
+                                                                            title={`${p.patientName} - ${p.productName} (${pTag.label})`}
+                                                                        />
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                )}
+
+                                                {/* Empty day - just show ghost slots so user knows capacity */}
+                                                {dayAppts.length === 0 && dayProcs.length === 0 && (
+                                                    <div className="mt-1.5 space-y-1 opacity-30">
+                                                        <p className="font-mono text-[7px] text-muted-foreground uppercase tracking-wider leading-none">Dr. Paulo</p>
+                                                        <div className="flex gap-[3px] items-center">
+                                                            {Array.from({ length: SLOTS_PER_DAY }).map((_, i) => (
+                                                                <div key={i} className="w-[6px] h-[6px] rounded-full border border-border/40 bg-transparent shrink-0" />
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </>
+                                        )}
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {/* ─── EXPANDED DAY DETAIL ─── */}
+                        <AnimatePresence>
+                            {selectedDay !== null && selectedRowIndex === rowIdx && (
+                                <motion.div
+                                    key={`detail-${selectedDay}`}
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.25, ease: 'easeInOut' }}
+                                    className="overflow-hidden border-b border-foreground/20 bg-foreground/[0.02]"
+                                >
+                                    <div className="p-6">
+                                        {/* Detail Header */}
+                                        <div className="flex items-center justify-between mb-5">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 bg-foreground text-white flex items-center justify-center font-mono text-lg font-bold">
+                                                    {selectedDay}
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-serif text-lg font-bold text-foreground">
+                                                        {new Date(currentYear, currentMonth, selectedDay!).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}
+                                                    </h3>
+                                                    <p className="font-mono text-xs text-muted-foreground">
+                                                        {selectedAppts.length} consultas • {selectedProcs.length} procedimentos
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => setSelectedDay(null)}
+                                                className="w-8 h-8 border border-border flex items-center justify-center hover:border-foreground/40 transition-colors"
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        </div>
+
+                                        {/* Split Layout */}
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                            {/* LEFT: Consultas */}
+                                            <div className="border border-border glass-card-solid p-5">
+                                                <h4 className="font-serif text-base font-bold text-foreground flex items-center gap-2 mb-4">
+                                                    <Calendar className="w-4 h-4 text-foreground" />
+                                                    Consultas
+                                                </h4>
+                                                {selectedAppts.length === 0 ? (
+                                                    <p className="font-mono text-xs text-muted-foreground text-center py-6">Nenhuma consulta neste dia</p>
+                                                ) : (
+                                                    <div className="space-y-2">
+                                                        {selectedAppts.sort((a: Appointment, b: Appointment) => a.startTime.localeCompare(b.startTime)).map((apt: Appointment) => (
+                                                            <div
+                                                                key={apt.id}
+                                                                className="flex items-center justify-between p-3 border border-border hover:border-foreground/30 transition-colors group"
+                                                            >
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="font-mono text-sm font-medium text-foreground min-w-[50px]">
+                                                                        {apt.startTime}
+                                                                    </div>
+                                                                    <div className="h-6 w-px bg-border" />
+                                                                    <div>
+                                                                        <p className="font-serif font-semibold text-foreground text-sm group-hover:text-foreground transition-colors">
+                                                                            {apt.patientName}
+                                                                        </p>
+                                                                        <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
+                                                                            {typeLabel[apt.type] || apt.type}
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                                <span className={`font-mono text-[9px] uppercase tracking-[0.15em] px-2 py-0.5 border ${apt.status === 'confirmed' ? 'border-foreground/30 text-foreground/80' :
+                                                                        apt.status === 'pending' ? 'border-warning/30 text-warning' :
+                                                                            apt.status === 'completed' ? 'border-border text-muted-foreground' :
+                                                                                'border-destructive/30 text-destructive'
+                                                                    }`}>
+                                                                    {apt.status === 'confirmed' ? 'Confirmado' :
+                                                                        apt.status === 'pending' ? 'Pendente' :
+                                                                            apt.status === 'completed' ? 'Concluído' : 'Cancelado'}
+                                                                </span>
+                                                            </div>
                                                         ))}
                                                     </div>
-                                                </div>
-                                            )}
-                                        </>
-                                    )}
-                                </button>
-                            );
-                        })}
-                    </div>
-                ))}
-
-                {/* ─── OVERLAY DAY DETAIL (Dashboard-style popover) ─── */}
-                <AnimatePresence>
-                    {selectedDay !== null && (
-                        <>
-                            {/* Backdrop */}
-                            <motion.div
-                                key="backdrop"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: 0.15 }}
-                                className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[2px]"
-                                onClick={() => setSelectedDay(null)}
-                            />
-
-                            {/* Popover */}
-                            <motion.div
-                                key={`detail-${selectedDay}`}
-                                initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                                animate={{ opacity: 1, scale: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                                transition={{ duration: 0.2, ease: 'easeOut' }}
-                                className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[90vw] max-w-[900px] max-h-[80vh] overflow-y-auto bg-card border border-border shadow-2xl"
-                            >
-                                <div className="p-6">
-                                    {/* Detail Header */}
-                                    <div className="flex items-center justify-between mb-5">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-foreground text-white flex items-center justify-center font-mono text-lg font-bold">
-                                                {selectedDay}
+                                                )}
                                             </div>
-                                            <div>
-                                                <h3 className="font-serif text-lg font-bold text-foreground">
-                                                    {new Date(currentYear, currentMonth, selectedDay!).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}
-                                                </h3>
-                                                <p className="font-mono text-xs text-muted-foreground">
-                                                    {selectedAppts.length} consultas • {selectedProcs.length} procedimentos
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <button
-                                            onClick={() => setSelectedDay(null)}
-                                            className="w-8 h-8 border border-border flex items-center justify-center hover:border-foreground/40 transition-colors hover:bg-muted/30"
-                                        >
-                                            <X className="w-4 h-4" />
-                                        </button>
-                                    </div>
 
-                                    {/* Split Layout */}
-                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                        {/* LEFT: Consultas */}
-                                        <div className="border border-border glass-card-solid p-5">
-                                            <h4 className="font-serif text-base font-bold text-foreground flex items-center gap-2 mb-4">
-                                                <Calendar className="w-4 h-4 text-foreground" />
-                                                Consultas
-                                            </h4>
-                                            {selectedAppts.length === 0 ? (
-                                                <p className="font-mono text-xs text-muted-foreground text-center py-6">Nenhuma consulta neste dia</p>
-                                            ) : (
-                                                <div className="space-y-2">
-                                                    {selectedAppts.sort((a: Appointment, b: Appointment) => a.startTime.localeCompare(b.startTime)).map((apt: Appointment) => (
-                                                        <div
-                                                            key={apt.id}
-                                                            className="flex items-center justify-between p-3 border border-border hover:border-foreground/30 transition-colors group"
-                                                        >
-                                                            <div className="flex items-center gap-3">
-                                                                <div className="font-mono text-sm font-medium text-foreground min-w-[50px]">
-                                                                    {apt.startTime}
-                                                                </div>
-                                                                <div className="h-6 w-px bg-border" />
-                                                                <div>
-                                                                    <p className="font-serif font-semibold text-foreground text-sm group-hover:text-foreground transition-colors">
-                                                                        {apt.patientName}
-                                                                    </p>
-                                                                    <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
-                                                                        {typeLabel[apt.type] || apt.type}
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                            <span className={`font-mono text-[9px] uppercase tracking-[0.15em] px-2 py-0.5 border ${apt.status === 'confirmed' ? 'border-foreground/30 text-foreground/80' :
-                                                                    apt.status === 'pending' ? 'border-warning/30 text-warning' :
-                                                                        apt.status === 'completed' ? 'border-border text-muted-foreground' :
-                                                                            'border-destructive/30 text-destructive'
-                                                                }`}>
-                                                                {apt.status === 'confirmed' ? 'Confirmado' :
-                                                                    apt.status === 'pending' ? 'Pendente' :
-                                                                        apt.status === 'completed' ? 'Concluído' : 'Cancelado'}
-                                                            </span>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
+                                            {/* RIGHT: Procedimentos */}
+                                            <div className="border border-border glass-card-solid p-5">
+                                                <h4 className="font-serif text-base font-bold text-foreground flex items-center gap-2 mb-4">
+                                                    <Syringe className="w-4 h-4 text-foreground" />
+                                                    Procedimentos
+                                                </h4>
 
-                                        {/* RIGHT: Procedimentos */}
-                                        <div className="border border-border glass-card-solid p-5">
-                                            <h4 className="font-serif text-base font-bold text-foreground flex items-center gap-2 mb-4">
-                                                <Syringe className="w-4 h-4 text-foreground" />
-                                                Procedimentos
-                                            </h4>
-
-                                            {selectedProcs.length === 0 ? (
-                                                <p className="font-mono text-xs text-muted-foreground text-center py-6">Nenhum procedimento neste dia</p>
-                                            ) : (
-                                                <>
-                                                    {/* Em Atendimento */}
-                                                    {selectedProcs.filter(p => p.status === 'in_progress' || p.status === 'done').length > 0 && (
-                                                        <div className="mb-4">
-                                                            <p className="mono-label text-foreground mb-2 flex items-center gap-1.5">
-                                                                <span className="w-2 h-2 rounded-full bg-foreground animate-pulse" />
-                                                                Na Clínica
-                                                            </p>
-                                                            <div className="grid grid-cols-2 gap-2">
-                                                                {selectedProcs.filter(p => p.status === 'in_progress' || p.status === 'done').map(app => (
-                                                                    <div key={app.id} className="group relative">
-                                                                        <div className={`p-3 border transition-all cursor-default ${app.status === 'done'
-                                                                                ? 'border-foreground/30 bg-foreground/[0.04]'
-                                                                                : 'border-warning/30 bg-warning/[0.04]'
-                                                                            }`}>
-                                                                            <div className="flex items-center justify-between mb-1.5">
-                                                                                <div className={`w-5 h-5 flex items-center justify-center ${app.status === 'done' ? 'text-foreground' : 'text-warning'}`}>
-                                                                                    {app.status === 'done' ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
+                                                {selectedProcs.length === 0 ? (
+                                                    <p className="font-mono text-xs text-muted-foreground text-center py-6">Nenhum procedimento neste dia</p>
+                                                ) : (
+                                                    <>
+                                                        {/* Em Atendimento */}
+                                                        {selectedProcs.filter(p => p.status === 'in_progress' || p.status === 'done').length > 0 && (
+                                                            <div className="mb-4">
+                                                                <p className="mono-label text-foreground mb-2 flex items-center gap-1.5">
+                                                                    <span className="w-2 h-2 rounded-full bg-foreground animate-pulse" />
+                                                                    Na Clínica
+                                                                </p>
+                                                                <div className="grid grid-cols-2 gap-2">
+                                                                    {selectedProcs.filter(p => p.status === 'in_progress' || p.status === 'done').map(app => (
+                                                                        <div key={app.id} className="group relative">
+                                                                            <div className={`p-3 border transition-all cursor-default ${app.status === 'done'
+                                                                                    ? 'border-foreground/30 bg-foreground/[0.04]'
+                                                                                    : 'border-warning/30 bg-warning/[0.04]'
+                                                                                }`}>
+                                                                                <div className="flex items-center justify-between mb-1.5">
+                                                                                    <div className={`w-5 h-5 flex items-center justify-center ${app.status === 'done' ? 'text-foreground' : 'text-warning'}`}>
+                                                                                        {app.status === 'done' ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
+                                                                                    </div>
+                                                                                    <span className={`font-mono text-[8px] uppercase tracking-[0.15em] px-1.5 py-0.5 border ${app.status === 'done' ? 'border-foreground/30 text-foreground/80' : 'border-warning/30 text-warning'
+                                                                                        }`}>
+                                                                                        {app.status === 'done' ? 'Feita' : 'Atendendo'}
+                                                                                    </span>
                                                                                 </div>
-                                                                                <span className={`font-mono text-[8px] uppercase tracking-[0.15em] px-1.5 py-0.5 border ${app.status === 'done' ? 'border-foreground/30 text-foreground/80' : 'border-warning/30 text-warning'
-                                                                                    }`}>
-                                                                                    {app.status === 'done' ? 'Feita' : 'Atendendo'}
-                                                                                </span>
+                                                                                <p className="font-serif font-semibold text-foreground text-xs truncate">{app.patientName}</p>
+                                                                                <p className="font-mono text-[9px] text-muted-foreground mt-0.5 truncate">{app.productName}</p>
+                                                                                {app.consultorio && (
+                                                                                    <p className="font-mono text-[9px] text-foreground mt-1.5 flex items-center gap-1">
+                                                                                        <MapPin className="w-2.5 h-2.5" /> {app.consultorio}
+                                                                                    </p>
+                                                                                )}
                                                                             </div>
-                                                                            <p className="font-serif font-semibold text-foreground text-xs truncate">{app.patientName}</p>
-                                                                            <p className="font-mono text-[9px] text-muted-foreground mt-0.5 truncate">{app.productName}</p>
-                                                                            {app.consultorio && (
-                                                                                <p className="font-mono text-[9px] text-foreground mt-1.5 flex items-center gap-1">
-                                                                                    <MapPin className="w-2.5 h-2.5" /> {app.consultorio}
-                                                                                </p>
-                                                                            )}
-                                                                        </div>
-                                                                        {/* Hover tooltip */}
-                                                                        <div className="absolute left-0 right-0 top-full mt-1 z-30 bg-foreground text-background p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 shadow-xl">
-                                                                            <p className="font-serif font-bold text-xs mb-1.5">{app.patientName}</p>
-                                                                            <div className="space-y-1 font-mono text-[9px]">
-                                                                                <div className="flex items-center gap-1.5"><Pill className="w-2.5 h-2.5 opacity-60" /> {app.productName}</div>
-                                                                                <div className="flex items-center gap-1.5"><Syringe className="w-2.5 h-2.5 opacity-60" /> {app.dose} • {app.route}</div>
-                                                                                {app.nurseAssigned && <div className="flex items-center gap-1.5"><User className="w-2.5 h-2.5 opacity-60" /> {app.nurseAssigned}</div>}
-                                                                                {app.arrivalTime && <div className="flex items-center gap-1.5"><Clock className="w-2.5 h-2.5 opacity-60" /> Chegou às {app.arrivalTime}</div>}
-                                                                                {app.lotNumber && <div className="opacity-50 mt-0.5">Lote: {app.lotNumber}</div>}
+                                                                            {/* Hover tooltip */}
+                                                                            <div className="absolute left-0 right-0 top-full mt-1 z-30 bg-foreground text-background p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 shadow-xl">
+                                                                                <p className="font-serif font-bold text-xs mb-1.5">{app.patientName}</p>
+                                                                                <div className="space-y-1 font-mono text-[9px]">
+                                                                                    <div className="flex items-center gap-1.5"><Pill className="w-2.5 h-2.5 opacity-60" /> {app.productName}</div>
+                                                                                    <div className="flex items-center gap-1.5"><Syringe className="w-2.5 h-2.5 opacity-60" /> {app.dose} • {app.route}</div>
+                                                                                    {app.nurseAssigned && <div className="flex items-center gap-1.5"><User className="w-2.5 h-2.5 opacity-60" /> {app.nurseAssigned}</div>}
+                                                                                    {app.arrivalTime && <div className="flex items-center gap-1.5"><Clock className="w-2.5 h-2.5 opacity-60" /> Chegou às {app.arrivalTime}</div>}
+                                                                                    {app.lotNumber && <div className="opacity-50 mt-0.5">Lote: {app.lotNumber}</div>}
+                                                                                </div>
                                                                             </div>
                                                                         </div>
-                                                                    </div>
-                                                                ))}
+                                                                    ))}
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    )}
+                                                        )}
 
-                                                    {/* Agendados */}
-                                                    {selectedProcs.filter(p => p.status === 'scheduled').length > 0 && (
-                                                        <div>
-                                                            <p className="mono-label text-muted-foreground mb-2 flex items-center gap-1.5">
-                                                                <span className="w-2 h-2 rounded-full bg-muted-foreground/40" />
-                                                                Agendados
-                                                            </p>
-                                                            <div className="grid grid-cols-2 gap-2">
-                                                                {selectedProcs.filter(p => p.status === 'scheduled').map(app => (
-                                                                    <div key={app.id} className="group relative">
-                                                                        <div className="p-3 border border-border hover:border-foreground/30 transition-all cursor-default">
-                                                                            <div className="flex items-center justify-between mb-1.5">
-                                                                                <Syringe className="w-3.5 h-3.5 text-muted-foreground/50" />
-                                                                                <span className="font-mono text-[8px] uppercase tracking-[0.15em] px-1.5 py-0.5 border border-border text-muted-foreground">Agendada</span>
+                                                        {/* Agendados */}
+                                                        {selectedProcs.filter(p => p.status === 'scheduled').length > 0 && (
+                                                            <div>
+                                                                <p className="mono-label text-muted-foreground mb-2 flex items-center gap-1.5">
+                                                                    <span className="w-2 h-2 rounded-full bg-muted-foreground/40" />
+                                                                    Agendados
+                                                                </p>
+                                                                <div className="grid grid-cols-2 gap-2">
+                                                                    {selectedProcs.filter(p => p.status === 'scheduled').map(app => (
+                                                                        <div key={app.id} className="group relative">
+                                                                            <div className="p-3 border border-border hover:border-foreground/30 transition-all cursor-default">
+                                                                                <div className="flex items-center justify-between mb-1.5">
+                                                                                    <Syringe className="w-3.5 h-3.5 text-muted-foreground/50" />
+                                                                                    <span className="font-mono text-[8px] uppercase tracking-[0.15em] px-1.5 py-0.5 border border-border text-muted-foreground">Agendada</span>
+                                                                                </div>
+                                                                                <p className="font-serif font-semibold text-foreground text-xs truncate">{app.patientName}</p>
+                                                                                <p className="font-mono text-[9px] text-muted-foreground mt-0.5 truncate">{app.productName}</p>
                                                                             </div>
-                                                                            <p className="font-serif font-semibold text-foreground text-xs truncate">{app.patientName}</p>
-                                                                            <p className="font-mono text-[9px] text-muted-foreground mt-0.5 truncate">{app.productName}</p>
-                                                                        </div>
-                                                                        {/* Hover tooltip */}
-                                                                        <div className="absolute left-0 right-0 top-full mt-1 z-30 bg-foreground text-background p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 shadow-xl">
-                                                                            <p className="font-serif font-bold text-xs mb-1.5">{app.patientName}</p>
-                                                                            <div className="space-y-1 font-mono text-[9px]">
-                                                                                <div className="flex items-center gap-1.5"><Pill className="w-2.5 h-2.5 opacity-60" /> {app.productName}</div>
-                                                                                <div className="flex items-center gap-1.5"><Syringe className="w-2.5 h-2.5 opacity-60" /> {app.dose} • {app.route}</div>
+                                                                            {/* Hover tooltip */}
+                                                                            <div className="absolute left-0 right-0 top-full mt-1 z-30 bg-foreground text-background p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 shadow-xl">
+                                                                                <p className="font-serif font-bold text-xs mb-1.5">{app.patientName}</p>
+                                                                                <div className="space-y-1 font-mono text-[9px]">
+                                                                                    <div className="flex items-center gap-1.5"><Pill className="w-2.5 h-2.5 opacity-60" /> {app.productName}</div>
+                                                                                    <div className="flex items-center gap-1.5"><Syringe className="w-2.5 h-2.5 opacity-60" /> {app.dose} • {app.route}</div>
+                                                                                </div>
                                                                             </div>
                                                                         </div>
-                                                                    </div>
-                                                                ))}
+                                                                    ))}
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    )}
-                                                </>
-                                            )}
+                                                        )}
+                                                    </>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </motion.div>
-                        </>
-                    )}
-                </AnimatePresence>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </React.Fragment>
+                ))}
             </div>
         </div>
     );
