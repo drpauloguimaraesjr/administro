@@ -262,18 +262,19 @@ export default function AgendaPage() {
     const [currentYear, setCurrentYear] = useState(today.getFullYear());
     const [selectedDay, setSelectedDay] = useState<number | null>(null);
 
-    // Try API, fallback to mock
-    const { data: apiAppts = [] } = useQuery({
+    // Try API, fallback to mock (return null on error to avoid flash)
+    const { data: apiAppts } = useQuery({
         queryKey: ['agenda-appointments'],
         queryFn: async () => {
             try {
                 const res = await api.get('/appointments');
-                return res.data;
-            } catch { return []; }
+                const data = res.data as Appointment[];
+                return data && data.length > 0 ? data : null;
+            } catch { return null; }
         },
     });
 
-    const appointments = apiAppts.length > 0 ? apiAppts : mockAppointments;
+    const appointments = apiAppts || mockAppointments;
     const procedures = mockProcedures;
 
     // Group by date
@@ -451,6 +452,8 @@ export default function AgendaPage() {
 
                                                         {/* Procedure dots (smaller) */}
                                                         {dayProcs.length > 0 && (
+                                                            <>
+                                                            <p className="font-mono text-[6px] text-muted-foreground/70 uppercase tracking-wider leading-none mt-0.5">Proced.</p>
                                                             <div className="flex gap-[3px] items-center">
                                                                 {dayProcs.map((p: Procedure, pIdx: number) => {
                                                                     const pTag = PROCEDURE_TAGS[p.route as keyof typeof PROCEDURE_TAGS] || PROCEDURE_TAGS.default;
@@ -464,6 +467,7 @@ export default function AgendaPage() {
                                                                     );
                                                                 })}
                                                             </div>
+                                                            </>
                                                         )}
                                                     </div>
                                                 )}
