@@ -38,12 +38,77 @@ const m = today.getMonth();
 const d = (day: number) => `${y}-${String(m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
 const mockAppointments: Appointment[] = [
-    { id: 'a1', patientName: 'Eduardo Costa', date: d(today.getDate()), startTime: '09:00', endTime: '09:45', status: 'confirmed', type: 'first_visit' },
-    { id: 'a2', patientName: 'Maria Silva', date: d(today.getDate()), startTime: '10:30', endTime: '11:00', status: 'pending', type: 'return' },
-    { id: 'a3', patientName: 'João Santos', date: d(today.getDate()), startTime: '14:00', endTime: '14:45', status: 'confirmed', type: 'procedure' },
-    { id: 'a4', patientName: 'Ana Oliveira', date: d(today.getDate()), startTime: '16:00', endTime: '16:30', status: 'confirmed', type: 'return' },
-    { id: 'a5', patientName: 'Carla Menezes', date: d(today.getDate()), startTime: '17:00', endTime: '17:45', status: 'pending', type: 'first_visit' },
-    // Day 18 - Rich Mock Data for UI Design
+    // ── Day 3 (Mon) ──
+    { id: 'a3_1', patientName: 'Luciana Ferreira', date: d(3), startTime: '08:00', endTime: '08:30', status: 'completed', type: 'return' },
+    { id: 'a3_2', patientName: 'Marcos Pereira', date: d(3), startTime: '09:00', endTime: '09:45', status: 'completed', type: 'first_visit' },
+    { id: 'a3_3', patientName: 'Beatriz Souza', date: d(3), startTime: '10:30', endTime: '11:00', status: 'completed', type: 'return' },
+    // ── Day 4 (Tue) ──
+    { id: 'a4_1', patientName: 'Ricardo Mendes', date: d(4), startTime: '08:30', endTime: '09:15', status: 'completed', type: 'first_visit' },
+    { id: 'a4_2', patientName: 'Teresa Monteiro', date: d(4), startTime: '09:30', endTime: '10:00', status: 'completed', type: 'return' },
+    { id: 'a4_3', patientName: 'Felipe Castro', date: d(4), startTime: '10:30', endTime: '11:15', status: 'completed', type: 'evaluation' },
+    { id: 'a4_4', patientName: 'Isabela Cruz', date: d(4), startTime: '14:00', endTime: '14:30', status: 'completed', type: 'return' },
+    { id: 'a4_5', patientName: 'Gabriel Nunes', date: d(4), startTime: '15:00', endTime: '15:30', status: 'completed', type: 'first_visit' },
+    // ── Day 5 (Wed) ──
+    { id: 'a5_1', patientName: 'Sandra Alves', date: d(5), startTime: '09:00', endTime: '09:30', status: 'completed', type: 'return' },
+    { id: 'a5_2', patientName: 'Paulo Henrique', date: d(5), startTime: '10:00', endTime: '10:45', status: 'completed', type: 'procedure' },
+    { id: 'a5_3', patientName: 'Amanda Rodrigues', date: d(5), startTime: '14:00', endTime: '14:30', status: 'completed', type: 'return' },
+    { id: 'a5_4', patientName: 'Henrique Faria', date: d(5), startTime: '15:30', endTime: '16:15', status: 'completed', type: 'first_visit' },
+    { id: 'a5_5', patientName: 'Cláudia Dias', date: d(5), startTime: '16:30', endTime: '17:00', status: 'completed', type: 'evaluation' },
+    { id: 'a5_6', patientName: 'Roberto Lima', date: d(5), startTime: '17:30', endTime: '18:00', status: 'completed', type: 'return' },
+    // ── Day 6 (Thu) ──
+    { id: 'a6_1', patientName: 'Fernanda Lopes', date: d(6), startTime: '08:00', endTime: '08:30', status: 'completed', type: 'return' },
+    { id: 'a6_2', patientName: 'Juliana Rocha', date: d(6), startTime: '09:00', endTime: '09:30', status: 'completed', type: 'first_visit' },
+    // ── Day 7 (Fri) ──
+    { id: 'a7_1', patientName: 'Carla Menezes', date: d(7), startTime: '09:00', endTime: '09:45', status: 'completed', type: 'evaluation' },
+    { id: 'a7_2', patientName: 'Eduardo Costa', date: d(7), startTime: '10:00', endTime: '10:30', status: 'completed', type: 'return' },
+    { id: 'a7_3', patientName: 'Maria Silva', date: d(7), startTime: '14:00', endTime: '14:30', status: 'completed', type: 'return' },
+    { id: 'a7_4', patientName: 'João Santos', date: d(7), startTime: '15:00', endTime: '15:45', status: 'completed', type: 'first_visit' },
+    // ── Today ──
+    { id: 'at_1', patientName: 'Eduardo Costa', date: d(today.getDate()), startTime: '09:00', endTime: '09:45', status: 'confirmed', type: 'first_visit' },
+    { id: 'at_2', patientName: 'Maria Silva', date: d(today.getDate()), startTime: '10:30', endTime: '11:00', status: 'pending', type: 'return' },
+    { id: 'at_3', patientName: 'João Santos', date: d(today.getDate()), startTime: '14:00', endTime: '14:45', status: 'confirmed', type: 'procedure' },
+    { id: 'at_4', patientName: 'Ana Oliveira', date: d(today.getDate()), startTime: '16:00', endTime: '16:30', status: 'confirmed', type: 'return' },
+    { id: 'at_5', patientName: 'Carla Menezes', date: d(today.getDate()), startTime: '17:00', endTime: '17:45', status: 'pending', type: 'first_visit' },
+    // ── Day 10 (Mon) ──
+    { id: 'a10_1', patientName: 'Ricardo Mendes', date: d(10), startTime: '08:30', endTime: '09:15', status: 'confirmed', type: 'first_visit' },
+    { id: 'a10_2', patientName: 'Luciana Ferreira', date: d(10), startTime: '10:00', endTime: '10:30', status: 'confirmed', type: 'return' },
+    { id: 'a10_3', patientName: 'Marcos Pereira', date: d(10), startTime: '11:00', endTime: '11:30', status: 'confirmed', type: 'return' },
+    { id: 'a10_4', patientName: 'Teresa Monteiro', date: d(10), startTime: '14:00', endTime: '14:30', status: 'pending', type: 'evaluation' },
+    { id: 'a10_5', patientName: 'Felipe Castro', date: d(10), startTime: '15:00', endTime: '15:30', status: 'confirmed', type: 'return' },
+    { id: 'a10_6', patientName: 'Gabriel Nunes', date: d(10), startTime: '16:00', endTime: '16:30', status: 'confirmed', type: 'first_visit' },
+    { id: 'a10_7', patientName: 'Isabela Cruz', date: d(10), startTime: '17:00', endTime: '17:30', status: 'confirmed', type: 'return' },
+    // ── Day 11 (Tue) ──
+    { id: 'a11_1', patientName: 'Sandra Alves', date: d(11), startTime: '09:00', endTime: '09:30', status: 'confirmed', type: 'procedure' },
+    { id: 'a11_2', patientName: 'Amanda Rodrigues', date: d(11), startTime: '10:00', endTime: '10:30', status: 'confirmed', type: 'return' },
+    { id: 'a11_3', patientName: 'Henrique Faria', date: d(11), startTime: '14:00', endTime: '14:45', status: 'confirmed', type: 'first_visit' },
+    { id: 'a11_4', patientName: 'Cláudia Dias', date: d(11), startTime: '16:00', endTime: '16:30', status: 'pending', type: 'return' },
+    // ── Day 12 (Wed) ──
+    { id: 'a12_1', patientName: 'Roberto Lima', date: d(12), startTime: '08:00', endTime: '08:30', status: 'confirmed', type: 'return' },
+    { id: 'a12_2', patientName: 'Fernanda Lopes', date: d(12), startTime: '09:00', endTime: '09:30', status: 'confirmed', type: 'first_visit' },
+    { id: 'a12_3', patientName: 'Juliana Rocha', date: d(12), startTime: '10:30', endTime: '11:00', status: 'confirmed', type: 'return' },
+    { id: 'a12_4', patientName: 'Carla Menezes', date: d(12), startTime: '14:00', endTime: '14:45', status: 'confirmed', type: 'evaluation' },
+    { id: 'a12_5', patientName: 'Eduardo Costa', date: d(12), startTime: '15:30', endTime: '16:00', status: 'pending', type: 'first_visit' },
+    { id: 'a12_6', patientName: 'Maria Silva', date: d(12), startTime: '16:30', endTime: '17:00', status: 'confirmed', type: 'return' },
+    { id: 'a12_7', patientName: 'João Santos', date: d(12), startTime: '17:00', endTime: '17:30', status: 'confirmed', type: 'procedure' },
+    { id: 'a12_8', patientName: 'Ana Oliveira', date: d(12), startTime: '17:30', endTime: '18:00', status: 'confirmed', type: 'return' },
+    // ── Day 13 (Thu) ──
+    { id: 'a13_1', patientName: 'Beatriz Souza', date: d(13), startTime: '09:00', endTime: '09:30', status: 'confirmed', type: 'first_visit' },
+    { id: 'a13_2', patientName: 'Ricardo Mendes', date: d(13), startTime: '10:00', endTime: '10:30', status: 'confirmed', type: 'return' },
+    { id: 'a13_3', patientName: 'Luciana Ferreira', date: d(13), startTime: '14:00', endTime: '14:30', status: 'pending', type: 'return' },
+    // ── Day 14 (Fri) ──
+    { id: 'a14_1', patientName: 'Marcos P.', date: d(14), startTime: '08:00', endTime: '08:30', status: 'confirmed', type: 'return' },
+    { id: 'a14_2', patientName: 'Teresa M.', date: d(14), startTime: '09:00', endTime: '09:30', status: 'confirmed', type: 'first_visit' },
+    { id: 'a14_3', patientName: 'Felipe Castro', date: d(14), startTime: '10:30', endTime: '11:00', status: 'confirmed', type: 'evaluation' },
+    { id: 'a14_4', patientName: 'Isabela Cruz', date: d(14), startTime: '14:00', endTime: '14:30', status: 'confirmed', type: 'return' },
+    { id: 'a14_5', patientName: 'Gabriel Nunes', date: d(14), startTime: '15:00', endTime: '15:30', status: 'confirmed', type: 'first_visit' },
+    { id: 'a14_6', patientName: 'Sandra Alves', date: d(14), startTime: '16:00', endTime: '16:30', status: 'pending', type: 'return' },
+    // ── Day 17 (Mon) ──
+    { id: 'a17_1', patientName: 'Amanda Rodrigues', date: d(17), startTime: '08:00', endTime: '08:45', status: 'confirmed', type: 'first_visit' },
+    { id: 'a17_2', patientName: 'Roberto Lima', date: d(17), startTime: '09:00', endTime: '09:30', status: 'confirmed', type: 'return' },
+    { id: 'a17_3', patientName: 'Cláudia Dias', date: d(17), startTime: '10:00', endTime: '10:30', status: 'confirmed', type: 'return' },
+    { id: 'a17_4', patientName: 'Henrique Faria', date: d(17), startTime: '14:00', endTime: '14:45', status: 'pending', type: 'evaluation' },
+    { id: 'a17_5', patientName: 'Fernanda Lopes', date: d(17), startTime: '15:30', endTime: '16:00', status: 'confirmed', type: 'return' },
+    // ── Day 18 (Tue) - Full Day ──
     { id: 'a18_1', patientName: 'Ricardo Teixeira da Silva', date: d(18), startTime: '08:00', endTime: '08:30', status: 'confirmed', type: 'return' },
     { id: 'a18_2', patientName: 'Laura Montenegro', date: d(18), startTime: '09:15', endTime: '10:00', status: 'pending', type: 'first_visit' },
     { id: 'a18_3', patientName: 'Carlos Eduardo Nogueira', date: d(18), startTime: '10:30', endTime: '11:15', status: 'completed', type: 'procedure' },
@@ -51,42 +116,103 @@ const mockAppointments: Appointment[] = [
     { id: 'a18_5', patientName: 'Dra. Beatriz Ferraz', date: d(18), startTime: '14:30', endTime: '15:15', status: 'confirmed', type: 'return' },
     { id: 'a18_6', patientName: 'Thiago Martins Carvalho', date: d(18), startTime: '16:00', endTime: '17:00', status: 'confirmed', type: 'first_visit' },
     { id: 'a18_7', patientName: 'Juliana Paes', date: d(18), startTime: '17:30', endTime: '18:15', status: 'pending', type: 'evaluation' },
-    // Other days
-    { id: 'a6', patientName: 'Roberto Lima', date: d(Math.min(today.getDate() + 1, 28)), startTime: '09:00', endTime: '09:30', status: 'confirmed', type: 'return' },
-    { id: 'a7', patientName: 'Fernanda Lopes', date: d(Math.min(today.getDate() + 1, 28)), startTime: '11:00', endTime: '11:30', status: 'confirmed', type: 'first_visit' },
-    { id: 'a8', patientName: 'Juliana Rocha', date: d(Math.min(today.getDate() + 2, 28)), startTime: '10:00', endTime: '10:30', status: 'pending', type: 'return' },
-    { id: 'a9', patientName: 'Paulo Henrique', date: d(Math.min(today.getDate() + 3, 28)), startTime: '14:00', endTime: '14:45', status: 'confirmed', type: 'procedure' },
-    { id: 'a10', patientName: 'Cláudia Dias', date: d(Math.min(today.getDate() - 1, 28)), startTime: '09:00', endTime: '09:30', status: 'completed', type: 'return' },
-    { id: 'a11', patientName: 'Marcos Pereira', date: d(Math.min(today.getDate() - 1, 28)), startTime: '10:30', endTime: '11:00', status: 'completed', type: 'first_visit' },
-    { id: 'a12', patientName: 'Beatriz Souza', date: d(Math.min(today.getDate() - 2, 28)), startTime: '09:30', endTime: '10:00', status: 'completed', type: 'evaluation' },
-    { id: 'a13', patientName: 'Ricardo Mendes', date: d(10), startTime: '08:30', endTime: '09:15', status: 'confirmed', type: 'first_visit' },
-    { id: 'a14', patientName: 'Luciana Ferreira', date: d(10), startTime: '10:00', endTime: '10:30', status: 'confirmed', type: 'return' },
-    { id: 'a15', patientName: 'Sandra Alves', date: d(15), startTime: '14:00', endTime: '14:45', status: 'confirmed', type: 'procedure' },
-    { id: 'a16', patientName: 'Felipe Castro', date: d(20), startTime: '09:00', endTime: '09:30', status: 'pending', type: 'return' },
-    { id: 'a17', patientName: 'Teresa Monteiro', date: d(20), startTime: '11:00', endTime: '11:30', status: 'confirmed', type: 'first_visit' },
-    { id: 'a18', patientName: 'Gabriel Nunes', date: d(20), startTime: '14:00', endTime: '14:30', status: 'confirmed', type: 'return' },
-    { id: 'a19', patientName: 'Isabela Cruz', date: d(25), startTime: '10:00', endTime: '10:45', status: 'confirmed', type: 'first_visit' },
+    // ── Day 19 (Wed) ──
+    { id: 'a19_1', patientName: 'Eduardo Costa', date: d(19), startTime: '08:00', endTime: '08:30', status: 'confirmed', type: 'return' },
+    { id: 'a19_2', patientName: 'Maria Silva', date: d(19), startTime: '09:30', endTime: '10:00', status: 'confirmed', type: 'return' },
+    { id: 'a19_3', patientName: 'João Santos', date: d(19), startTime: '10:30', endTime: '11:15', status: 'confirmed', type: 'first_visit' },
+    { id: 'a19_4', patientName: 'Carla Menezes', date: d(19), startTime: '14:00', endTime: '14:30', status: 'pending', type: 'return' },
+    // ── Day 20 (Thu) ──
+    { id: 'a20_1', patientName: 'Felipe Castro', date: d(20), startTime: '09:00', endTime: '09:30', status: 'confirmed', type: 'return' },
+    { id: 'a20_2', patientName: 'Teresa Monteiro', date: d(20), startTime: '11:00', endTime: '11:30', status: 'confirmed', type: 'first_visit' },
+    { id: 'a20_3', patientName: 'Gabriel Nunes', date: d(20), startTime: '14:00', endTime: '14:30', status: 'confirmed', type: 'return' },
+    { id: 'a20_4', patientName: 'Isabela Cruz', date: d(20), startTime: '15:00', endTime: '15:30', status: 'confirmed', type: 'evaluation' },
+    { id: 'a20_5', patientName: 'Sandra Alves', date: d(20), startTime: '16:00', endTime: '16:30', status: 'confirmed', type: 'first_visit' },
+    { id: 'a20_6', patientName: 'Marcos Pereira', date: d(20), startTime: '17:00', endTime: '17:30', status: 'pending', type: 'return' },
+    // ── Day 21 (Fri) ──
+    { id: 'a21_1', patientName: 'Luciana Ferreira', date: d(21), startTime: '08:00', endTime: '08:30', status: 'confirmed', type: 'first_visit' },
+    { id: 'a21_2', patientName: 'Beatriz Souza', date: d(21), startTime: '09:30', endTime: '10:00', status: 'confirmed', type: 'return' },
+    { id: 'a21_3', patientName: 'Ricardo Mendes', date: d(21), startTime: '10:30', endTime: '11:00', status: 'confirmed', type: 'return' },
+    // ── Day 24 (Mon) ──
+    { id: 'a24_1', patientName: 'Ana Oliveira', date: d(24), startTime: '08:00', endTime: '08:45', status: 'confirmed', type: 'first_visit' },
+    { id: 'a24_2', patientName: 'Henrique Faria', date: d(24), startTime: '09:00', endTime: '09:30', status: 'confirmed', type: 'return' },
+    { id: 'a24_3', patientName: 'Amanda Rodrigues', date: d(24), startTime: '10:00', endTime: '10:30', status: 'confirmed', type: 'evaluation' },
+    { id: 'a24_4', patientName: 'Cláudia Dias', date: d(24), startTime: '14:00', endTime: '14:30', status: 'pending', type: 'return' },
+    { id: 'a24_5', patientName: 'Roberto Lima', date: d(24), startTime: '15:00', endTime: '15:30', status: 'confirmed', type: 'first_visit' },
+    { id: 'a24_6', patientName: 'Fernanda Lopes', date: d(24), startTime: '16:00', endTime: '16:30', status: 'confirmed', type: 'return' },
+    { id: 'a24_7', patientName: 'Juliana Rocha', date: d(24), startTime: '17:00', endTime: '17:30', status: 'confirmed', type: 'procedure' },
+    // ── Day 25 (Tue) ──
+    { id: 'a25_1', patientName: 'Isabela Cruz', date: d(25), startTime: '10:00', endTime: '10:45', status: 'confirmed', type: 'first_visit' },
+    { id: 'a25_2', patientName: 'Gabriel Nunes', date: d(25), startTime: '14:00', endTime: '14:30', status: 'confirmed', type: 'return' },
+    { id: 'a25_3', patientName: 'Teresa Monteiro', date: d(25), startTime: '15:30', endTime: '16:00', status: 'confirmed', type: 'return' },
+    // ── Day 26 (Wed) ──
+    { id: 'a26_1', patientName: 'Felipe Castro', date: d(26), startTime: '08:00', endTime: '08:30', status: 'confirmed', type: 'return' },
+    { id: 'a26_2', patientName: 'Eduardo Costa', date: d(26), startTime: '09:00', endTime: '09:45', status: 'confirmed', type: 'first_visit' },
+    { id: 'a26_3', patientName: 'Maria Silva', date: d(26), startTime: '10:30', endTime: '11:00', status: 'confirmed', type: 'evaluation' },
+    { id: 'a26_4', patientName: 'Carla Menezes', date: d(26), startTime: '14:00', endTime: '14:30', status: 'pending', type: 'return' },
+    { id: 'a26_5', patientName: 'Sandra Alves', date: d(26), startTime: '15:00', endTime: '15:30', status: 'confirmed', type: 'first_visit' },
+    // ── Day 27 (Thu) ──
+    { id: 'a27_1', patientName: 'Marcos Pereira', date: d(27), startTime: '09:00', endTime: '09:30', status: 'confirmed', type: 'return' },
+    { id: 'a27_2', patientName: 'Luciana Ferreira', date: d(27), startTime: '10:00', endTime: '10:30', status: 'confirmed', type: 'first_visit' },
+    { id: 'a27_3', patientName: 'Beatriz Souza', date: d(27), startTime: '14:00', endTime: '14:30', status: 'confirmed', type: 'return' },
+    { id: 'a27_4', patientName: 'Ricardo Mendes', date: d(27), startTime: '15:00', endTime: '15:30', status: 'confirmed', type: 'evaluation' },
 ];
 
 const mockProcedures: Procedure[] = [
-    { id: 'p1', patientName: 'Fernanda Lopes', productName: 'Gestrinona 20mg', dose: '20mg', route: 'Implante SC', status: 'done', date: d(today.getDate()), nurseAssigned: 'Enfermeira Ana', consultorio: 'Sala 1', arrivalTime: '08:30', lotNumber: 'LOT-2025-0847' },
-    { id: 'p2', patientName: 'Juliana Rocha', productName: 'Testosterona 50mg', dose: '50mg', route: 'Implante SC', status: 'in_progress', date: d(today.getDate()), nurseAssigned: 'Enfermeira Ana', consultorio: 'Consultório Dr. Paulo', arrivalTime: '09:15', lotNumber: 'LOT-2025-1293' },
-    { id: 'p3', patientName: 'João da Silveira', productName: 'Testosterona 75mg + Oxandrolona 10mg', dose: '85mg total', route: 'Implante SC', status: 'in_progress', date: d(today.getDate()), nurseAssigned: 'Enfermeira Carla', consultorio: 'Sala 2', arrivalTime: '09:40', lotNumber: 'LOT-2025-0991' },
-    { id: 'p4', patientName: 'Patrícia Almeida', productName: 'Oxandrolona 15mg', dose: '15mg', route: 'Implante SC', status: 'scheduled', date: d(today.getDate()) },
-    { id: 'p5', patientName: 'Roberto Lima', productName: 'Testosterona 75mg', dose: '75mg', route: 'Implante Glúteo', status: 'scheduled', date: d(today.getDate()) },
-    { id: 'p6', patientName: 'Cláudia Dias', productName: 'Gestrinona 10mg + Testosterona 25mg', dose: '35mg total', route: 'Implante SC', status: 'scheduled', date: d(today.getDate()) },
-    { id: 'p7', patientName: 'Marcos Pereira', productName: 'Testosterona 100mg', dose: '100mg', route: 'Implante Glúteo', status: 'scheduled', date: d(today.getDate()) },
-    // Day 18 - Rich Mock Data for UI Design (Tirzepatida & Compounding)
+    // ── Today ──
+    { id: 'pt_1', patientName: 'Fernanda Lopes', productName: 'Gestrinona 20mg', dose: '20mg', route: 'Implante SC', status: 'done', date: d(today.getDate()), nurseAssigned: 'Enfermeira Ana', consultorio: 'Sala 1', arrivalTime: '08:30', lotNumber: 'LOT-2025-0847' },
+    { id: 'pt_2', patientName: 'Juliana Rocha', productName: 'Testosterona 50mg', dose: '50mg', route: 'Implante SC', status: 'in_progress', date: d(today.getDate()), nurseAssigned: 'Enfermeira Ana', consultorio: 'Consultório Dr. Paulo', arrivalTime: '09:15', lotNumber: 'LOT-2025-1293' },
+    { id: 'pt_3', patientName: 'João da Silveira', productName: 'Testosterona 75mg + Oxandrolona 10mg', dose: '85mg total', route: 'Implante SC', status: 'in_progress', date: d(today.getDate()), nurseAssigned: 'Enfermeira Carla', consultorio: 'Sala 2', arrivalTime: '09:40', lotNumber: 'LOT-2025-0991' },
+    { id: 'pt_4', patientName: 'Patrícia Almeida', productName: 'Oxandrolona 15mg', dose: '15mg', route: 'Implante SC', status: 'scheduled', date: d(today.getDate()) },
+    { id: 'pt_5', patientName: 'Roberto Lima', productName: 'Testosterona 75mg', dose: '75mg', route: 'Implante Glúteo', status: 'scheduled', date: d(today.getDate()) },
+    { id: 'pt_6', patientName: 'Cláudia Dias', productName: 'Gestrinona 10mg + Testosterona 25mg', dose: '35mg total', route: 'Implante SC', status: 'scheduled', date: d(today.getDate()) },
+    { id: 'pt_7', patientName: 'Marcos Pereira', productName: 'Testosterona 100mg', dose: '100mg', route: 'Implante Glúteo', status: 'scheduled', date: d(today.getDate()) },
+    // ── Day 3 ──
+    { id: 'p3_1', patientName: 'Luciana Ferreira', productName: 'Testosterona 50mg', dose: '50mg', route: 'Implante SC', status: 'done', date: d(3) },
+    // ── Day 5 ──
+    { id: 'p5_1', patientName: 'Paulo Henrique', productName: 'Gestrinona 30mg', dose: '30mg', route: 'Implante SC', status: 'done', date: d(5) },
+    { id: 'p5_2', patientName: 'Amanda Rodrigues', productName: 'Tirzepatida 2.5mg', dose: '2.5mg', route: 'Subcutânea', status: 'done', date: d(5) },
+    // ── Day 7 ──
+    { id: 'p7_1', patientName: 'João Santos', productName: 'Testosterona 75mg', dose: '75mg', route: 'Implante Glúteo', status: 'done', date: d(7) },
+    { id: 'p7_2', patientName: 'Maria Silva', productName: 'Soroterapia Vitamina C', dose: '500ml', route: 'Intravenosa', status: 'done', date: d(7) },
+    // ── Day 10 ──
+    { id: 'p10_1', patientName: 'Sandra Alves', productName: 'Oxandrolona 10mg', dose: '10mg', route: 'Implante SC', status: 'scheduled', date: d(10) },
+    { id: 'p10_2', patientName: 'Teresa Monteiro', productName: 'Tirzepatida 5mg', dose: '5mg', route: 'Subcutânea', status: 'scheduled', date: d(10) },
+    { id: 'p10_3', patientName: 'Gabriel Nunes', productName: 'Testosterona 100mg', dose: '100mg', route: 'Implante Glúteo', status: 'scheduled', date: d(10) },
+    // ── Day 12 ──
+    { id: 'p12_1', patientName: 'Roberto Lima', productName: 'Gestrinona 20mg', dose: '20mg', route: 'Implante SC', status: 'scheduled', date: d(12) },
+    { id: 'p12_2', patientName: 'Fernanda Lopes', productName: 'Soroterapia Complexo B + Zinco', dose: '250ml', route: 'Intravenosa', status: 'scheduled', date: d(12) },
+    // ── Day 14 ──
+    { id: 'p14_1', patientName: 'Teresa M.', productName: 'Testosterona 50mg + DHEA', dose: '60mg', route: 'Implante SC', status: 'scheduled', date: d(14) },
+    { id: 'p14_2', patientName: 'Isabela Cruz', productName: 'Tirzepatida 5mg', dose: '5mg', route: 'Subcutânea', status: 'scheduled', date: d(14) },
+    { id: 'p14_3', patientName: 'Gabriel Nunes', productName: 'Gestrinona 40mg', dose: '40mg', route: 'Implante Glúteo', status: 'scheduled', date: d(14) },
+    { id: 'p14_4', patientName: 'Sandra Alves', productName: 'Soroterapia Vitamina C', dose: '500ml', route: 'Intravenosa', status: 'scheduled', date: d(14) },
+    // ── Day 17 ──
+    { id: 'p17_1', patientName: 'Amanda Rodrigues', productName: 'Tirzepatida 2.5mg', dose: '2.5mg', route: 'Subcutânea', status: 'scheduled', date: d(17) },
+    { id: 'p17_2', patientName: 'Roberto Lima', productName: 'Testosterona 75mg', dose: '75mg', route: 'Implante Glúteo', status: 'scheduled', date: d(17) },
+    // ── Day 18 - Rich Tirzepatida Day ──
     { id: 'p18_1', patientName: 'Ricardo Teixeira da Silva', productName: 'Tirzepatida 5mg (Mounjaro)', dose: '5mg', route: 'Subcutânea', status: 'done', date: d(18), nurseAssigned: 'Enf. Júlia', consultorio: 'Sala 1', arrivalTime: '08:15', lotNumber: 'MJ2024A002' },
     { id: 'p18_2', patientName: 'Carlos Eduardo Nogueira', productName: 'Testosterona 100mg + Anastrozol', dose: '100mg', route: 'Implante SC', status: 'in_progress', date: d(18), nurseAssigned: 'Enf. Clara', consultorio: 'Sala Botox', arrivalTime: '10:20', lotNumber: 'TST-84992-B' },
     { id: 'p18_3', patientName: 'Amanda Rodrigues', productName: 'Tirzepatida 2.5mg', dose: '2.5mg', route: 'Subcutânea', status: 'scheduled', date: d(18) },
     { id: 'p18_4', patientName: 'Juliana Paes', productName: 'Gestrinona 40mg', dose: '40mg', route: 'Implante Glúteo', status: 'scheduled', date: d(18) },
     { id: 'p18_5', patientName: 'Henrique Faria', productName: 'Soroterapia Vitamina C + Zinco', dose: '250ml', route: 'Intravenosa', status: 'scheduled', date: d(18) },
-    // Other days
-    { id: 'p8', patientName: 'Roberto Lima', productName: 'Testosterona 75mg', dose: '75mg', route: 'Implante Glúteo', status: 'scheduled', date: d(Math.min(today.getDate() + 1, 28)) },
-    { id: 'p9', patientName: 'Fernanda Lopes', productName: 'Gestrinona 20mg', dose: '20mg', route: 'Implante SC', status: 'scheduled', date: d(Math.min(today.getDate() + 1, 28)) },
-    { id: 'p10', patientName: 'Sandra Alves', productName: 'Oxandrolona 10mg', dose: '10mg', route: 'Implante SC', status: 'scheduled', date: d(10) },
-    { id: 'p11', patientName: 'Isabela Cruz', productName: 'Testosterona 50mg', dose: '50mg', route: 'Implante SC', status: 'scheduled', date: d(25) },
+    // ── Day 20 ──
+    { id: 'p20_1', patientName: 'Teresa Monteiro', productName: 'Testosterona 50mg', dose: '50mg', route: 'Implante SC', status: 'scheduled', date: d(20) },
+    { id: 'p20_2', patientName: 'Sandra Alves', productName: 'Tirzepatida 7.5mg', dose: '7.5mg', route: 'Subcutânea', status: 'scheduled', date: d(20) },
+    { id: 'p20_3', patientName: 'Marcos Pereira', productName: 'Testosterona 100mg', dose: '100mg', route: 'Implante Glúteo', status: 'scheduled', date: d(20) },
+    // ── Day 24 ──
+    { id: 'p24_1', patientName: 'Ana Oliveira', productName: 'Gestrinona 30mg + DHEA', dose: '50mg', route: 'Implante SC', status: 'scheduled', date: d(24) },
+    { id: 'p24_2', patientName: 'Cláudia Dias', productName: 'Tirzepatida 5mg', dose: '5mg', route: 'Subcutânea', status: 'scheduled', date: d(24) },
+    { id: 'p24_3', patientName: 'Roberto Lima', productName: 'Soroterapia Vitamina C + B12', dose: '500ml', route: 'Intravenosa', status: 'scheduled', date: d(24) },
+    { id: 'p24_4', patientName: 'Juliana Rocha', productName: 'Testosterona 75mg', dose: '75mg', route: 'Implante Glúteo', status: 'scheduled', date: d(24) },
+    // ── Day 25 ──
+    { id: 'p25_1', patientName: 'Isabela Cruz', productName: 'Testosterona 50mg', dose: '50mg', route: 'Implante SC', status: 'scheduled', date: d(25) },
+    // ── Day 26 ──
+    { id: 'p26_1', patientName: 'Eduardo Costa', productName: 'Tirzepatida 10mg', dose: '10mg', route: 'Subcutânea', status: 'scheduled', date: d(26) },
+    { id: 'p26_2', patientName: 'Sandra Alves', productName: 'Gestrinona 20mg', dose: '20mg', route: 'Implante SC', status: 'scheduled', date: d(26) },
+    // ── Day 27 ──
+    { id: 'p27_1', patientName: 'Luciana Ferreira', productName: 'Testosterona 50mg + Pregnenolona', dose: '70mg', route: 'Implante SC', status: 'scheduled', date: d(27) },
+    { id: 'p27_2', patientName: 'Beatriz Souza', productName: 'Soroterapia Vitamina C', dose: '500ml', route: 'Intravenosa', status: 'scheduled', date: d(27) },
+    { id: 'p27_3', patientName: 'Ricardo Mendes', productName: 'Tirzepatida 7.5mg', dose: '7.5mg', route: 'Subcutânea', status: 'scheduled', date: d(27) },
 ];
 
 const WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
